@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaFood | Bebidas Tech</title>
+    <link rel="stylesheet" href="JAVAFOOD.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="code-overlay"></div>
+
+    <div class="kiosk-container">
+      <aside class="sidebar">
+        <div class="logo-area">
+          <img
+            src="Gemini_Generated_Image_7c63do7c63do7c63.png"
+            alt="Logo"
+            class="main-logo"
+          />
+          <h1 class="brand-name">Java<span class="brand-accent">Food</span></h1>
+        </div>
+
+        <nav class="nav-links">
+          <button class="nav-btn">🍱 MENÚS</button>
+          <button class="nav-btn">🍔 PRINCIPALES</button>
+          <button class="nav-btn">🍟 COMPLEMENTOS</button>
+          <button class="nav-btn">🍯 SALSAS</button>
+          <button class="nav-btn active">🥤 BEBIDAS</button>
+          <button class="nav-btn">🎂 POSTRES</button>
+        </nav>
+
+        <div class="cart-box">
+          <h3 class="cart-title">Tu Pedido</h3>
+          <div class="cart-items-list">
+            <div class="cart-item"></div>
+          </div>
+          <div class="total-row">
+            <span>Total:</span>
+            <span class="total-price">0.00€</span>
+          </div>
+          <button class="pay-btn">PAGAR AHORA</button>
+        </div>
+      </aside>
+
+      <main class="main-view">
+        <header class="top-info">
+          <span class="status-indicator"
+            >Explorando: <strong>BEBIDAS</strong></span
+          >
+        </header>
+
+        <div class="promo-banner drinks-theme">
+          <div class="promo-content">
+            <h2 class="promo-title">BEBIDAS <br /></h2>
+          </div>
+          <span class="promo-icon">🥤</span>
+        </div>
+
+        <div class="food-grid">
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/agua con gas.jpg" alt="Agua Con Gas" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Agua Con Gas [0.75 cl]</h4>
+              <div class="card-footer">
+                <span class="price">2.00€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/agua.jfif" alt="Agua" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Agua Natural [0.75 cl]</h4>
+              <div class="card-footer">
+                <span class="price">1.80€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/cerveza.jpg" alt="Cerveza" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Cerveza</h4>
+              <div class="card-footer">
+                <span class="price">2.20€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/coca-cola-lata-33cl.jpg" alt="Cola" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">CocaCola</h4>
+              <div class="card-footer">
+                <span class="price">2.50€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/0.jpg" alt="Cola 0" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">CocaCola Zero</h4>
+              <div class="card-footer">
+                <span class="price">2.50€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/cerveza sin.jpg" alt="servesa 0" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Cerveza Sin Alcohol</h4>
+              <div class="card-footer">
+                <span class="price">2.20€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/00.jpg" alt="Cola 00" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">CocaCola Zero Zero</h4>
+              <div class="card-footer">
+                <span class="price">2.50€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/light.jpg" alt="cola light" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">CocaCola Light</h4>
+              <div class="card-footer">
+                <span class="price">2.50€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img
+                src="Imagenes/Bebidas/fanta-de-naranja-330ml.jpg"
+                alt="Fanta Naranja"
+              />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Fanta de Naranja</h4>
+              <div class="card-footer">
+                <span class="price">2.50€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/aquarius.jfif" alt="Aquarius Limon" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Aquarius de Limon</h4>
+              <div class="card-footer">
+                <span class="price">3.00€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img
+                src="Imagenes/Bebidas/aquarius_naranja.jfif"
+                alt="Aquarius Naranja"
+              />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Aquarius de Naranja</h4>
+              <div class="card-footer">
+                <span class="price">3.00€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/fantalimon.jpg" alt="Fanta Limon" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Fanta de Limon</h4>
+              <div class="card-footer">
+                <span class="price">2.50€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/nestea-330-ml.jpg" alt="Nestea" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Nestea</h4>
+              <div class="card-footer">
+                <span class="price">3.00€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/sprite.jpg" alt="Sprite" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Sprite</h4>
+              <div class="card-footer">
+                <span class="price">2.50€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/cassalleta.webp" alt="Cassalla" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Anis Tenis [Chupito]</h4>
+              <div class="card-footer">
+                <span class="price">1.50€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/tinto.jpg" alt="Tinto de Verano" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Tinto de Verano</h4>
+              <div class="card-footer">
+                <span class="price">3.20€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img
+                src="Imagenes/Bebidas/tinto 00.jpg"
+                alt="Tinto de Verano 0"
+              />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Tinto de Verano Sin Alcohol</h4>
+              <div class="card-footer">
+                <span class="price">3.20€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img
+                src="Imagenes/Bebidas/aigua_val.webp"
+                alt="Aigua de Valencia"
+              />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Aigua de Valencia</h4>
+              <div class="card-footer">
+                <span class="price">3.50€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/trina.jpg" alt="Trina" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Trina</h4>
+              <div class="card-footer">
+                <span class="price">3.00€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img
+                src="Imagenes/Bebidas/zumodemelocoton.jpg"
+                alt="Zumo de Melocoton"
+              />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Zumo de Melocoton</h4>
+              <div class="card-footer">
+                <span class="price">2.00€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/zumodepiña.jfif" alt="Zumo de Piña" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Zumo de Piña</h4>
+              <div class="card-footer">
+                <span class="price">2.00€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/cafesolo.avif" alt="Cafe solo" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Café Solo</h4>
+              <div class="card-footer">
+                <span class="price">1.20€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/cafe_cortado.jpg" alt="cafe Cortado" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Café Cortado</h4>
+              <div class="card-footer">
+                <span class="price">1.40€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/cafe_leche.jpg" alt="Cafe Leche" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Café con Leche</h4>
+              <div class="card-footer">
+                <span class="price">1.60€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img
+                src="Imagenes/Bebidas/cafesolo.avif"
+                alt="Cafe solo Descafeinado"
+              />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Café Solo Descafeinado</h4>
+              <div class="card-footer">
+                <span class="price">1.20€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img
+                src="Imagenes/Bebidas/cafe_cortado.jpg"
+                alt="cafe Cortado Descafeinado"
+              />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Café Cortado Descafeinado</h4>
+              <div class="card-footer">
+                <span class="price">1.40€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img
+                src="Imagenes/Bebidas/cafe_leche.jpg"
+                alt="Cafe Leche Descafeinado"
+              />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Café con Leche Descafeinado</h4>
+              <div class="card-footer">
+                <span class="price">1.60€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/teverde.avif" alt="Te verde" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Te Verde</h4>
+              <div class="card-footer">
+                <span class="price">1.50€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/tenegro.jpg" alt="Te Negro" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Te Negro</h4>
+              <div class="card-footer">
+                <span class="price">1.50€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="image-container">
+              <img src="Imagenes/Bebidas/manzanilla.jpg" alt="Manzanilla" />
+            </div>
+            <div class="card-content">
+              <h4 class="product-name">Manzanilla</h4>
+              <div class="card-footer">
+                <span class="price">1.50€</span>
+                <button class="add-button">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  <script src="main.js"></script>
+  </body>
+</html>
