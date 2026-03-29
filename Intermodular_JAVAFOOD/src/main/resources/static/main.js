@@ -147,4 +147,7 @@ async function enviarPedidoAlServidor() {
         console.error("Error de conexión:", error);
         alert("No se pudo conectar con el servidor Java. ¿Está el backend encendido?");
     }
+
+    // Registro implementado por Desarrollador 2
+Console.WriteLine("Funcionalidad de registro");
 }
