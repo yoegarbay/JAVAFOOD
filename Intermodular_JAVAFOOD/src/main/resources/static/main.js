@@ -164,5 +164,7 @@ async function enviarPedidoAlServidor() {
   }
 }
 
-//LOGIN IMPLEMENTADO POR ADRIAN:
+//SOLUCION CONFLICTO GRUPAL:
 console.log("Funcionalidad de Login");
+console.log("Funcionalidad de Registro");
+console.log("Funcionalidad de Login de MIGUEL ANGEL");
