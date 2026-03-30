@@ -167,4 +167,8 @@ async function enviarPedidoAlServidor() {
 //SOLUCION CONFLICTO GRUPAL:
 console.log("Funcionalidad de Login");
 console.log("Funcionalidad de Registro");
+<<<<<<< HEAD
 console.log("Funcionalidad de Login de MIGUEL ANGEL");
+=======
+console.log("Funcionalidad de Login de MIGUEL ANGEL");
+>>>>>>> 470afcdfcbb1d5fd69e6b74149b44ca3a8f85b6b
