@@ -1,0 +1,113 @@
+/* General */
+body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: #0080ff;
+  display: flex;
+  justify-content: center;
+  padding-top: 50px;
+  margin: 0;
+}
+
+.main-container {
+  width: 90%;
+  max-width: 800px;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Título y Botón de Acceso */
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+  font-size: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+/* ARREGLO DEL BOTÓN VERDE (El enlace <a>) */
+h2 a {
+  text-decoration: none; /* Quita el subrayado */
+}
+
+h2 a button {
+  background-color: #05d008; /* Verde */
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background 0.3s ease;
+}
+
+h2 a button:hover {
+  background-color: #04b007;
+}
+
+/* Tabla */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+td {
+  padding: 20px;
+  border-bottom: 1px solid #d17a22;
+}
+
+.user-info {
+  font-size: 1.1rem;
+}
+
+.rol {
+  color: #888;
+  font-size: 0.9rem;
+  margin-left: 8px;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* Botones de acción */
+button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition:
+    transform 0.1s,
+    opacity 0.2s;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+.btn-blue {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-yellow {
+  background-color: #ffbf00;
+  color: white;
+}
+
+.btn-red {
+  background-color: #dc3545;
+  color: white;
+}
+
+button:hover {
+  opacity: 0.85;
+}
