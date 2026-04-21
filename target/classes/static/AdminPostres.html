@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaFood Admin - Gestión Postres</title>
+    <link rel="stylesheet" href="JAVAFOOD.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { overflow: hidden; }
+        .admin-header-box { background:var(--glass-bg); border:1px solid var(--primary-orange); border-radius:20px; padding:20px 25px; margin-bottom:20px; }
+        .section-title { color:var(--primary-orange); font-size:1.1rem; text-transform:uppercase; letter-spacing:2px; margin-bottom:15px; }
+        .admin-form-row { display:flex; gap:10px; flex-wrap:wrap; }
+        .input-name { flex:1; min-width:160px; padding:10px 14px; background:rgba(0,0,0,0.4); border:1px solid var(--primary-orange); color:white; border-radius:10px; font-family:inherit; font-size:0.9rem; outline:none; }
+        .input-price { width:130px; padding:10px 14px; background:rgba(0,0,0,0.4); border:1px solid var(--primary-orange); color:white; border-radius:10px; font-family:inherit; font-size:0.9rem; outline:none; }
+        .input-name::placeholder,.input-price::placeholder { color:rgba(245,232,211,0.4); }
+        .btn-orange-add { padding:10px 22px; background:var(--primary-orange); border:none; border-radius:10px; color:var(--coffee-dark); font-weight:900; cursor:pointer; font-family:inherit; font-size:0.9rem; letter-spacing:1px; transition:0.2s; white-space:nowrap; }
+        .btn-orange-add:hover { background:var(--cream); }
+        #admin-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:16px; }
+        .product-card { background:var(--glass-bg); border:1px solid rgba(209,122,34,0.25); border-radius:18px; overflow:hidden; transition:0.2s; }
+        .product-card:hover { border-color:var(--primary-orange); transform:translateY(-4px); }
+        .product-card img { width:100%; height:120px; object-fit:cover; display:block; }
+        .no-image { width:100%; height:120px; display:flex; align-items:center; justify-content:center; font-size:2.5rem; background:rgba(0,0,0,0.3); }
+        .card-footer { padding:10px 12px; display:flex; justify-content:space-between; align-items:center; }
+        .card-footer .info { flex:1; overflow:hidden; }
+        .p-title { font-size:0.85rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--cream); }
+        .price { color:var(--primary-orange); font-weight:bold; font-size:0.9rem; }
+        .actions { display:flex; gap:6px; flex-shrink:0; }
+        .btn-edit,.btn-borrar { width:30px; height:30px; border-radius:8px; border:none; cursor:pointer; font-size:0.8rem; display:flex; align-items:center; justify-content:center; transition:0.2s; }
+        .btn-edit { background:rgba(209,122,34,0.2); color:var(--primary-orange); border:1px solid var(--primary-orange); }
+        .btn-borrar { background:rgba(255,68,68,0.15); color:#ff6666; border:1px solid rgba(255,68,68,0.5); }
+        .btn-edit:hover { background:var(--primary-orange); color:var(--coffee-dark); }
+        .btn-borrar:hover { background:#ff4444; color:white; border-color:#ff4444; }
+        .admin-label { font-size:0.7rem; color:var(--primary-orange); letter-spacing:2px; margin-top:4px; }
+        .modal-label { display:block; margin:14px 0 5px; font-size:0.78rem; color:var(--primary-orange); text-align:left; font-weight:bold; text-transform:uppercase; letter-spacing:1px; }
+        .modal-input { width:100%; padding:11px; background:rgba(0,0,0,0.4); border:1px solid var(--primary-orange); color:white; border-radius:10px; font-family:inherit; outline:none; }
+        .cancel-btn { width:100%; padding:12px; background:transparent; border:1px solid rgba(245,232,211,0.3); border-radius:12px; color:var(--cream); font-weight:bold; cursor:pointer; margin-top:8px; font-family:inherit; transition:0.2s; }
+        .cancel-btn:hover { border-color:var(--primary-orange); color:var(--primary-orange); }
+        .admin-footer { position:fixed; bottom:0; left:0; right:0; background:rgba(43,27,18,0.95); border-top:1px solid var(--primary-orange); padding:10px 40px; backdrop-filter:blur(10px); z-index:100; }
+        .footer-content { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+        .footer-logo { font-size:1.3rem; font-weight:700; color:white; }
+        .footer-logo span { color:var(--primary-orange); }
+        .copy { font-size:0.75rem; margin-top:4px; }
+        #toast { position:fixed; top:20px; right:20px; background:var(--primary-orange); color:var(--coffee-dark); padding:12px 22px; border-radius:12px; font-weight:bold; font-size:0.9rem; opacity:0; transform:translateY(-20px); transition:0.3s; z-index:99999; pointer-events:none; }
+        #toast.show { opacity:1; transform:translateY(0); }
+        #toast.error { background:#ff4444; color:white; }
+        #toast.info { background:#3a7bd5; color:white; }
+        .loading-text { color:rgba(245,232,211,0.5); padding:30px; text-align:center; }
+        .notice-bar { background:rgba(58,123,213,0.15); border:1px solid rgba(58,123,213,0.4); border-radius:12px; padding:10px 16px; margin-bottom:16px; font-size:0.8rem; color:rgba(200,220,255,0.8); }
+    </style>
+</head>
+<body>
+    <div class="code-overlay"></div>
+    <div id="toast"></div>
+
+    <div class="kiosk-container" style="padding-bottom:60px;">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <h1>Java<span>Food</span></h1>
+                <p class="admin-label">ADMIN · POSTRES</p>
+            </div>
+            <nav class="nav-links">
+                <button class="nav-btn active">🎂 GESTIÓN POSTRES</button>
+                <button class="nav-btn" onclick="location.href='Postres.html'">👁️ VISTA PÚBLICA</button>
+                <button class="nav-btn" onclick="location.href='index.html'">🏠 INICIO</button>
+            </nav>
+            <div class="cart-box">
+                <h3 class="cart-title">Estado</h3>
+                <div class="total-row"><span>Total postres:</span><span id="total-count" style="color:var(--primary-orange);font-weight:bold;">—</span></div>
+                <div class="total-row" style="font-size:0.8rem;"><span>Fuente:</span><span id="data-source" style="color:#6fbf6f;font-size:0.75rem;">Cargando...</span></div>
+            </div>
+        </aside>
+
+        <main class="main-view">
+            <header class="admin-header-box">
+                <h2 class="section-title">➕ Añadir Nuevo Postre</h2>
+                <div class="admin-form-row">
+                    <input type="text"   id="new-name"  placeholder="Nombre del postre" class="input-name">
+                    <input type="number" step="0.01" id="new-price" placeholder="Precio (€)" class="input-price">
+                    <button class="btn-orange-add" onclick="addProduct()">AÑADIR</button>
+                </div>
+            </header>
+
+            <div id="notice-bar" class="notice-bar" style="display:none;">
+                ℹ️ Los postres se cargan desde la base de datos (categoría <strong>Postres</strong>). Si no hay registros, se muestran los datos predeterminados.
+            </div>
+
+            <div class="food-grid" id="admin-grid">
+                <p class="loading-text">Cargando postres...</p>
+            </div>
+        </main>
+    </div>
+
+    <footer class="admin-footer">
+        <div class="footer-content">
+            <div class="footer-logo">Java<span>Food</span></div>
+            <div><span style="color:white;">Desarrollado por:</span> <strong style="color:var(--primary-orange);">Yoel, Miguel y Adrian</strong></div>
+            <div><p class="copy"><span style="color:var(--primary-orange);">© 2026 Patente YMA-99.</span> <span style="color:white;">Todos los derechos reservados.</span></p></div>
+        </div>
+    </footer>
+
+    <div id="edit-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);z-index:9999;justify-content:center;align-items:center;">
+        <div class="modal-content">
+            <h2>Modificar Postre</h2>
+            <div class="modal-body">
+                <input type="hidden" id="edit-id">
+                <label class="modal-label">Nombre</label>
+                <input type="text" id="edit-name" class="modal-input">
+                <label class="modal-label">Precio (€)</label>
+                <input type="number" step="0.01" id="edit-price" class="modal-input">
+                <button class="confirm-btn" onclick="saveEdit()">ACTUALIZAR</button>
+                <button class="cancel-btn" onclick="closeEdit()">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Postres: la BD no tiene una categoría Postres con id_detalle propio todavía.
+        // Intentamos cargar desde /api/admin/peliculas filtrando por id_detalle=6 (si existe),
+        // si no hay resultados usamos el fallback local y permitimos añadir con id_detalle=6.
+        const ID_DETALLE_POSTRES = 6;
+        const API = '/api/admin/peliculas';
+
+        const IMAGENES = {
+            'JavaFusion Oreo y Chocolate Blanco': 'Imagenes/Postres/Brownie.png',
+            'JavaFusion Kinder Bueno y Nutella':  'Imagenes/Postres/Cheesecake.png',
+            'JavaFusion Huesitos y Caramelo':     'Imagenes/Postres/Helado.png',
+            'EuroCono':                           'Imagenes/Postres/Tarta_Manzana.png',
+            'Donut Relleno de Fresa':             'Imagenes/Postres/Batido.png',
+        };
+
+        // Fallback data from the original Postres.html
+        const FALLBACK = [
+            {id_producto:-1,nombre:'JavaFusion Oreo y Chocolate Blanco',precio:3.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-2,nombre:'JavaFusion Kinder Bueno y Nutella',precio:3.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-3,nombre:'JavaFusion Huesitos y Caramelo',precio:3.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-4,nombre:'EuroCono',precio:1.00,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-5,nombre:'Sundae',precio:2.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-6,nombre:'Sundae Chocolate',precio:2.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-7,nombre:'Sundae Chocolate Blanco',precio:2.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-8,nombre:'Sundae Caramelo',precio:2.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-9,nombre:'Sundae Fresa',precio:2.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-10,nombre:'Magdalena',precio:2.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-11,nombre:'Magdalena Chocolate',precio:2.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-12,nombre:'Donut',precio:1.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-13,nombre:'Donut Relleno de Chocolate',precio:3.00,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-14,nombre:'Donut Relleno de Crema',precio:3.00,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-15,nombre:'Donut Relleno de Fresa',precio:3.00,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-16,nombre:'Batido de Bacon y Llave Ácida',precio:4.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-17,nombre:'Batido de Oreo',precio:4.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-18,nombre:'Batido Fresa y Nata',precio:4.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-19,nombre:'Batido Kit Kat',precio:4.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-20,nombre:'Batido Plátano y Caramelo',precio:4.50,id_detalle:ID_DETALLE_POSTRES},
+            {id_producto:-21,nombre:'Tarta de Queso',precio:3.50,id_detalle:ID_DETALLE_POSTRES},
+        ];
+
+        async function apiFetch(url, opts={}) {
+            const res = await fetch(url, {headers:{'Content-Type':'application/json'},...opts});
+            if (!res.ok) throw new Error('HTTP '+res.status);
+            if (res.status===204) return null;
+            return res.json();
+        }
+        function showToast(msg,err=false,info=false) {
+            const t=document.getElementById('toast');
+            t.textContent=msg;
+            t.className = err?'show error':info?'show info':'show';
+            setTimeout(()=>{t.className='';},2800);
+        }
+
+        function renderGrid(productos, fromDB) {
+            document.getElementById('total-count').textContent = productos.length;
+            document.getElementById('data-source').textContent = fromDB ? 'Base de datos' : 'Datos locales';
+            if (fromDB) document.getElementById('notice-bar').style.display='block';
+
+            const grid = document.getElementById('admin-grid');
+            if (!productos.length) { grid.innerHTML='<p class="loading-text">Sin postres disponibles.</p>'; return; }
+            grid.innerHTML = productos.map(p => {
+                const src = IMAGENES[p.nombre] || '';
+                const imgHTML = src
+                    ? `<img src="${src}" alt="${p.nombre}" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'>🍰</div>'">`
+                    : `<div class="no-image">🍰</div>`;
+                const isDB = p.id_producto > 0;
+                return `<div class="product-card" data-id="${p.id_producto}">
+                    ${imgHTML}
+                    <div class="card-footer">
+                        <div class="info">
+                            <h4 class="p-title" title="${p.nombre}">${p.nombre}</h4>
+                            <span class="price">${Number(p.precio).toFixed(2)}€</span>
+                        </div>
+                        <div class="actions">
+                            ${isDB ? `<button class="btn-edit" onclick="openEdit(${p.id_producto},'${p.nombre.replace(/'/g,"\\'")}',${p.precio})">✏️</button>
+                            <button class="btn-borrar" onclick="deleteProduct(${p.id_producto})">×</button>` : `<span style="font-size:0.65rem;color:rgba(245,232,211,0.4);">local</span>`}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function load() {
+            try {
+                const all = await apiFetch(API);
+                const postres = all.filter(p => p.id_detalle === ID_DETALLE_POSTRES);
+                if (postres.length > 0) {
+                    renderGrid(postres, true);
+                } else {
+                    renderGrid(FALLBACK, false);
+                    showToast('ℹ️ Sin postres en BD — mostrando datos locales', false, true);
+                }
+            } catch(e) {
+                renderGrid(FALLBACK, false);
+                showToast('Sin conexión — mostrando datos locales', false, true);
+            }
+        }
+
+        async function addProduct() {
+            const nombre=document.getElementById('new-name').value.trim();
+            const precio=parseFloat(document.getElementById('new-price').value);
+            if (!nombre) { showToast('Escribe el nombre',true); return; }
+            if (isNaN(precio)||precio<=0) { showToast('Precio inválido',true); return; }
+            try {
+                await apiFetch(API,{method:'POST',body:JSON.stringify({nombre,precio,id_detalle:ID_DETALLE_POSTRES})});
+                document.getElementById('new-name').value='';
+                document.getElementById('new-price').value='';
+                showToast(`✅ "${nombre}" añadido`);
+                load();
+            } catch(e) { showToast('Error al añadir (asegúrate de que id_detalle=6 existe en BD)',true); }
+        }
+
+        async function deleteProduct(id) {
+            if (id<0) { showToast('Este producto es local, no está en BD',true); return; }
+            const card=document.querySelector(`.product-card[data-id="${id}"]`);
+            const nombre=card?card.querySelector('.p-title').textContent:`#${id}`;
+            if (!confirm(`¿Eliminar "${nombre}"?`)) return;
+            try {
+                await apiFetch(`${API}/${id}`,{method:'DELETE'});
+                showToast(`🗑️ "${nombre}" eliminado`);
+                load();
+            } catch(e) { showToast('Error al eliminar',true); }
+        }
+
+        function openEdit(id,nombre,precio) {
+            document.getElementById('edit-id').value=id;
+            document.getElementById('edit-name').value=nombre;
+            document.getElementById('edit-price').value=Number(precio).toFixed(2);
+            document.getElementById('edit-modal').style.display='flex';
+        }
+        function closeEdit() { document.getElementById('edit-modal').style.display='none'; }
+        async function saveEdit() {
+            const id=parseInt(document.getElementById('edit-id').value);
+            const nombre=document.getElementById('edit-name').value.trim();
+            const precio=parseFloat(document.getElementById('edit-price').value);
+            if (!nombre) { showToast('Nombre vacío',true); return; }
+            if (isNaN(precio)||precio<=0) { showToast('Precio inválido',true); return; }
+            try {
+                await apiFetch(`${API}/${id}`,{method:'PUT',body:JSON.stringify({nombre,precio,id_detalle:ID_DETALLE_POSTRES})});
+                closeEdit(); showToast(`✏️ "${nombre}" actualizado`); load();
+            } catch(e) { showToast('Error al actualizar',true); }
+        }
+        document.getElementById('edit-modal').addEventListener('click',function(e){if(e.target===this)closeEdit();});
+        document.getElementById('new-price').addEventListener('keydown',e=>{if(e.key==='Enter')addProduct();});
+        document.getElementById('new-name').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('new-price').focus();});
+        load();
+    </script>
+</body>
+</html>

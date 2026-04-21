@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaFood | Postres Sweet Tech</title>
+    <link rel="stylesheet" href="JAVAFOOD.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="code-overlay"></div>
+
+    <div class="kiosk-container">
+      <aside class="sidebar">
+        <div class="logo-area">
+          <img
+            src="Gemini_Generated_Image_7c63do7c63do7c63.jpg"
+            alt="Logo"
+            class="main-logo"
+          />
+          <h1>Java<span>Food</span></h1>
+        </div>
+
+        <nav class="nav-links">
+          <button class="nav-btn">🍱 MENÚS</button>
+          <button class="nav-btn">🍔 PRINCIPALES</button>
+          <button class="nav-btn">🍟 COMPLEMENTOS</button>
+          <button class="nav-btn">🍯 SALSAS</button>
+          <button class="nav-btn">🥤 BEBIDAS</button>
+          <button class="nav-btn active">🎂 POSTRES</button>
+        </nav>
+
+        <div class="cart-box">
+          <h3>Tu Pedido</h3>
+          <div id="cart-items-container" class="cart-items-scroll"></div>
+
+          <div class="total-row">
+            <span>Total:</span>
+            <span class="total-price">0.00€</span>
+          </div>
+          <button class="pay-btn">PAGAR AHORA</button>
+          <button id="clear-cart" class="clear-btn">Vaciar pedido</button>
+        </div>
+      </aside>
+
+      <main class="main-view">
+        <header class="top-info">
+          <span>Explorando: <strong>POSTRES</strong></span>
+        <a href="AdminPostres.html" style="
+                    display:inline-flex;align-items:center;gap:5px;
+                    padding:5px 13px;border-radius:20px;font-size:0.72rem;
+                    font-weight:700;letter-spacing:1px;text-decoration:none;
+                    background:linear-gradient(135deg,rgba(209,122,34,0.15),rgba(209,122,34,0.05));
+                    border:1px solid var(--primary-orange);color:var(--primary-orange);
+                    box-shadow:0 0 10px rgba(209,122,34,0.2);font-family:inherit;transition:all 0.2s;"
+                onmouseover="this.style.background='var(--primary-orange)';this.style.color='#2b1b12';"
+                onmouseout="this.style.background='linear-gradient(135deg,rgba(209,122,34,0.15),rgba(209,122,34,0.05))';this.style.color='var(--primary-orange)';">
+                    ⚙️ ADMIN
+                </a>
+        </header>
+
+        <div class="promo-banner secondary">
+          <div class="promo-content">
+            <h2>NUESTROS <br /><span>POSTRES</span></h2>
+            <p>El cierre perfecto para tu ejecución.</p>
+          </div>
+          <span style="font-size: 80px">🍰</span>
+        </div>
+
+        <div class="food-grid">
+          <div class="card" data-name="Helado Oreo">
+            <img src="Imagenes/Postres/Brownie.png" alt="Helados" />
+            <div class="card-body">
+              <h4>JavaFusion Oreo y Chocolate Blanco</h4>
+              <div class="card-price">
+                <span>3.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="Cheesecake" data-price="5.50">
+            <img src="Imagenes/Postres/Cheesecake.png" alt="Helados" />
+            <div class="card-body">
+              <h4>JavaFusion Kinder Bueno y Nutella</h4>
+              <div class="card-price">
+                <span>3.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="Helado" data-price="3.20">
+            <img src="Imagenes/Postres/Helado.png" alt="Helados" />
+            <div class="card-body">
+              <h4>JavaFusion Huesitos y Caramelo</h4>
+              <div class="card-price">
+                <span>3.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="Cono" data-price="4.00">
+            <img src="Imagenes/Postres/Tarta_Manzana.png" alt="Helados" />
+            <div class="card-body">
+              <h4>EuroCono</h4>
+              <div class="card-price">
+                <span>1.00€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="helado" data-price="3.50">
+            <img src="" alt="Helados" />
+            <div class="card-body">
+              <h4>Sundae</h4>
+              <div class="card-price">
+                <span>2.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="helado" data-price="3.50">
+            <img src="" alt="Helados" />
+            <div class="card-body">
+              <h4>Sundae Chocolate</h4>
+              <div class="card-price">
+                <span>2.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="helado" data-price="3.50">
+            <img src="" alt="Helados" />
+            <div class="card-body">
+              <h4>Sundae Chocolate Blanco</h4>
+              <div class="card-price">
+                <span>2.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="helado" data-price="3.50">
+            <img src="" alt="Helados" />
+            <div class="card-body">
+              <h4>Sundae Caramelo</h4>
+              <div class="card-price">
+                <span>2.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="helado" data-price="3.50">
+            <img src="" alt="Helados" />
+            <div class="card-body">
+              <h4>Sundae Fresa</h4>
+              <div class="card-price">
+                <span>2.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="muffins" data-price="3.50">
+            <img src="" alt="Donuts" />
+            <div class="card-body">
+              <h4>Magdalena</h4>
+              <div class="card-price">
+                <span>2.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="muffins" data-price="3.50">
+            <img src="" alt="Donuts" />
+            <div class="card-body">
+              <h4>Magdalena Chocolate</h4>
+              <div class="card-price">
+                <span>2.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="Donut" data-price="3.50">
+            <img src="" alt="Donuts" />
+            <div class="card-body">
+              <h4>Donut</h4>
+              <div class="card-price">
+                <span>1.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="relleno chocolate" data-price="3.50">
+            <img src="" alt="Donuts" />
+            <div class="card-body">
+              <h4>Donut Relleno de Chocolate</h4>
+              <div class="card-price">
+                <span>3.00€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="relleno crema" data-price="3.50">
+            <img src="" alt="Donuts" />
+            <div class="card-body">
+              <h4>Donut Relleno de Crema</h4>
+              <div class="card-price">
+                <span>3.00€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="relleno fresa" data-price="4.80">
+            <img src="Imagenes/Postres/Batido.png" alt="Batido" />
+            <div class="card-body">
+              <h4>Donut Relleno de Fresa</h4>
+              <div class="card-price">
+                <span>3.00€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="batido bacon" data-price="3.50">
+            <img src="" alt="Donuts" />
+            <div class="card-body">
+              <h4>Batido de Bacon y Llave Ácida</h4>
+              <div class="card-price">
+                <span>4.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="batido oreo" data-price="3.50">
+            <img src="" alt="Donuts" />
+            <div class="card-body">
+              <h4>Batido de Oreo</h4>
+              <div class="card-price">
+                <span>4.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="batido fresa" data-price="3.50">
+            <img src="" alt="Donuts" />
+            <div class="card-body">
+              <h4>Batido Fresa y Nata</h4>
+              <div class="card-price">
+                <span>4.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="batido kitkat" data-price="3.50">
+            <img src="" alt="Donuts" />
+            <div class="card-body">
+              <h4>Batido Kit kat</h4>
+              <div class="card-price">
+                <span>4.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="batido platano" data-price="3.50">
+            <img src="" alt="Donuts" />
+            <div class="card-body">
+              <h4>Batido Plátano y Caramelo</h4>
+              <div class="card-price">
+                <span>4.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-name="Tarta de queso" data-price="3.50">
+            <img src="" alt="Tarta" />
+            <div class="card-body">
+              <h4>Tarta de Queso</h4>
+              <div class="card-price">
+                <span>3.50€</span>
+                <button class="add-btn">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

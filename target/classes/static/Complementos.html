@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaFood | Complementos Tech</title>
+    <link rel="stylesheet" href="JAVAFOOD.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="code-overlay"></div>
+    <div class="kiosk-container">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <img src="Gemini_Generated_Image_7c63do7c63do7c63.jpg" alt="Logo" class="main-logo">
+                <h1>Java<span>Food</span></h1>
+            </div>
+            <nav class="nav-links">
+                <button class="nav-btn">🍱 MENÚS</button>
+                <button class="nav-btn">🍔 PRINCIPALES</button>
+                <button class="nav-btn active">🍟 COMPLEMENTOS</button>
+                <button class="nav-btn" onclick="location.href='Salsas.html'">🍯 SALSAS</button>
+                <button class="nav-btn" onclick="location.href='Bebidas.html'">🥤 BEBIDAS</button>
+                <button class="nav-btn">🎂 POSTRES</button>
+            </nav>
+            <div class="cart-box">
+                <h3 class="cart-title">Tu Pedido</h3>
+                <div class="cart-items-list"></div>
+                <div class="total-row">
+                    <span>Total:</span>
+                    <span class="total-price">0.00€</span>
+                </div>
+                <button class="pay-btn">PAGAR AHORA</button>
+            </div>
+        </aside>
+        <main class="main-view">
+            <header class="top-info" style="position:relative;">
+                <span>Explorando: <strong>COMPLEMENTOS</strong></span>
+                <span class="highlight" id="contador-comp">Cargando...</span>
+                <a href="AdminComplementos.html" style="
+                    display: inline-flex; align-items: center; gap: 5px;
+                    padding: 5px 13px; border-radius: 20px; font-size: 0.72rem;
+                    font-weight: 700; letter-spacing: 1px; text-decoration: none;
+                    background: linear-gradient(135deg, rgba(209,122,34,0.15), rgba(209,122,34,0.05));
+                    border: 1px solid var(--primary-orange);
+                    color: var(--primary-orange);
+                    box-shadow: 0 0 10px rgba(209,122,34,0.2);
+                    font-family: inherit; transition: all 0.2s;
+                " onmouseover="this.style.background='var(--primary-orange)';this.style.color='#2b1b12';"
+                   onmouseout="this.style.background='linear-gradient(135deg,rgba(209,122,34,0.15),rgba(209,122,34,0.05))';this.style.color='var(--primary-orange)';">
+                    ⚙️ ADMIN
+                </a>
+            </header>
+            <div class="promo-banner secondary">
+                <div class="promo-content">
+                    <h2>EXTRA <br><span>CRUNCHY BITS</span></h2>
+                    <p>El push definitivo para tu menú.</p>
+                </div>
+                <span style="font-size: 80px;">🍟</span>
+            </div>
+            <div class="search-container">
+                <input type="text" id="buscador" placeholder="Busca tu side favorito..." oninput="filtrarProductos()">
+                <button>🔍</button>
+            </div>
+            <div class="food-grid" id="grid-comp">
+                <p style="color:#aaa; padding:20px;">Cargando complementos desde el servidor...</p>
+            </div>
+        </main>
+    </div>
+<script src="main.js"></script>
+<script>
+    // Mapa EXACTO: nombre en BD → nombre del archivo PNG en static/Imagenes/Complementos/
+    const imagenesComp = {
+        'Java Fries':                       'Java Fries.png',
+        'Nuggets (6 uds)':                  'Nuggets (6 uds).png',
+        'Aros de Cebolla':                  'Aros de Cebolla.png',
+        'Ensalada':                         'Ensalada.png',
+        'Alitas (4 uds)':                   'Alitas (4 uds).png',
+        'Nachos':                           'Nachos.png',
+        'Croquetas':                        'Croquetas.png',
+        'Patatas Gajo':                     'Patatas Gajo.png',
+        'Bolas de queso con mermelada':     'Bolas de queso con mermelada.png'
+    };
+
+    async function cargarComplementos() {
+        try {
+            const res = await fetch('/api/productos/categoria/Complementos');
+            if (!res.ok) throw new Error('Error HTTP ' + res.status);
+            const productos = await res.json();
+
+            const grid = document.getElementById('grid-comp');
+            document.getElementById('contador-comp').textContent = productos.length + ' Complementos Disponibles';
+
+            if (productos.length === 0) {
+                grid.innerHTML = '<p style="color:#aaa;padding:20px;">No hay complementos disponibles.</p>';
+                return;
+            }
+
+            grid.innerHTML = productos.map(p => {
+                const archivo = imagenesComp[p.nombre];
+                // Construir URL sin encodeURIComponent — Spring Boot sirve espacios y paréntesis bien
+                const src = archivo ? 'Imagenes/Complementos/' + archivo : '';
+                return `
+                    <div class="card">
+                        <img src="${src}" alt="${p.nombre}"
+                             style="width:100%;height:140px;object-fit:cover;border-radius:15px;"
+                             onerror="this.style.display='none'">
+                        <div class="card-body">
+                            <h4>${p.nombre}</h4>
+                            <div class="card-price">
+                                <span>${p.precio.toFixed(2)}€</span>
+                                <button>+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+        } catch (e) {
+            console.error('Error cargando complementos:', e);
+            cargarFallback();
+        }
+    }
+
+    function cargarFallback() {
+        const items = [
+            { nombre: 'Java Fries',                     precio: 3.50 },
+            { nombre: 'Nuggets (6 uds)',                 precio: 5.20 },
+            { nombre: 'Aros de Cebolla',                 precio: 4.00 },
+            { nombre: 'Ensalada',                        precio: 4.50 },
+            { nombre: 'Alitas (4 uds)',                  precio: 6.00 },
+            { nombre: 'Nachos',                          precio: 4.80 },
+            { nombre: 'Croquetas',                       precio: 3.90 },
+            { nombre: 'Patatas Gajo',                    precio: 3.75 },
+            { nombre: 'Bolas de queso con mermelada',    precio: 5.50 }
+        ];
+        const grid = document.getElementById('grid-comp');
+        document.getElementById('contador-comp').textContent = items.length + ' Complementos Disponibles';
+        grid.innerHTML = items.map(p => {
+            const archivo = imagenesComp[p.nombre];
+            const src = archivo ? 'Imagenes/Complementos/' + archivo : '';
+            return `
+                <div class="card">
+                    <img src="${src}" alt="${p.nombre}"
+                         style="width:100%;height:140px;object-fit:cover;border-radius:15px;"
+                         onerror="this.style.display='none'">
+                    <div class="card-body">
+                        <h4>${p.nombre}</h4>
+                        <div class="card-price">
+                            <span>${p.precio.toFixed(2)}€</span>
+                            <button>+</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function filtrarProductos() {
+        const texto = document.getElementById('buscador').value.toLowerCase();
+        document.querySelectorAll('#grid-comp .card').forEach(card => {
+            const nombre = card.querySelector('h4').textContent.toLowerCase();
+            card.style.display = nombre.includes(texto) ? '' : 'none';
+        });
+    }
+
+    cargarComplementos();
+</script>
+</body>
+</html>

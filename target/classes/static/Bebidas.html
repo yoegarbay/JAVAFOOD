@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaFood | Bebidas Tech</title>
+    <link rel="stylesheet" href="JAVAFOOD.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="code-overlay"></div>
+    <div class="kiosk-container">
+      <aside class="sidebar">
+        <div class="logo-area">
+          <img src="Gemini_Generated_Image_7c63do7c63do7c63.png" alt="Logo" class="main-logo" />
+          <h1 class="brand-name">Java<span class="brand-accent">Food</span></h1>
+        </div>
+        <nav class="nav-links">
+          <button class="nav-btn">🍱 MENÚS</button>
+          <button class="nav-btn">🍔 PRINCIPALES</button>
+          <button class="nav-btn" onclick="location.href='Complementos.html'">🍟 COMPLEMENTOS</button>
+          <button class="nav-btn" onclick="location.href='Salsas.html'">🍯 SALSAS</button>
+          <button class="nav-btn active">🥤 BEBIDAS</button>
+          <button class="nav-btn">🎂 POSTRES</button>
+        </nav>
+        <div class="cart-box">
+          <h3 class="cart-title">Tu Pedido</h3>
+          <div class="cart-items-list"></div>
+          <div class="total-row">
+            <span>Total:</span>
+            <span class="total-price">0.00€</span>
+          </div>
+          <button class="pay-btn">PAGAR AHORA</button>
+        </div>
+      </aside>
+      <main class="main-view">
+        <header class="top-info">
+          <span class="status-indicator">Explorando: <strong>BEBIDAS</strong></span>
+          <span class="highlight" id="contador-bebidas">Cargando...</span>
+        <a href="AdminBebidas.html" style="
+                    display:inline-flex;align-items:center;gap:5px;
+                    padding:5px 13px;border-radius:20px;font-size:0.72rem;
+                    font-weight:700;letter-spacing:1px;text-decoration:none;
+                    background:linear-gradient(135deg,rgba(209,122,34,0.15),rgba(209,122,34,0.05));
+                    border:1px solid var(--primary-orange);color:var(--primary-orange);
+                    box-shadow:0 0 10px rgba(209,122,34,0.2);font-family:inherit;transition:all 0.2s;"
+                onmouseover="this.style.background='var(--primary-orange)';this.style.color='#2b1b12';"
+                onmouseout="this.style.background='linear-gradient(135deg,rgba(209,122,34,0.15),rgba(209,122,34,0.05))';this.style.color='var(--primary-orange)';">
+                    ⚙️ ADMIN
+                </a>
+        </header>
+        <div class="promo-banner drinks-theme">
+          <div class="promo-content">
+            <h2 class="promo-title">BEBIDAS <br /></h2>
+          </div>
+          <span class="promo-icon">🥤</span>
+        </div>
+        <div class="food-grid" id="grid-bebidas">
+          <p style="color:#aaa; padding:20px;">Cargando bebidas desde el servidor...</p>
+        </div>
+      </main>
+    </div>
+
+    <!-- Mapa nombre producto → archivo imagen (coincide con los nombres del SQL) -->
+    <script>
+      const imagenesBebidas = {
+        'Agua Con Gas [0.75 cl]':          'agua con gas.jpg',
+        'Agua Natural [0.75 cl]':           'agua.jfif',
+        'CocaCola':                         'coca-cola-lata-33cl.jpg',
+        'CocaCola Zero':                    '0.jpg',
+        'CocaCola Zero Zero':               '00.jpg',
+        'CocaCola Light':                   'light.jpg',
+        'Fanta de Naranja':                 'fanta-de-naranja-330ml.jpg',
+        'Fanta de Limon':                   'fantalimon.jpg',
+        'Aquarius de Limon':                'aquarius.jfif',
+        'Aquarius de Naranja':              'aquarius_naranja.jfif',
+        'Nestea':                           'nestea-330-ml.jpg',
+        'Sprite':                           'sprite.jpg',
+        'Trina':                            'trina.jpg',
+        'Zumo de Melocoton':                'zumodemelocoton.jpg',
+        'Zumo de Piña':                     'zumodepiña.jfif',
+        'Cerveza':                          'cerveza.jpg',
+        'Cerveza Sin Alcohol':              'cerveza sin.jpg',
+        'Anis Tenis [Chupito]':             'cassalleta.webp',
+        'Tinto de Verano':                  'tinto.jpg',
+        'Tinto de Verano Sin Alcohol':      'tinto 00.jpg',
+        'Aigua de Valencia':                'aigua_val.webp',
+        'Café Solo':                        'cafesolo.avif',
+        'Café Cortado':                     'cafe_cortado.jpg',
+        'Café con Leche':                   'cafe_leche.jpg',
+        'Café Solo Descafeinado':           'cafesolo.avif',
+        'Café Cortado Descafeinado':        'cafe_cortado.jpg',
+        'Café con Leche Descafeinado':      'cafe_leche.jpg',
+        'Te Verde':                         'teverde.avif',
+        'Te Negro':                         'tenegro.jpg',
+        'Manzanilla':                       'manzanilla.jpg'
+      };
+
+      async function cargarBebidas() {
+        try {
+          const res = await fetch('/api/productos/categoria/Bebidas');
+          if (!res.ok) throw new Error('Error HTTP ' + res.status);
+          const productos = await res.json();
+
+          const grid = document.getElementById('grid-bebidas');
+          document.getElementById('contador-bebidas').textContent = productos.length + ' Bebidas Disponibles';
+
+          if (productos.length === 0) {
+            grid.innerHTML = '<p style="color:#aaa;padding:20px;">No hay bebidas disponibles.</p>';
+            return;
+          }
+
+          grid.innerHTML = productos.map(p => {
+            const img = imagenesBebidas[p.nombre] || '';
+            const src = img ? `Imagenes/Bebidas/${img}` : '';
+            return `
+              <div class="product-card">
+                <div class="image-container">
+                  <img src="${src}" onerror="this.src=''" alt="${p.nombre}" />
+                </div>
+                <div class="card-content">
+                  <h4 class="product-name">${p.nombre}</h4>
+                  <div class="card-footer">
+                    <span class="price">${p.precio.toFixed(2)}€</span>
+                    <button class="add-button">+</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+        } catch (e) {
+          console.error('Error cargando bebidas desde la API:', e);
+          // Fallback con datos del SQL para no dejar la pantalla vacía
+          cargarBebidasFallback();
+        }
+      }
+
+      function cargarBebidasFallback() {
+        const bebidas = [
+          { nombre: 'Agua Con Gas [0.75 cl]', precio: 2.00 },
+          { nombre: 'Agua Natural [0.75 cl]', precio: 1.80 },
+          { nombre: 'CocaCola', precio: 2.50 },
+          { nombre: 'CocaCola Zero', precio: 2.50 },
+          { nombre: 'CocaCola Zero Zero', precio: 2.50 },
+          { nombre: 'CocaCola Light', precio: 2.50 },
+          { nombre: 'Fanta de Naranja', precio: 2.50 },
+          { nombre: 'Fanta de Limon', precio: 2.50 },
+          { nombre: 'Aquarius de Limon', precio: 3.00 },
+          { nombre: 'Aquarius de Naranja', precio: 3.00 },
+          { nombre: 'Nestea', precio: 3.00 },
+          { nombre: 'Sprite', precio: 2.50 },
+          { nombre: 'Trina', precio: 3.00 },
+          { nombre: 'Zumo de Melocoton', precio: 2.00 },
+          { nombre: 'Zumo de Piña', precio: 2.00 },
+          { nombre: 'Cerveza', precio: 2.20 },
+          { nombre: 'Cerveza Sin Alcohol', precio: 2.20 },
+          { nombre: 'Anis Tenis [Chupito]', precio: 1.50 },
+          { nombre: 'Tinto de Verano', precio: 3.20 },
+          { nombre: 'Tinto de Verano Sin Alcohol', precio: 3.20 },
+          { nombre: 'Aigua de Valencia', precio: 3.50 },
+          { nombre: 'Café Solo', precio: 1.20 },
+          { nombre: 'Café Cortado', precio: 1.40 },
+          { nombre: 'Café con Leche', precio: 1.60 },
+          { nombre: 'Café Solo Descafeinado', precio: 1.20 },
+          { nombre: 'Café Cortado Descafeinado', precio: 1.40 },
+          { nombre: 'Café con Leche Descafeinado', precio: 1.60 },
+          { nombre: 'Te Verde', precio: 1.50 },
+          { nombre: 'Te Negro', precio: 1.50 },
+          { nombre: 'Manzanilla', precio: 1.50 }
+        ];
+        const grid = document.getElementById('grid-bebidas');
+        document.getElementById('contador-bebidas').textContent = bebidas.length + ' Bebidas Disponibles';
+        grid.innerHTML = bebidas.map(p => {
+          const img = imagenesBebidas[p.nombre] || '';
+          const src = img ? `Imagenes/Bebidas/${img}` : '';
+          return `
+            <div class="product-card">
+              <div class="image-container">
+                <img src="${src}" onerror="this.src=''" alt="${p.nombre}" />
+              </div>
+              <div class="card-content">
+                <h4 class="product-name">${p.nombre}</h4>
+                <div class="card-footer">
+                  <span class="price">${p.precio.toFixed(2)}€</span>
+                  <button class="add-button">+</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      cargarBebidas();
+    </script>
+    <script src="main.js"></script>
+  </body>
+</html>

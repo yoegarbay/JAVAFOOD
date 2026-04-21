@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaFood Admin - Gestión Bebidas</title>
+    <link rel="stylesheet" href="JAVAFOOD.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { overflow: hidden; }
+        .admin-label { font-size:.7rem; color:var(--primary-orange); letter-spacing:2px; margin-top:4px; }
+        .admin-header-box { background:var(--glass-bg); border:1px solid var(--primary-orange); border-radius:20px; padding:20px 25px; margin-bottom:16px; }
+        .section-title { color:var(--primary-orange); font-size:1rem; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; }
+        .admin-form-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+        .input-name { flex:1; min-width:150px; padding:10px 14px; background:rgba(0,0,0,0.4); border:1px solid var(--primary-orange); color:white; border-radius:10px; font-family:inherit; font-size:.88rem; outline:none; }
+        .input-price { width:110px; padding:10px 14px; background:rgba(0,0,0,0.4); border:1px solid var(--primary-orange); color:white; border-radius:10px; font-family:inherit; font-size:.88rem; outline:none; }
+        .input-select { padding:10px 14px; background:rgba(0,0,0,0.4); border:1px solid var(--primary-orange); color:white; border-radius:10px; font-family:inherit; font-size:.88rem; outline:none; }
+        .input-select option, .modal-input option { background:#2b1b12; }
+        .input-name::placeholder,.input-price::placeholder { color:rgba(245,232,211,.35); }
+        .btn-orange-add { padding:10px 20px; background:var(--primary-orange); border:none; border-radius:10px; color:var(--coffee-dark); font-weight:900; cursor:pointer; font-family:inherit; font-size:.88rem; letter-spacing:1px; transition:.2s; white-space:nowrap; }
+        .btn-orange-add:hover { background:var(--cream); }
+        .filter-tabs { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+        .tab-btn { padding:6px 16px; border-radius:20px; border:1px solid rgba(209,122,34,.4); background:transparent; color:var(--cream); font-family:inherit; font-size:.78rem; cursor:pointer; transition:.2s; }
+        .tab-btn.active,.tab-btn:hover { background:var(--primary-orange); color:var(--coffee-dark); font-weight:bold; border-color:var(--primary-orange); }
+        #admin-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(195px,1fr)); gap:14px; }
+        .product-card { background:var(--glass-bg); border:1px solid rgba(209,122,34,.25); border-radius:18px; overflow:hidden; transition:.2s; }
+        .product-card:hover { border-color:var(--primary-orange); transform:translateY(-4px); }
+        .product-card img { width:100%; height:115px; object-fit:cover; display:block; }
+        .no-image { width:100%; height:115px; display:flex; align-items:center; justify-content:center; font-size:2.8rem; background:rgba(0,0,0,.3); }
+        .card-footer { padding:10px 12px; display:flex; justify-content:space-between; align-items:center; }
+        .card-footer .info { flex:1; overflow:hidden; min-width:0; }
+        .p-title { font-size:.82rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--cream); }
+        .p-cat { font-size:.68rem; color:rgba(209,122,34,.7); margin-top:2px; }
+        .price { color:var(--primary-orange); font-weight:bold; font-size:.88rem; }
+        .actions { display:flex; gap:5px; flex-shrink:0; margin-left:6px; }
+        .btn-edit,.btn-borrar { width:30px; height:30px; border-radius:8px; border:none; cursor:pointer; font-size:.8rem; display:flex; align-items:center; justify-content:center; transition:.2s; }
+        .btn-edit { background:rgba(209,122,34,.2); color:var(--primary-orange); border:1px solid var(--primary-orange); }
+        .btn-borrar { background:rgba(255,68,68,.15); color:#ff6666; border:1px solid rgba(255,68,68,.5); }
+        .btn-edit:hover { background:var(--primary-orange); color:var(--coffee-dark); }
+        .btn-borrar:hover { background:#ff4444; color:white; border-color:#ff4444; }
+        .modal-label { display:block; margin:14px 0 5px; font-size:.78rem; color:var(--primary-orange); text-align:left; font-weight:bold; text-transform:uppercase; letter-spacing:1px; }
+        .modal-input { width:100%; padding:11px; background:rgba(0,0,0,.4); border:1px solid var(--primary-orange); color:white; border-radius:10px; font-family:inherit; outline:none; }
+        .cancel-btn { width:100%; padding:12px; background:transparent; border:1px solid rgba(245,232,211,.3); border-radius:12px; color:var(--cream); font-weight:bold; cursor:pointer; margin-top:8px; font-family:inherit; transition:.2s; }
+        .cancel-btn:hover { border-color:var(--primary-orange); color:var(--primary-orange); }
+        .admin-footer { position:fixed; bottom:0; left:0; right:0; background:rgba(43,27,18,.95); border-top:1px solid var(--primary-orange); padding:10px 40px; backdrop-filter:blur(10px); z-index:100; }
+        .footer-content { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+        .footer-logo { font-size:1.3rem; font-weight:700; color:white; }
+        .footer-logo span { color:var(--primary-orange); }
+        .copy { font-size:.75rem; margin-top:4px; }
+        #toast { position:fixed; top:20px; right:20px; background:var(--primary-orange); color:var(--coffee-dark); padding:12px 22px; border-radius:12px; font-weight:bold; font-size:.9rem; opacity:0; transform:translateY(-20px); transition:.3s; z-index:99999; pointer-events:none; }
+        #toast.show { opacity:1; transform:translateY(0); }
+        #toast.error { background:#ff4444; color:white; }
+        .loading-text { color:rgba(245,232,211,.5); padding:30px; text-align:center; grid-column:1/-1; }
+    </style>
+</head>
+<body>
+    <div class="code-overlay"></div>
+    <div id="toast"></div>
+
+    <div class="kiosk-container" style="padding-bottom:60px;">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <h1>Java<span>Food</span></h1>
+                <p class="admin-label">ADMIN · BEBIDAS</p>
+            </div>
+            <nav class="nav-links">
+                <button class="nav-btn active">🥤 GESTIÓN BEBIDAS</button>
+                <button class="nav-btn" onclick="location.href='Bebidas.html'">👁️ VISTA PÚBLICA</button>
+                <button class="nav-btn" onclick="location.href='index.html'">🏠 INICIO</button>
+            </nav>
+            <div class="cart-box">
+                <h3 class="cart-title">Estado</h3>
+                <div class="total-row"><span>Total bebidas:</span><span id="total-count" style="color:var(--primary-orange);font-weight:bold;">—</span></div>
+                <div class="total-row" style="font-size:.8rem;"><span>Mostrando:</span><span id="showing-count" style="color:#6fbf6f;">—</span></div>
+            </div>
+        </aside>
+
+        <main class="main-view">
+            <header class="admin-header-box">
+                <h2 class="section-title">➕ Añadir Nueva Bebida</h2>
+                <div class="admin-form-row">
+                    <input type="text"   id="new-name"     placeholder="Nombre de la bebida" class="input-name">
+                    <input type="number" id="new-price" step="0.01" placeholder="Precio (€)" class="input-price">
+                    <select id="new-detalle" class="input-select">
+                        <option value="1">💧 Refrescos y Aguas</option>
+                        <option value="2">🍺 Cervezas y Alcohol</option>
+                        <option value="3">☕ Cafés e Infusiones</option>
+                    </select>
+                    <button class="btn-orange-add" onclick="addProduct()">AÑADIR</button>
+                </div>
+            </header>
+
+            <div class="filter-tabs">
+                <button class="tab-btn active" onclick="setFilter(0,this)">🥤 Todas</button>
+                <button class="tab-btn"        onclick="setFilter(1,this)">💧 Refrescos</button>
+                <button class="tab-btn"        onclick="setFilter(2,this)">🍺 Alcohol</button>
+                <button class="tab-btn"        onclick="setFilter(3,this)">☕ Cafés</button>
+            </div>
+
+            <div id="admin-grid">
+                <p class="loading-text">Cargando bebidas desde la base de datos...</p>
+            </div>
+        </main>
+    </div>
+
+    <footer class="admin-footer">
+        <div class="footer-content">
+            <div class="footer-logo">Java<span>Food</span></div>
+            <div><span style="color:white;">Desarrollado por:</span> <strong style="color:var(--primary-orange);">Yoel, Miguel y Adrian</strong></div>
+            <div><p class="copy"><span style="color:var(--primary-orange);">© 2026 Patente YMA-99.</span> <span style="color:white;">Todos los derechos reservados.</span></p></div>
+        </div>
+    </footer>
+
+    <!-- Modal editar — usa las clases CSS de JAVAFOOD.css -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal-content">
+            <h2>Modificar Bebida</h2>
+            <div class="modal-body">
+                <input type="hidden" id="edit-id">
+                <label class="modal-label">Nombre</label>
+                <input type="text" id="edit-name" class="modal-input" placeholder="Nombre">
+                <label class="modal-label">Precio (€)</label>
+                <input type="number" step="0.01" id="edit-price" class="modal-input" placeholder="0.00">
+                <label class="modal-label">Subcategoría</label>
+                <select id="edit-detalle" class="modal-input">
+                    <option value="1">💧 Refrescos y Aguas</option>
+                    <option value="2">🍺 Cervezas y Alcohol</option>
+                    <option value="3">☕ Cafés e Infusiones</option>
+                </select>
+                <button class="confirm-btn" onclick="saveEdit()">ACTUALIZAR</button>
+                <button class="cancel-btn"  onclick="closeEdit()">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const IMAGENES = {
+            'Agua Con Gas [0.75 cl]':'agua con gas.jpg','Agua Natural [0.75 cl]':'agua.jfif',
+            'CocaCola':'coca-cola-lata-33cl.jpg','CocaCola Zero':'0.jpg',
+            'CocaCola Zero Zero':'00.jpg','CocaCola Light':'light.jpg',
+            'Fanta de Naranja':'fanta-de-naranja-330ml.jpg','Fanta de Limon':'fantalimon.jpg',
+            'Aquarius de Limon':'aquarius.jfif','Aquarius de Naranja':'aquarius_naranja.jfif',
+            'Nestea':'nestea-330-ml.jpg','Sprite':'sprite.jpg','Trina':'trina.jpg',
+            'Zumo de Melocoton':'zumodemelocoton.jpg','Zumo de Piña':'zumodepina.jfif',
+            'Cerveza':'cerveza.jpg','Cerveza Sin Alcohol':'cerveza sin.jpg',
+            'Anis Tenis [Chupito]':'cassalleta.webp',
+            'Tinto de Verano':'tinto.jpg','Tinto de Verano Sin Alcohol':'tinto 00.jpg',
+            'Aigua de Valencia':'aigua_val.webp',
+            'Café Solo':'cafesolo.avif','Café Cortado':'cafe_cortado.jpg','Café con Leche':'cafe_leche.jpg',
+            'Café Solo Descafeinado':'cafesolo.avif','Café Cortado Descafeinado':'cafe_cortado.jpg',
+            'Café con Leche Descafeinado':'cafe_leche.jpg',
+            'Te Verde':'teverde.avif','Te Negro':'tenegro.jpg','Manzanilla':'manzanilla.jpg'
+        };
+        const CATS = {1:'💧 Refrescos',2:'🍺 Alcohol',3:'☕ Cafés'};
+        const BEB_IDS = [1,2,3];
+        const API = '/api/admin/peliculas';
+        let allProducts = [], activeFilter = 0;
+
+        async function apiFetch(url, opts={}) {
+            const res = await fetch(url, {headers:{'Content-Type':'application/json'},...opts});
+            if (!res.ok) throw new Error('HTTP '+res.status);
+            if (res.status===204) return null;
+            return res.json();
+        }
+        function toast(msg, err=false) {
+            const t=document.getElementById('toast');
+            t.textContent=msg; t.className=err?'show error':'show';
+            setTimeout(()=>{t.className='';},2800);
+        }
+        function setFilter(id,btn) {
+            activeFilter=id;
+            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active'); renderGrid();
+        }
+        function renderGrid() {
+            const list = activeFilter===0 ? allProducts : allProducts.filter(p=>p.id_detalle===activeFilter);
+            document.getElementById('showing-count').textContent=list.length;
+            const grid=document.getElementById('admin-grid');
+            if (!list.length){grid.innerHTML='<p class="loading-text">Sin resultados.</p>';return;}
+            grid.innerHTML=list.map(p=>{
+                const file=IMAGENES[p.nombre];
+                const imgHTML=file
+                    ?`<img src="Imagenes/Bebidas/${file}" alt="${p.nombre}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="no-image" style="display:none">🥤</div>`
+                    :`<div class="no-image">🥤</div>`;
+                const ns=p.nombre.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+                return `<div class="product-card" data-id="${p.id_producto}">
+                    ${imgHTML}
+                    <div class="card-footer">
+                        <div class="info">
+                            <h4 class="p-title" title="${p.nombre}">${p.nombre}</h4>
+                            <p class="p-cat">${CATS[p.id_detalle]||''}</p>
+                            <span class="price">${Number(p.precio).toFixed(2)}€</span>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-edit"   onclick="openEdit(${p.id_producto},'${ns}',${p.precio},${p.id_detalle})">✏️</button>
+                            <button class="btn-borrar" onclick="deleteProduct(${p.id_producto})">×</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+        async function load() {
+            try {
+                const all=await apiFetch(API);
+                allProducts=all.filter(p=>BEB_IDS.includes(p.id_detalle));
+                document.getElementById('total-count').textContent=allProducts.length;
+                document.getElementById('showing-count').textContent=allProducts.length;
+                renderGrid();
+            } catch(e) {
+                document.getElementById('admin-grid').innerHTML='<p class="loading-text" style="color:#ff6666;">⚠️ Error conectando. ¿Está Spring Boot corriendo?</p>';
+                toast('Error al cargar',true);
+            }
+        }
+        async function addProduct() {
+            const nombre=document.getElementById('new-name').value.trim();
+            const precio=parseFloat(document.getElementById('new-price').value);
+            const id_detalle=parseInt(document.getElementById('new-detalle').value);
+            if (!nombre){toast('Escribe el nombre',true);return;}
+            if (isNaN(precio)||precio<=0){toast('Precio inválido',true);return;}
+            try {
+                await apiFetch(API,{method:'POST',body:JSON.stringify({nombre,precio,id_detalle})});
+                document.getElementById('new-name').value='';
+                document.getElementById('new-price').value='';
+                toast(`✅ "${nombre}" añadida`); load();
+            } catch(e){toast('Error al añadir',true);}
+        }
+        async function deleteProduct(id) {
+            const card=document.querySelector(`.product-card[data-id="${id}"]`);
+            const nombre=card?card.querySelector('.p-title').textContent:`#${id}`;
+            if (!confirm(`¿Eliminar "${nombre}"?`)) return;
+            try {
+                await apiFetch(`${API}/${id}`,{method:'DELETE'});
+                toast(`🗑️ "${nombre}" eliminada`); load();
+            } catch(e){toast('Error al eliminar',true);}
+        }
+        function openEdit(id,nombre,precio,id_detalle) {
+            document.getElementById('edit-id').value=id;
+            document.getElementById('edit-name').value=nombre;
+            document.getElementById('edit-price').value=Number(precio).toFixed(2);
+            document.getElementById('edit-detalle').value=id_detalle;
+            document.getElementById('edit-modal').style.display='flex';
+        }
+        function closeEdit(){document.getElementById('edit-modal').style.display='none';}
+        async function saveEdit() {
+            const id=parseInt(document.getElementById('edit-id').value);
+            const nombre=document.getElementById('edit-name').value.trim();
+            const precio=parseFloat(document.getElementById('edit-price').value);
+            const id_detalle=parseInt(document.getElementById('edit-detalle').value);
+            if (!nombre){toast('Nombre vacío',true);return;}
+            if (isNaN(precio)||precio<=0){toast('Precio inválido',true);return;}
+            try {
+                await apiFetch(`${API}/${id}`,{method:'PUT',body:JSON.stringify({nombre,precio,id_detalle})});
+                closeEdit(); toast(`✏️ "${nombre}" actualizada`); load();
+            } catch(e){toast('Error al actualizar',true);}
+        }
+        document.getElementById('edit-modal').addEventListener('click',function(e){if(e.target===this)closeEdit();});
+        document.getElementById('new-name').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('new-price').focus();});
+        document.getElementById('new-price').addEventListener('keydown',e=>{if(e.key==='Enter')addProduct();});
+        load();
+    </script>
+</body>
+</html>
