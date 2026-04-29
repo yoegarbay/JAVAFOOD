@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Usuarios</title>
+  <link rel="stylesheet" href="/css/webAdmin.css" />
+</head>
+
+<body>
+  <div class="main-container">
+
+    <h2>
+      ADMINISTRACIÓN DE USUARIOS
+      <div class="header-actions">
+        <a href="WEB" class="btn-green">🔗 Sitio Web</a>
+        <button onclick="abrirModalAdd()">➕ Añadir usuario</button>
+      </div>
+    </h2>
+
+    <!-- ================= MODAL AÑADIR ================= -->
+    <div id="modalAdd" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Añadir usuario</h3>
+
+        <input type="text" id="nombre" placeholder="Nombre">
+        <input type="text" id="apellidos" placeholder="Apellidos">
+        <input type="text" id="direccion" placeholder="Dirección">
+        <input type="tel" id="telefono" placeholder="Teléfono">
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Contraseña">
+
+        <div class="modal-footer">
+          
+          <button id="cancelAdd" class="btn-close">Cancelar</button>
+		  <button onclick="crearUsuario()" class="btn-green">Guardar</button>
+		  </div>
+      </div>
+    </div>
+
+    <table>
+      <tbody id="tablaUsuarios"></tbody>
+    </table>
+
+  </div>
+
+  <!-- ================= MODAL DELETE ================= -->
+  <div id="modalDelete" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Eliminar usuario</h3>
+      <p>¿Seguro que quieres eliminar este usuario?</p>
+      <div class="modal-footer">
+        <button id="cancelDelete">Cancelar</button>
+        <button id="confirmDelete" class="btn-red">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL EDIT ================= -->
+  <div id="modalEdit" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Editar usuario</h3>
+      <input id="editNombre" placeholder="Nombre">
+      <input id="editApellidos" placeholder="Apellidos">
+      <input id="editDireccion" placeholder="Dirección">
+      <input id="editTelefono" placeholder="Teléfono">
+      <input id="editEmail" placeholder="Email">
+      <div class="modal-footer">
+        <button id="cancelEdit">Cancelar</button>
+        <button id="saveEdit" class="btn-green">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL ROLE ================= -->
+  <div id="modalRole" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Cambiar rol</h3>
+      <div class="roles-container">
+        <label><input type="radio" name="rol" value="ADMIN"> Administrador</label>
+        <label><input type="radio" name="rol" value="EMPLEADO"> Empleado</label>
+        <label><input type="radio" name="rol" value="CLIENTE"> Cliente</label>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelRole">Cancelar</button>
+        <button id="saveRole" class="btn-green">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL VIEW ================= -->
+  <div id="modalView" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Detalles del usuario</h3>
+      <div id="infoUsuario" class="info-container"></div>
+      <div class="modal-footer">
+        <button id="closeView" class="btn-close">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/sitioAdmin/webAdmin.js"></script>
+</body>
+</html>
