@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaFood | Pago</title>
+    <link rel="stylesheet" href="JAVAFOOD.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- Estilos específicos de la pantalla de pago -->
+    <style>
+        /* ── Contenedor principal de la pantalla de pago ── */
+        .pago-wrapper {
+            display: flex;
+            gap: 24px;
+            padding: 30px;
+            min-height: 100vh;
+            background: #0d0d0d;
+            color: #e0e0e0;
+            font-family: 'Space Grotesk', sans-serif;
+            box-sizing: border-box;
+        }
+
+        /* ── Panel izquierdo: resumen del carrito ── */
+        .pago-resumen {
+            flex: 1;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 28px;
+            max-width: 480px;
+        }
+
+        .pago-resumen h2 {
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            color: #00e5ff;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 12px;
+        }
+
+        /* Tabla de ítems del carrito */
+        .resumen-tabla {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+        }
+        .resumen-tabla th {
+            text-align: left;
+            font-size: 0.75rem;
+            color: #888;
+            padding: 8px 4px;
+            border-bottom: 1px solid #2a2a2a;
+            letter-spacing: 1px;
+        }
+        .resumen-tabla td {
+            padding: 10px 4px;
+            border-bottom: 1px solid #1f1f1f;
+            font-size: 0.88rem;
+        }
+        .resumen-tabla td:last-child {
+            text-align: right;
+            color: #00e5ff;
+        }
+
+        /* Fila del total */
+        .resumen-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            padding: 14px 4px 0;
+            border-top: 1px solid #444;
+            margin-top: 10px;
+        }
+        .resumen-total span:last-child {
+            color: #00e5ff;
+        }
+
+        /* ── Panel derecho: formulario de pago ── */
+        .pago-formulario {
+            flex: 1;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 28px;
+            max-width: 480px;
+        }
+
+        .pago-formulario h2 {
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            color: #00e5ff;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 12px;
+        }
+
+        /* Grupos de campos del formulario */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 12px 14px;
+            color: #e0e0e0;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #00e5ff;
+        }
+
+        /* Selector de método de pago (tarjetas visuales) */
+        .metodos-pago {
+            display: flex;
+            gap: 12px;
+        }
+        .metodo-card {
+            flex: 1;
+            background: #111;
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            user-select: none;
+        }
+        .metodo-card.activo {
+            border-color: #00e5ff;
+            background: #0a2a2a;
+        }
+        .metodo-card span {
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 6px;
+        }
+        .metodo-card p {
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        /* Sección de datos de tarjeta (aparece solo si seleccionan TARJETA) */
+        #seccion-tarjeta {
+            display: none;
+            margin-top: 6px;
+        }
+        #seccion-tarjeta.visible {
+            display: block;
+        }
+
+        /* Botones de acción */
+        .btn-confirmar {
+            width: 100%;
+            background: #00e5ff;
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            padding: 16px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .btn-confirmar:hover    { background: #00b8cc; }
+        .btn-confirmar:active   { transform: scale(0.98); }
+        .btn-confirmar:disabled { background: #333; color: #666; cursor: not-allowed; }
+
+        .btn-volver {
+            width: 100%;
+            background: transparent;
+            border: 1px solid #555;
+            border-radius: 10px;
+            padding: 13px;
+            color: #aaa;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .btn-volver:hover { border-color: #aaa; color: #fff; }
+
+        /* ── Modal de confirmación ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        .modal-overlay.visible { display: flex; }
+        .modal-content {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 14px;
+            padding: 36px 32px;
+            max-width: 380px;
+            width: 90%;
+            text-align: center;
+        }
+        .modal-content h2 {
+            font-size: 1.4rem;
+            margin-bottom: 16px;
+            letter-spacing: 2px;
+        }
+        .modal-content p {
+            color: #aaa;
+            line-height: 1.8;
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+            white-space: pre-line;
+        }
+        .modal-ok-btn {
+            background: #00e5ff;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 13px 40px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            letter-spacing: 2px;
+        }
+
+        /* ── Carrito vacío ── */
+        .carrito-vacio {
+            text-align: center;
+            padding: 40px 20px;
+            color: #555;
+        }
+        .carrito-vacio span { font-size: 3rem; display: block; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+    <div class="code-overlay"></div>
+
+    <div class="pago-wrapper">
+
+        <!-- ══════════════════════════════════
+             PANEL IZQUIERDO — Resumen pedido
+        ═══════════════════════════════════ -->
+        <section class="pago-resumen">
+            <h2>🛒 RESUMEN DEL PEDIDO</h2>
+            <div id="resumen-contenido">
+                <!-- Se rellena con pago.js -->
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════
+             PANEL DERECHO — Formulario pago
+        ═══════════════════════════════════ -->
+        <section class="pago-formulario">
+            <h2>💳 DATOS DE PAGO</h2>
+
+            <!-- Nombre del cliente -->
+            <div class="form-group">
+                <label>NOMBRE DEL CLIENTE</label>
+                <input type="text" id="input-nombre"
+                       placeholder="Ej: María García"
+                       maxlength="100"
+                       autocomplete="off">
+            </div>
+
+            <!-- Selección método de pago -->
+            <div class="form-group">
+                <label>MÉTODO DE PAGO</label>
+                <div class="metodos-pago">
+                    <div class="metodo-card activo" id="btn-efectivo"
+                         onclick="seleccionarMetodo('EFECTIVO')">
+                        <span>💵</span>
+                        <p>EFECTIVO</p>
+                    </div>
+                    <div class="metodo-card" id="btn-tarjeta"
+                         onclick="seleccionarMetodo('TARJETA')">
+                        <span>💳</span>
+                        <p>TARJETA</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datos de tarjeta (visible solo si elige TARJETA) -->
+            <div id="seccion-tarjeta">
+                <div class="form-group">
+                    <label>NÚMERO DE TARJETA</label>
+                    <input type="text" id="input-numero-tarjeta"
+                           placeholder="0000 0000 0000 0000"
+                           maxlength="19"
+                           oninput="formatearTarjeta(this)">
+                </div>
+                <div class="form-group">
+                    <label>NOMBRE EN LA TARJETA</label>
+                    <input type="text" id="input-nombre-tarjeta"
+                           placeholder="Nombre Apellido"
+                           maxlength="60">
+                </div>
+                <div style="display:flex; gap:12px;">
+                    <div class="form-group" style="flex:1;">
+                        <label>CADUCIDAD</label>
+                        <input type="text" id="input-caducidad"
+                               placeholder="MM/AA"
+                               maxlength="5"
+                               oninput="formatearCaducidad(this)">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>CVV</label>
+                        <input type="password" id="input-cvv"
+                               placeholder="•••"
+                               maxlength="4">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <button class="btn-confirmar" id="btn-pagar" onclick="confirmarPago()">
+                CONFIRMAR PAGO
+            </button>
+            <button class="btn-volver" onclick="history.back()">
+                ← VOLVER AL MENÚ
+            </button>
+        </section>
+    </div>
+
+    <!-- ══════════════════════════════════
+         Modal de confirmación / error
+    ═══════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-resultado">
+        <div class="modal-content">
+            <h2 id="modal-titulo">✅ PEDIDO CONFIRMADO</h2>
+            <p id="modal-mensaje"></p>
+            <button class="modal-ok-btn" onclick="cerrarModal()">ACEPTAR</button>
+        </div>
+    </div>
+
+    <script src="pago.js"></script>
+</body>
+</html>

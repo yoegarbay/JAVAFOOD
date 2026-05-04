@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaFood | Gestión Complementos</title>
+    <link rel="stylesheet" href="JAVAFOOD.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="code-overlay"></div>
+    <div class="kiosk-container">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <img src="Gemini_Generated_Image_7c63do7c63do7c63.jpg" alt="Logo" class="main-logo">
+                <h1>Java<span>Food</span></h1>
+            </div>
+            <nav class="nav-links">
+                <button class="nav-btn">🍱 MENÚS</button>
+                <button class="nav-btn">🍔 PRINCIPALES</button>
+                <button class="nav-btn active">🍟 COMPLEMENTOS</button>
+                <button class="nav-btn" onclick="location.href='Salsas.html'">🍯 SALSAS</button>
+                <button class="nav-btn" onclick="location.href='Bebidas.html'">🥤 BEBIDAS</button>
+                <button class="nav-btn">🎂 POSTRES</button>
+            </nav>
+            <div class="cart-box">
+                <h3 class="cart-title">Tu Pedido</h3>
+                <div class="cart-items-list"></div>
+                <div class="total-row">
+                    <span>Total:</span>
+                    <span class="total-price">0.00€</span>
+                </div>
+                <button class="pay-btn" id="btn-pagar-principal">PAGAR AHORA</button>
+            </div>
+        </aside>
+
+        <main class="main-view">
+            <header class="top-info">
+                <span>Panel de Control: <strong>COMPLEMENTOS</strong></span>
+                <span class="highlight" id="contador-comp">Conectando...</span>
+            </header>
+
+            <div class="search-container">
+                <input type="text" id="buscador" placeholder="Buscar producto..." oninput="filtrarProductos()">
+            </div>
+
+            <div class="food-grid" id="grid-comp">
+                <p style="color:#aaa; padding:20px;">Cargando productos...</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

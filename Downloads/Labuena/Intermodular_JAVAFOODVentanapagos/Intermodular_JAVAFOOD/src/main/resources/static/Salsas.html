@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaFood | Salsas & Dips</title>
+    <link rel="stylesheet" href="JAVAFOOD.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="code-overlay"></div>
+    <div class="kiosk-container">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <img src="Gemini_Generated_Image_7c63do7c63do7c63.jpg" alt="Logo" class="main-logo">
+                <h1>Java<span>Food</span></h1>
+            </div>
+            <nav class="nav-links">
+                <button class="nav-btn">🍱 MENÚS</button>
+                <button class="nav-btn">🍔 PRINCIPALES</button>
+                <button class="nav-btn" onclick="location.href='Complementos.html'">🍟 COMPLEMENTOS</button>
+                <button class="nav-btn active">🍯 SALSAS</button>
+                <button class="nav-btn" onclick="location.href='Bebidas.html'">🥤 BEBIDAS</button>
+                <button class="nav-btn">🎂 POSTRES</button>
+            </nav>
+            <div class="cart-box">
+                <h3 class="cart-title">Tu Pedido</h3>
+                <div class="cart-items-list"></div>
+                <div class="total-row">
+                    <span>Total:</span>
+                    <span class="total-price">0.00€</span>
+                </div>
+                <button class="pay-btn">PAGAR AHORA</button>
+            </div>
+        </aside>
+        <main class="main-view">
+            <header class="top-info">
+                <span>Explorando: <strong>SALSAS</strong></span>
+                <span class="highlight" id="contador-salsas">Cargando...</span>
+            </header>
+            <div class="promo-banner secondary">
+                <div class="promo-content">
+                    <h2>DIP YOUR <br><span>CODE IN STYLE</span></h2>
+                    <p>Salsas optimizadas para cada byte de tu menú.</p>
+                </div>
+                <span style="font-size: 80px;">🍯</span>
+            </div>
+            <div class="search-container">
+                <input type="text" id="buscador" placeholder="Busca tu salsa favorita..." oninput="filtrarProductos()">
+                <button>🔍</button>
+            </div>
+            <div class="food-grid" id="grid-salsas">
+                <p style="color:#aaa; padding:20px;">Cargando salsas desde el servidor...</p>
+            </div>
+        </main>
+    </div>
+<script src="main.js"></script>
+<script>
+    // Mapa de nombres de producto → imagen en la carpeta Salsas
+    const imagenesSalsas = {};
+
+    async function cargarSalsas() {
+        try {
+            const res = await fetch('/api/productos/categoria/Salsas');
+            if (!res.ok) throw new Error('Error HTTP ' + res.status);
+            const productos = await res.json();
+
+            const grid = document.getElementById('grid-salsas');
+            document.getElementById('contador-salsas').textContent = productos.length + ' Salsas Disponibles';
+
+            if (productos.length === 0) {
+                grid.innerHTML = '<p style="color:#aaa;padding:20px;">No hay salsas disponibles.</p>';
+                return;
+            }
+
+            grid.innerHTML = productos.map(p => `
+                <div class="card">
+                    <img src="Imagenes/Salsas/${encodeURIComponent(p.nombre)}.jpg"
+                         onerror="this.src=''" alt="${p.nombre}">
+                    <div class="card-body">
+                        <h4>${p.nombre}</h4>
+                        <div class="card-price">
+                            <span>${p.precio.toFixed(2)}€</span>
+                            <button>+</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        } catch (e) {
+            console.error('Error cargando salsas:', e);
+            // Fallback: mantener el HTML estático original si la API no está disponible
+            cargarSalsasFallback();
+        }
+    }
+
+    function cargarSalsasFallback() {
+        const salsas = [
+            { nombre: 'Ketchup', precio: 0.50 },
+            { nombre: 'Mayonesa', precio: 0.50 },
+            { nombre: 'Barbacoa', precio: 0.60 },
+            { nombre: 'Mostaza', precio: 0.50 },
+            { nombre: 'Alioli', precio: 0.70 },
+            { nombre: 'Salsa Brava', precio: 0.75 },
+            { nombre: 'Miel y Mostaza', precio: 0.80 },
+            { nombre: 'Ranch', precio: 0.80 },
+            { nombre: 'Cheddar', precio: 1.00 },
+            { nombre: 'Pesto', precio: 1.20 },
+            { nombre: 'Picante', precio: 0.90 },
+            { nombre: 'Teriyaki', precio: 1.10 },
+            { nombre: 'César', precio: 0.85 },
+            { nombre: 'Yogur', precio: 0.75 },
+            { nombre: 'Curry', precio: 0.80 },
+            { nombre: 'Sriracha', precio: 0.95 },
+            { nombre: 'Tártara', precio: 0.85 },
+            { nombre: 'Guacamole', precio: 1.50 },
+            { nombre: 'Soja', precio: 0.60 },
+            { nombre: 'Llave Ácida', precio: 1.25 }
+        ];
+        const grid = document.getElementById('grid-salsas');
+        document.getElementById('contador-salsas').textContent = salsas.length + ' Salsas Disponibles';
+        grid.innerHTML = salsas.map(p => `
+            <div class="card">
+                <img src="" alt="${p.nombre}">
+                <div class="card-body">
+                    <h4>${p.nombre}</h4>
+                    <div class="card-price">
+                        <span>${p.precio.toFixed(2)}€</span>
+                        <button>+</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function filtrarProductos() {
+        const texto = document.getElementById('buscador').value.toLowerCase();
+        document.querySelectorAll('#grid-salsas .card').forEach(card => {
+            const nombre = card.querySelector('h4').textContent.toLowerCase();
+            card.style.display = nombre.includes(texto) ? '' : 'none';
+        });
+    }
+
+    cargarSalsas();
+</script>
+</body>
+</html>

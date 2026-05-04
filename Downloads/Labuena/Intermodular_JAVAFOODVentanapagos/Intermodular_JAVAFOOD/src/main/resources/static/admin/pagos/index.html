@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAVAFOOD · Admin Pagos</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  /* ── Variables ─────────────────────────────────────────────── */
+  :root {
+    --orange:     #d17a22;
+    --dark:       #2b1b12;
+    --bg:         #0d0804;
+    --cream:      #f5e8d3;
+    --glass:      rgba(43,27,18,0.92);
+    --glow:       rgba(209,122,34,0.35);
+    --border:     rgba(209,122,34,0.25);
+    --red:        #e05555;
+    --green:      #4caf50;
+  }
+
+  * { font-family:'Space Grotesk',sans-serif; box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--cream); min-height:100vh; }
+
+  /* ── Navbar ────────────────────────────────────────────────── */
+  nav {
+    background:var(--glass);
+    border-bottom:2px solid var(--orange);
+    box-shadow:0 0 24px var(--glow);
+    padding:14px 32px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand { font-size:1.6rem; font-weight:900; color:#fff; text-decoration:none; }
+  .brand span { color:var(--orange); }
+  .nav-links a {
+    color:var(--cream); text-decoration:none; margin-left:22px;
+    font-weight:600; opacity:.6; transition:.2s; font-size:.9rem;
+  }
+  .nav-links a:hover, .nav-links a.active { color:var(--orange); opacity:1; }
+
+  /* ── Hero ──────────────────────────────────────────────────── */
+  .hero {
+    background:linear-gradient(135deg,#2b1b12 0%,#0d0804 100%);
+    border-bottom:1px solid var(--border);
+    padding:50px 32px 38px; text-align:center;
+  }
+  .hero h1 { font-size:2.4rem; font-weight:900; }
+  .hero h1 span { color:var(--orange); }
+  .hero p { opacity:.5; font-size:.95rem; margin-top:6px; }
+
+  /* ── Main container ────────────────────────────────────────── */
+  .main { max-width:920px; margin:0 auto; padding:36px 20px 80px; }
+
+  /* ── Stats row ─────────────────────────────────────────────── */
+  .stats {
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:14px; margin-bottom:30px;
+  }
+  .stat {
+    background:var(--glass); border:1px solid var(--border);
+    border-radius:16px; padding:22px; text-align:center;
+  }
+  .stat .num { font-size:2rem; font-weight:900; color:var(--orange); }
+  .stat .lbl { font-size:.7rem; opacity:.45; text-transform:uppercase; letter-spacing:1px; margin-top:5px; }
+
+  /* ── Buscador ──────────────────────────────────────────────── */
+  .search-bar {
+    background:var(--glass); border:1px solid var(--border);
+    border-radius:16px; padding:18px 24px; margin-bottom:26px;
+    display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+  }
+  .search-bar input {
+    flex:1; min-width:180px;
+    padding:10px 16px; background:rgba(0,0,0,.5);
+    border:1px solid rgba(209,122,34,.4); color:#fff;
+    border-radius:10px; font-family:inherit; font-size:.95rem;
+    outline:none; transition:.2s;
+  }
+  .search-bar input:focus { border-color:var(--orange); box-shadow:0 0 10px var(--glow); }
+  .search-bar input::placeholder { opacity:.4; }
+  .btn-primary {
+    padding:10px 22px;
+    background:linear-gradient(45deg,#d17a22,#f5e8d3);
+    color:var(--dark); font-weight:900; border:none;
+    border-radius:10px; cursor:pointer; font-size:.9rem;
+    transition:.2s; white-space:nowrap;
+  }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 0 18px var(--glow); }
+  .btn-ghost {
+    padding:10px 18px; background:transparent;
+    border:1px solid rgba(245,232,211,.15); color:var(--cream);
+    border-radius:10px; cursor:pointer; font-size:.88rem;
+    font-family:inherit; transition:.2s; white-space:nowrap;
+  }
+  .btn-ghost:hover { border-color:var(--orange); color:var(--orange); }
+
+  /* ── Tabla ─────────────────────────────────────────────────── */
+  .table-wrap {
+    background:var(--glass); border:1px solid var(--border);
+    border-radius:18px; overflow:hidden;
+  }
+  table { width:100%; border-collapse:collapse; }
+  thead { background:rgba(209,122,34,.12); }
+  th {
+    padding:14px 18px; text-align:left;
+    font-size:.72rem; text-transform:uppercase;
+    letter-spacing:1px; color:var(--orange); font-weight:700;
+  }
+  td {
+    padding:14px 18px; font-size:.92rem;
+    border-top:1px solid rgba(209,122,34,.07);
+    vertical-align:middle;
+  }
+  tr:hover td { background:rgba(209,122,34,.04); }
+
+  /* ── Badges ────────────────────────────────────────────────── */
+  .badge {
+    padding:4px 12px; border-radius:20px;
+    font-size:.75rem; font-weight:700; display:inline-block;
+  }
+  .badge-pagado  { background:rgba(76,175,80,.15); color:#4caf50; border:1px solid rgba(76,175,80,.3); }
+  .badge-pending { background:rgba(255,193,7,.15);  color:#ffc107; border:1px solid rgba(255,193,7,.3); }
+
+  /* ── Acciones ──────────────────────────────────────────────── */
+  .btn-ver {
+    padding:6px 14px; background:rgba(209,122,34,.12);
+    border:1px solid rgba(209,122,34,.3); color:var(--orange);
+    border-radius:8px; text-decoration:none; font-size:.82rem;
+    font-weight:700; transition:.2s;
+  }
+  .btn-ver:hover { background:rgba(209,122,34,.25); }
+  .btn-del {
+    padding:6px 14px; background:rgba(224,85,85,.08);
+    border:1px solid rgba(224,85,85,.25); color:var(--red);
+    border-radius:8px; font-size:.82rem; font-weight:700;
+    cursor:pointer; font-family:inherit; transition:.2s;
+  }
+  .btn-del:hover { background:rgba(224,85,85,.2); }
+
+  /* ── Empty / Spinner ───────────────────────────────────────── */
+  .empty { text-align:center; padding:60px 20px; opacity:.35; }
+  .empty .icon { font-size:3rem; display:block; margin-bottom:12px; }
+
+  .spinner-wrap { text-align:center; padding:60px; }
+  .spinner {
+    width:32px; height:32px;
+    border:3px solid rgba(209,122,34,.15);
+    border-top-color:var(--orange);
+    border-radius:50%; animation:spin .7s linear infinite;
+    margin:0 auto 12px;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  .total-cell { font-weight:700; color:var(--orange); }
+
+  @media(max-width:600px) {
+    .stats { grid-template-columns:repeat(2,1fr); }
+    th:nth-child(3), td:nth-child(3) { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/index.html" class="brand">JAVA<span>FOOD</span></a>
+  <div class="nav-links">
+    <a href="/index.html">Inicio</a>
+    <a href="/admin/peliculas/index.html">Productos</a>
+    <a href="/admin/pagos/index.html" class="active">Pagos</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Admin <span>Pagos</span></h1>
+  <p>Gestión completa de pedidos y cobros</p>
+</div>
+
+<div class="main">
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="num" id="stat-total">—</div>
+      <div class="lbl">Total pedidos</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="stat-importe">—</div>
+      <div class="lbl">Recaudado (€)</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="stat-hoy">—</div>
+      <div class="lbl">Pedidos hoy</div>
+    </div>
+  </div>
+
+  <!-- Buscador -->
+  <div class="search-bar">
+    <input id="input-buscar" type="text" placeholder="Buscar por nº pedido o estado…" oninput="filtrar()">
+    <button class="btn-ghost" onclick="limpiarFiltro()">Ver todos</button>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div id="loading" class="spinner-wrap">
+      <div class="spinner"></div>
+      <p style="opacity:.4">Cargando pedidos…</p>
+    </div>
+    <div id="empty" class="empty" style="display:none">
+      <span class="icon">📭</span>
+      <p>No hay pedidos que mostrar</p>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/index.js"></script>
+</body>
+</html>
