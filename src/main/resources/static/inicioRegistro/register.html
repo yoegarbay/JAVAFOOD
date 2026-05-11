@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaFood - Registro</title>
+    <link rel="stylesheet" href="/css/app.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <div class="code-overlay"></div>
+
+    <div
+      class="kiosk-container"
+      style="justify-content: center; align-items: center"
+    >
+      <div class="sidebar" style="width: 400px; margin: auto">
+        <div class="logo-area">
+          <h1>Java<span>Food</span></h1>
+          <p>Regístrate Aquí:</p>
+        </div>
+
+        <form class="form" action="/api/clientes" method="post">
+			<input name="nombre" id="nombre" type="text" placeholder="Nombre" required />
+			<input name="apellidos" id="apellidos" type="text" placeholder="Apellidos" required />
+			<input name="direccion" id="direccion" type="text" placeholder="Dirección" required />
+			<input name="telefono" id="telefono" type="tel" placeholder="Teléfono" required />
+			<input name="email" id="email" type="email" placeholder="Correo Electrónico" required />
+			<input name="contrasenya" id="password" type="password" placeholder="Contraseña" required />
+
+          <button type="submit" class="pay-btn">Registrarse</button>
+        </form>
+
+        <p style="margin-top: 15px; text-align: center">
+          ¿Ya tienes cuenta?
+          <a href="InicioSesion.html" class="link">Inicia sesión</a>
+        </p>
+
+        <p id="mensaje" class="message"></p>
+      </div>
+    </div>
+
+    <script src="/js/inicioRegistro/register.js"></script>
+  </body>
+</html>
