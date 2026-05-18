@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAVAFOOD · Editar Pedido</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange:#d17a22;--dark:#2b1b12;--bg:#0d0804;--cream:#f5e8d3;
+    --glass:rgba(43,27,18,0.92);--glow:rgba(209,122,34,0.35);--border:rgba(209,122,34,0.25);
+    --red:#e05555;--green:#4caf50;
+  }
+  *{font-family:'Space Grotesk',sans-serif;box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--cream);min-height:100vh;}
+  nav{background:var(--glass);border-bottom:2px solid var(--orange);box-shadow:0 0 24px var(--glow);
+      padding:14px 32px;display:flex;align-items:center;justify-content:space-between;}
+  .brand{font-size:1.6rem;font-weight:900;color:#fff;text-decoration:none;}
+  .brand span{color:var(--orange);}
+  .nav-back{color:var(--cream);text-decoration:none;opacity:.6;font-size:.9rem;font-weight:600;transition:.2s;}
+  .nav-back:hover{color:var(--orange);opacity:1;}
+  .page{max-width:620px;margin:40px auto;padding:0 20px 80px;}
+  .card{background:var(--glass);border:1px solid var(--border);border-radius:24px;overflow:hidden;
+        box-shadow:0 0 50px rgba(0,0,0,.6);}
+  .card-head{background:linear-gradient(135deg,#2b1b12,#1a0f07);border-bottom:1px solid var(--border);
+             padding:28px 30px;text-align:center;}
+  .card-head .emoji{font-size:2.5rem;display:block;margin-bottom:10px;}
+  .card-head h1{font-size:1.3rem;font-weight:900;}
+  .card-head h1 span{color:var(--orange);}
+  .card-head p{font-size:.8rem;opacity:.4;margin-top:5px;}
+  .card-body{padding:28px 30px;}
+  .section-title{font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--orange);
+                 font-weight:700;margin-bottom:12px;margin-top:20px;}
+  .section-title:first-child{margin-top:0;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:1px;
+               color:var(--orange);font-weight:700;margin-bottom:7px;}
+  .field input,.field select{width:100%;padding:11px 16px;background:rgba(0,0,0,.5);
+    border:1px solid rgba(209,122,34,.4);color:#fff;border-radius:10px;
+    font-family:inherit;font-size:.93rem;outline:none;transition:.2s;appearance:none;}
+  .field input:focus,.field select:focus{border-color:var(--orange);box-shadow:0 0 10px var(--glow);}
+  .field select option{background:#1a0f07;}
+  .field input::placeholder{opacity:.4;}
+  .info-row{font-size:.82rem;opacity:.45;margin-bottom:18px;}
+  hr.sep{border:none;border-top:1px solid var(--border);margin:20px 0;}
+  #lineas-wrap{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .linea-item{display:grid;grid-template-columns:2fr 70px 90px auto;
+              gap:8px;align-items:center;background:rgba(0,0,0,.3);
+              border:1px solid rgba(209,122,34,.1);border-radius:12px;padding:10px 14px;}
+  .linea-item select,.linea-item input{padding:8px 10px;background:rgba(0,0,0,.4);
+    border:1px solid rgba(209,122,34,.3);color:#fff;border-radius:8px;
+    font-family:inherit;font-size:.85rem;outline:none;transition:.2s;appearance:none;}
+  .linea-item select:focus,.linea-item input:focus{border-color:var(--orange);}
+  .linea-item select option{background:#1a0f07;}
+  .linea-item input::placeholder{opacity:.35;}
+  .btn-rm-linea{background:rgba(224,85,85,.1);border:1px solid rgba(224,85,85,.25);
+                color:var(--red);border-radius:8px;cursor:pointer;font-size:.9rem;
+                padding:6px 10px;transition:.2s;}
+  .btn-rm-linea:hover{background:rgba(224,85,85,.25);}
+  .btn-add-linea{width:100%;padding:10px;background:rgba(209,122,34,.08);
+                 border:1px dashed rgba(209,122,34,.35);color:var(--orange);
+                 border-radius:10px;cursor:pointer;font-family:inherit;
+                 font-size:.88rem;font-weight:700;transition:.2s;}
+  .btn-add-linea:hover{background:rgba(209,122,34,.18);}
+  .total-preview{background:rgba(209,122,34,.07);border:1px solid var(--border);
+                 border-radius:12px;padding:14px 18px;display:flex;
+                 justify-content:space-between;align-items:center;margin:16px 0 22px;}
+  .total-preview .lbl{font-size:.75rem;text-transform:uppercase;letter-spacing:1px;opacity:.5;}
+  .total-preview .num{font-size:1.6rem;font-weight:900;color:var(--orange);}
+  .btn-row{display:flex;gap:12px;}
+  .btn-save{flex:1;padding:14px;background:linear-gradient(45deg,#d17a22,#f5e8d3);
+            color:var(--dark);font-weight:900;border:none;border-radius:12px;
+            cursor:pointer;font-size:.95rem;font-family:inherit;transition:.2s;}
+  .btn-save:hover{transform:translateY(-2px);box-shadow:0 0 18px var(--glow);}
+  .btn-save:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+  .btn-cancel{flex:1;padding:14px;text-align:center;background:transparent;
+              border:1px solid var(--border);color:var(--cream);font-weight:700;
+              border-radius:12px;text-decoration:none;font-size:.95rem;transition:.2s;}
+  .btn-cancel:hover{border-color:var(--orange);color:var(--orange);}
+  .msg{padding:12px 16px;border-radius:10px;margin-top:16px;font-size:.88rem;
+       font-weight:600;text-align:center;display:none;}
+  .msg.ok {background:rgba(76,175,80,.15);border:1px solid rgba(76,175,80,.3);color:#4caf50;}
+  .msg.err{background:rgba(224,85,85,.15);border:1px solid rgba(224,85,85,.3);color:var(--red);}
+  .spinner{width:26px;height:26px;border:3px solid rgba(209,122,34,.2);
+           border-top-color:var(--orange);border-radius:50%;
+           animation:spin .7s linear infinite;margin:60px auto;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/index.html" class="brand">JAVA<span>FOOD</span></a>
+  <a href="index.html" class="nav-back">← Volver a Pagos</a>
+</nav>
+<div class="page">
+  <div id="loading" style="text-align:center;padding:60px"><div class="spinner"></div></div>
+  <div id="contenido" class="card" style="display:none">
+    <div class="card-head">
+      <span class="emoji">✏️</span>
+      <h1>Editar <span id="titulo-id">Pedido</span></h1>
+      <p>Modifica cualquier campo del pedido</p>
+    </div>
+    <div class="card-body">
+      <div class="info-row">📅 <span id="info-fecha">—</span></div>
+
+      <div class="section-title">Datos del cliente</div>
+      <div class="field">
+        <label>Nombre cliente</label>
+        <input id="inp-nombre" type="text" placeholder="Nombre del cliente">
+      </div>
+      <div class="field">
+        <label>Método de pago</label>
+        <select id="sel-metodo">
+          <option value="EFECTIVO">💵 EFECTIVO</option>
+          <option value="TARJETA">💳 TARJETA</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Estado</label>
+        <select id="sel-estado">
+          <option value="PAGADO">✅ PAGADO</option>
+          <option value="PENDIENTE">⏳ PENDIENTE</option>
+          <option value="CANCELADO">❌ CANCELADO</option>
+        </select>
+      </div>
+
+      <hr class="sep">
+      <div class="section-title">Productos del pedido</div>
+      <div id="lineas-wrap"></div>
+      <button class="btn-add-linea" onclick="addLinea()">＋ Añadir producto</button>
+
+      <div class="total-preview">
+        <div class="lbl">Total recalculado</div>
+        <div class="num" id="total-preview">0.00 €</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-save" id="btn-guardar" onclick="guardar()">💾 Guardar cambios</button>
+        <a href="index.html" class="btn-cancel">Cancelar</a>
+      </div>
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+</div>
+<script src="js/edit.js"></script>
+</body>
+</html>

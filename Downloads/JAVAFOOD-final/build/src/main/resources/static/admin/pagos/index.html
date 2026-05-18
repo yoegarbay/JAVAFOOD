@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAVAFOOD · Admin Pedidos</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #d17a22; --orange2: #f0932b;
+    --dark: #0d0804; --card: rgba(28,16,8,0.98);
+    --cream: #f5e8d3; --muted: rgba(245,232,211,0.42);
+    --border: rgba(209,122,34,0.20); --glow: rgba(209,122,34,0.28);
+    --green: #4caf50; --red: #e05555;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Space Grotesk', sans-serif; background: var(--dark); color: var(--cream); min-height: 100vh; }
+
+  nav {
+    background: rgba(18,10,4,.98); border-bottom: 2px solid var(--orange);
+    box-shadow: 0 0 28px var(--glow); padding: 13px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .brand { font-size: 1.4rem; font-weight: 900; color: #fff; text-decoration: none; }
+  .brand span { color: var(--orange); }
+  .brand small { font-size: .65rem; background: rgba(209,122,34,.18); color: var(--orange);
+    border-radius: 4px; padding: 2px 7px; margin-left: 8px; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; }
+  .nav-links a { color: var(--cream); text-decoration: none; margin-left: 18px;
+    font-weight: 600; opacity: .5; transition: .2s; font-size: .85rem; }
+  .nav-links a:hover, .nav-links a.active { color: var(--orange); opacity: 1; }
+
+  /* ── Stats bar ── */
+  .stats-bar {
+    background: linear-gradient(135deg, #1a0d06, #0d0804);
+    border-bottom: 1px solid var(--border);
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    padding: 0;
+  }
+  .stat-item {
+    padding: 20px 24px; border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-item .n { font-size: 1.9rem; font-weight: 900; color: var(--orange); line-height: 1; }
+  .stat-item .l { font-size: .65rem; text-transform: uppercase; letter-spacing: .09em; opacity: .35; margin-top: 5px; }
+
+  /* ── Toolbar ── */
+  .toolbar {
+    max-width: 1100px; margin: 24px auto 0; padding: 0 24px;
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  }
+  .search-wrap { flex: 1; min-width: 200px; position: relative; }
+  .search-wrap svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); opacity: .35; pointer-events: none; }
+  .search-wrap input {
+    width: 100%; background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--cream); padding: 9px 12px 9px 38px;
+    font-family: inherit; font-size: .88rem; outline: none; transition: .2s;
+  }
+  .search-wrap input:focus { border-color: rgba(209,122,34,.6); }
+  .search-wrap input::placeholder { color: var(--muted); }
+  select.fsel {
+    background: var(--card); border: 1px solid var(--border); color: var(--cream);
+    padding: 9px 32px 9px 14px; border-radius: 10px; font-family: inherit;
+    font-size: .85rem; outline: none; cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23d17a22' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+  }
+  .btn-new {
+    background: linear-gradient(135deg, var(--orange), var(--orange2));
+    border: none; color: #fff; padding: 9px 20px; border-radius: 10px;
+    font-family: inherit; font-size: .87rem; font-weight: 700; cursor: pointer;
+    box-shadow: 0 2px 14px rgba(209,122,34,.4); transition: .18s;
+    white-space: nowrap;
+  }
+  .btn-new:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(209,122,34,.55); }
+  .count-lbl { font-size: .8rem; color: var(--muted); white-space: nowrap; }
+  .count-lbl strong { color: var(--orange); }
+
+  /* ── Tabla ── */
+  .main { max-width: 1100px; margin: 18px auto 80px; padding: 0 24px; }
+  .table-wrap {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    background: rgba(43,27,18,.7); padding: 12px 18px;
+    text-align: left; font-size: .65rem; text-transform: uppercase;
+    letter-spacing: .1em; opacity: .38; border-bottom: 1px solid var(--border);
+    font-weight: 700;
+  }
+  tbody tr { border-bottom: 1px solid rgba(255,255,255,.04); transition: background .15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(209,122,34,.04); }
+  tbody td { padding: 13px 18px; font-size: .88rem; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: .68rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+  .b-pagado    { background: rgba(76,175,80,.12);  color: #6fcf72; border: 1px solid rgba(76,175,80,.25); }
+  .b-pendiente { background: rgba(240,147,43,.12); color: var(--orange2); border: 1px solid rgba(240,147,43,.25); }
+  .b-cancelado { background: rgba(224,85,85,.12);  color: #e05555; border: 1px solid rgba(224,85,85,.2); }
+
+  .metodo-tag { font-size: .72rem; opacity: .5; }
+  .td-acciones { display: flex; gap: 6px; }
+  .btn-sm {
+    padding: 5px 12px; border-radius: 7px; cursor: pointer; font-family: inherit;
+    font-size: .75rem; font-weight: 600; border: 1px solid; transition: .15s;
+    background: transparent;
+  }
+  .btn-sm.ver     { border-color: rgba(209,122,34,.35); color: var(--cream); }
+  .btn-sm.ver:hover { border-color: var(--orange); color: var(--orange); background: rgba(209,122,34,.08); }
+  .btn-sm.editar  { border-color: rgba(74,158,255,.3); color: #4a9eff; }
+  .btn-sm.editar:hover { border-color: #4a9eff; background: rgba(74,158,255,.08); }
+  .btn-sm.borrar  { border-color: rgba(224,85,85,.25); color: #e05555; }
+  .btn-sm.borrar:hover { border-color: #e05555; background: rgba(224,85,85,.08); }
+
+  .spinner-wrap { text-align: center; padding: 60px; }
+  .spinner { width: 32px; height: 32px; border-radius: 50%; border: 3px solid var(--border);
+    border-top-color: var(--orange); animation: spin .7s linear infinite; margin: 0 auto 14px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Modal CREATE/EDIT ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75);
+    z-index: 200; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #180e06; border: 1px solid rgba(209,122,34,.4);
+    border-radius: 20px; padding: 28px; max-width: 650px; width: 95%;
+    max-height: 88vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,.65);
+    animation: slideUp .2s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+  .modal-header h2 { font-size: 1.2rem; font-weight: 900; }
+  .modal-header h2 span { color: var(--orange); }
+  .btn-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.3rem; }
+  .btn-close:hover { color: var(--cream); }
+
+  .form-row { margin-bottom: 16px; }
+  .form-row label { display: block; font-size: .72rem; text-transform: uppercase;
+    letter-spacing: .08em; opacity: .45; margin-bottom: 6px; }
+  .form-row input, .form-row select {
+    width: 100%; background: rgba(255,255,255,.04);
+    border: 1px solid var(--border); border-radius: 10px;
+    color: var(--cream); padding: 10px 14px; font-family: inherit;
+    font-size: .9rem; outline: none; transition: .2s;
+  }
+  .form-row input:focus, .form-row select:focus { border-color: rgba(209,122,34,.6); }
+  .form-row input::placeholder { color: var(--muted); }
+  .form-row select option { background: #1a0f07; }
+
+  .lineas-editor { margin: 18px 0; }
+  .lineas-editor-title { font-size: .72rem; text-transform: uppercase;
+    letter-spacing: .08em; opacity: .45; margin-bottom: 10px; }
+  .linea-edit-row {
+    display: grid; grid-template-columns: 1fr 60px 80px auto;
+    gap: 8px; align-items: center; margin-bottom: 8px;
+  }
+  .linea-edit-row input { padding: 8px 12px; font-size: .85rem; }
+  .btn-rm-linea { background: rgba(224,85,85,.12); border: 1px solid rgba(224,85,85,.25);
+    color: #e05555; border-radius: 7px; cursor: pointer; padding: 8px 10px;
+    font-size: .8rem; font-weight: 700; transition: .15s; }
+  .btn-rm-linea:hover { background: rgba(224,85,85,.2); }
+  .btn-add-linea {
+    background: rgba(209,122,34,.1); border: 1px dashed rgba(209,122,34,.35);
+    color: var(--orange); padding: 9px; border-radius: 10px; width: 100%;
+    cursor: pointer; font-family: inherit; font-size: .83rem; font-weight: 600; transition: .15s;
+  }
+  .btn-add-linea:hover { background: rgba(209,122,34,.18); }
+
+  .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+  .btn-cancel-form {
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    padding: 10px 20px; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: .88rem;
+  }
+  .btn-cancel-form:hover { border-color: rgba(255,255,255,.2); color: var(--cream); }
+  .btn-submit {
+    background: linear-gradient(135deg, var(--orange), var(--orange2));
+    border: none; color: #fff; padding: 10px 24px; border-radius: 10px;
+    cursor: pointer; font-family: inherit; font-size: .88rem; font-weight: 700;
+    box-shadow: 0 2px 14px rgba(209,122,34,.4); transition: .18s;
+  }
+  .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(209,122,34,.55); }
+  .btn-submit:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+  /* ── Modal detalle (solo ver) ── */
+  .detail-modal .modal { max-width: 560px; }
+  .modal-table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+  .modal-table th { text-align: left; font-size: .65rem; text-transform: uppercase;
+    letter-spacing: .09em; opacity: .35; padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .modal-table td { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.04); font-size: .87rem; }
+  .modal-table td:last-child { text-align: right; color: var(--orange); font-weight: 700; }
+  .modal-total { display: flex; justify-content: space-between; padding: 14px 0 0;
+    border-top: 2px solid var(--border); font-weight: 900; font-size: 1.05rem; }
+  .modal-total span:last-child { color: var(--orange); }
+
+  @media (max-width: 700px) {
+    .stats-bar { grid-template-columns: 1fr 1fr; }
+    table thead { display: none; }
+    tbody td { display: block; padding: 6px 16px; }
+    tbody td::before { content: attr(data-label) ': '; opacity: .4; font-size: .72rem; }
+    tbody tr { display: block; padding: 10px 0; border-radius: 12px; margin-bottom: 8px; background: var(--card); border: 1px solid var(--border); }
+    .td-acciones { padding: 8px 16px; }
+    .linea-edit-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/complementos_Administrador.html" class="brand">JAVA<span>FOOD</span> <small>Admin</small></a>
+  <div class="nav-links">
+    <a href="/complementos_Administrador.html">Menú</a>
+    <a href="/pedidos/index.html">Mis Pedidos</a>
+    <a href="/admin/pedidos/index.html" class="active">Gestión Pedidos</a>
+  </div>
+</nav>
+
+<div class="stats-bar">
+  <div class="stat-item"><div class="n" id="s-total">—</div><div class="l">Pedidos totales</div></div>
+  <div class="stat-item"><div class="n" id="s-hoy">—</div><div class="l">Pedidos hoy</div></div>
+  <div class="stat-item"><div class="n" id="s-recaudado">—</div><div class="l">Recaudado (€)</div></div>
+  <div class="stat-item"><div class="n" id="s-estados">—</div><div class="l">Pagados</div></div>
+</div>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" id="buscador" placeholder="Buscar por ID, cliente..." oninput="filtrar()">
+  </div>
+  <select class="fsel" id="filt-estado" onchange="filtrar()">
+    <option value="">Todos los estados</option>
+    <option value="PAGADO">Pagado</option>
+    <option value="PENDIENTE">Pendiente</option>
+    <option value="CANCELADO">Cancelado</option>
+  </select>
+  <select class="fsel" id="filt-pago" onchange="filtrar()">
+    <option value="">Todos los métodos</option>
+    <option value="TARJETA">Tarjeta</option>
+    <option value="EFECTIVO">Efectivo</option>
+  </select>
+  <button class="btn-new" onclick="abrirCreate()">＋ Nuevo pedido</button>
+  <span class="count-lbl" id="count-lbl"></span>
+</div>
+
+<div class="main">
+  <div class="table-wrap">
+    <div id="tabla-contenido">
+      <div class="spinner-wrap"><div class="spinner"></div><p style="opacity:.35;font-size:.82rem">Cargando...</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal VER detalle -->
+<div class="modal-overlay detail-modal" id="modal-ver" onclick="cerrarVer(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Pedido <span id="ver-id"></span></h2>
+      <button class="btn-close" onclick="cerrarVer()">✕</button>
+    </div>
+    <div id="ver-info"></div>
+    <table class="modal-table">
+      <thead><tr><th>Producto</th><th>Cant.</th><th>P/U</th><th>Subtotal</th></tr></thead>
+      <tbody id="ver-lineas"></tbody>
+    </table>
+    <div class="modal-total"><span>Total</span><span id="ver-total"></span></div>
+  </div>
+</div>
+
+<!-- Modal CREATE / EDIT -->
+<div class="modal-overlay" id="modal-form" onclick="cerrarForm(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="form-title">Nuevo <span>Pedido</span></h2>
+      <button class="btn-close" onclick="cerrarForm()">✕</button>
+    </div>
+    <input type="hidden" id="edit-id">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-row">
+        <label>Nombre del cliente</label>
+        <input id="f-nombre" type="text" placeholder="Ej: Juan García" list="clientes-list">
+        <datalist id="clientes-list"></datalist>
+      </div>
+      <div class="form-row">
+        <label>Método de pago</label>
+        <select id="f-metodo">
+          <option value="EFECTIVO">Efectivo</option>
+          <option value="TARJETA">Tarjeta</option>
+        </select>
+      </div>
+      <div class="form-row" id="estado-row" style="display:none">
+        <label>Estado</label>
+        <select id="f-estado">
+          <option value="PAGADO">Pagado</option>
+          <option value="PENDIENTE">Pendiente</option>
+          <option value="CANCELADO">Cancelado</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="lineas-editor">
+      <div class="lineas-editor-title">Productos del pedido</div>
+      <div id="lineas-editor-list"></div>
+      <button class="btn-add-linea" onclick="addLinea()">＋ Añadir producto</button>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-cancel-form" onclick="cerrarForm()">Cancelar</button>
+      <button class="btn-submit" id="btn-submit" onclick="guardar()">Guardar pedido</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:8080';
+let pedidos = [];
+let lineaCounter = 0;
+
+// ── CARGA ─────────────────────────────────────────────────────
+async function cargar() {
+  try {
+    const res = await fetch(`${API}/api/admin/pedidos`);
+    pedidos = await res.json();
+    actualizarStats();
+    renderTabla(pedidos);
+    cargarClientes();
+  } catch(e) {
+    document.getElementById('tabla-contenido').innerHTML = `
+      <div style="text-align:center;padding:60px;opacity:.4">
+        <div style="font-size:2rem">⚠️</div>
+        <p style="margin-top:12px">No se pudo conectar con la API (puerto 8080)</p>
+      </div>`;
+  }
+}
+
+async function cargarClientes() {
+  try {
+    const res = await fetch(`${API}/api/admin/pedidos/clientes`);
+    const clientes = await res.json();
+    const dl = document.getElementById('clientes-list');
+    dl.innerHTML = clientes.map(c => `<option value="${c}">`).join('');
+  } catch(e) {}
+}
+
+function actualizarStats() {
+  const hoy = new Date().toDateString();
+  document.getElementById('s-total').textContent      = pedidos.length;
+  document.getElementById('s-hoy').textContent        = pedidos.filter(p => new Date(p.fecha).toDateString() === hoy).length;
+  document.getElementById('s-recaudado').textContent  = pedidos.reduce((a, p) => a + p.total, 0).toFixed(0);
+  document.getElementById('s-estados').textContent    = pedidos.filter(p => p.estado === 'PAGADO').length;
+}
+
+function filtrar() {
+  const q = document.getElementById('buscador').value.toLowerCase();
+  const e = document.getElementById('filt-estado').value;
+  const m = document.getElementById('filt-pago').value;
+  let lista = pedidos;
+  if (q) lista = lista.filter(p => String(p.id_pedido).includes(q) || (p.nombreCliente||'').toLowerCase().includes(q));
+  if (e) lista = lista.filter(p => p.estado === e);
+  if (m) lista = lista.filter(p => p.metodoPago === m);
+  renderTabla(lista);
+}
+
+// ── TABLA ─────────────────────────────────────────────────────
+function badgeCls(estado) {
+  return { 'PAGADO': 'b-pagado', 'PENDIENTE': 'b-pendiente', 'CANCELADO': 'b-cancelado' }[estado] || 'b-pendiente';
+}
+function fmtFecha(f) {
+  return new Date(f).toLocaleDateString('es-ES', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function renderTabla(lista) {
+  document.getElementById('count-lbl').innerHTML =
+    `<strong>${lista.length}</strong> pedido${lista.length !== 1 ? 's' : ''}`;
+
+  if (lista.length === 0) {
+    document.getElementById('tabla-contenido').innerHTML =
+      `<div style="text-align:center;padding:60px;opacity:.35"><div style="font-size:2.5rem">📋</div><p style="margin-top:12px">Sin pedidos</p></div>`;
+    return;
+  }
+
+  document.getElementById('tabla-contenido').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Fecha</th><th>Cliente</th>
+          <th>Total</th><th>Estado</th><th>Pago</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${lista.map(p => `
+          <tr>
+            <td data-label="ID" style="opacity:.5;font-size:.8rem;font-weight:700">
+              PED-${String(p.id_pedido).padStart(3,'0')}
+            </td>
+            <td data-label="Fecha" style="font-size:.82rem">${fmtFecha(p.fecha)}</td>
+            <td data-label="Cliente" style="font-weight:600">${p.nombreCliente || '—'}</td>
+            <td data-label="Total" style="font-weight:700;color:var(--orange)">${Number(p.total).toFixed(2)} €</td>
+            <td data-label="Estado"><span class="badge ${badgeCls(p.estado)}">${p.estado}</span></td>
+            <td data-label="Pago" class="metodo-tag">${p.metodoPago || '—'}</td>
+            <td data-label="Acciones">
+              <div class="td-acciones">
+                <button class="btn-sm ver"    onclick="verDetalle(${p.id_pedido})">Ver</button>
+                <button class="btn-sm editar" onclick="abrirEdit(${p.id_pedido})">Editar</button>
+                <button class="btn-sm borrar" onclick="borrar(${p.id_pedido}, this)">Borrar</button>
+              </div>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>`;
+}
+
+// ── VER DETALLE ───────────────────────────────────────────────
+async function verDetalle(id) {
+  document.getElementById('ver-id').textContent = `#PED-${String(id).padStart(3,'0')}`;
+  document.getElementById('ver-info').innerHTML = `<div style="opacity:.3;padding:20px;text-align:center">Cargando...</div>`;
+  document.getElementById('ver-lineas').innerHTML = '';
+  document.getElementById('modal-ver').classList.add('open');
+
+  const res  = await fetch(`${API}/api/admin/pedidos/${id}`);
+  const data = await res.json();
+
+  document.getElementById('ver-info').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;
+        background:rgba(255,255,255,.03);border-radius:10px;padding:12px;
+        border:1px solid var(--border);margin-bottom:6px">
+      <div><div style="font-size:.62rem;opacity:.3;text-transform:uppercase;letter-spacing:.08em">Cliente</div>
+           <div style="font-weight:700;margin-top:3px">${data.nombreCliente||'—'}</div></div>
+      <div><div style="font-size:.62rem;opacity:.3;text-transform:uppercase;letter-spacing:.08em">Método</div>
+           <div style="font-weight:700;margin-top:3px">${data.metodoPago||'—'}</div></div>
+      <div><div style="font-size:.62rem;opacity:.3;text-transform:uppercase;letter-spacing:.08em">Estado</div>
+           <div style="margin-top:3px"><span class="badge ${badgeCls(data.estado)}">${data.estado}</span></div></div>
+    </div>`;
+
+  const lineas = data.lineas || [];
+  document.getElementById('ver-lineas').innerHTML = lineas.map(l => `
+    <tr>
+      <td>${l.nombre_producto}</td>
+      <td style="opacity:.5">×${l.cantidad}</td>
+      <td style="opacity:.5">${Number(l.precio_unitario).toFixed(2)} €</td>
+      <td>${Number(l.subtotal).toFixed(2)} €</td>
+    </tr>`).join('');
+  document.getElementById('ver-total').textContent = `${Number(data.total).toFixed(2)} €`;
+}
+function cerrarVer(e) { if (!e || e.target.id === 'modal-ver') document.getElementById('modal-ver').classList.remove('open'); }
+
+// ── CREATE ────────────────────────────────────────────────────
+function abrirCreate() {
+  document.getElementById('edit-id').value = '';
+  document.getElementById('form-title').innerHTML = 'Nuevo <span>Pedido</span>';
+  document.getElementById('f-nombre').value = '';
+  document.getElementById('f-metodo').value = 'EFECTIVO';
+  document.getElementById('estado-row').style.display = 'none';
+  document.getElementById('lineas-editor-list').innerHTML = '';
+  lineaCounter = 0;
+  addLinea();
+  document.getElementById('modal-form').classList.add('open');
+}
+
+// ── EDIT ──────────────────────────────────────────────────────
+async function abrirEdit(id) {
+  const res  = await fetch(`${API}/api/admin/pedidos/${id}`);
+  const data = await res.json();
+
+  document.getElementById('edit-id').value = id;
+  document.getElementById('form-title').innerHTML = `Editar Pedido <span>#${id}</span>`;
+  document.getElementById('f-nombre').value = data.nombreCliente || '';
+  document.getElementById('f-metodo').value = data.metodoPago || 'EFECTIVO';
+  document.getElementById('f-estado').value = data.estado || 'PAGADO';
+  document.getElementById('estado-row').style.display = 'block';
+
+  document.getElementById('lineas-editor-list').innerHTML = '';
+  lineaCounter = 0;
+  (data.lineas || []).forEach(l => addLinea(l.nombre_producto, l.cantidad, l.precio_unitario));
+  if ((data.lineas || []).length === 0) addLinea();
+
+  document.getElementById('modal-form').classList.add('open');
+}
+
+function addLinea(nombre='', cantidad=1, precio=0) {
+  lineaCounter++;
+  const id = `ln-${lineaCounter}`;
+  const div = document.createElement('div');
+  div.className = 'linea-edit-row'; div.id = id;
+  div.innerHTML = `
+    <input type="text"   placeholder="Nombre del producto" value="${nombre}" class="lnombre" oninput="recalcular()">
+    <input type="number" placeholder="Cant" min="1" value="${cantidad}" class="lcantidad" oninput="recalcular()">
+    <input type="number" placeholder="€" min="0" step="0.01" value="${precio > 0 ? precio : ''}" class="lprecio" oninput="recalcular()">
+    <button class="btn-rm-linea" onclick="quitarLinea('${id}')">✕</button>`;
+  document.getElementById('lineas-editor-list').appendChild(div);
+}
+
+function quitarLinea(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+function recalcular() {} // podríamos mostrar total en tiempo real
+
+function getLineas() {
+  return [...document.querySelectorAll('.linea-edit-row')].map(row => ({
+    nombre:   row.querySelector('.lnombre').value.trim(),
+    cantidad: parseInt(row.querySelector('.lcantidad').value) || 1,
+    precio:   parseFloat(row.querySelector('.lprecio').value) || 0,
+    total:    (parseInt(row.querySelector('.lcantidad').value) || 1) * (parseFloat(row.querySelector('.lprecio').value) || 0)
+  })).filter(l => l.nombre);
+}
+
+async function guardar() {
+  const id     = document.getElementById('edit-id').value;
+  const nombre = document.getElementById('f-nombre').value.trim();
+  const metodo = document.getElementById('f-metodo').value;
+  const estado = document.getElementById('f-estado').value;
+  const items  = getLineas();
+
+  if (!nombre) { alert('Introduce el nombre del cliente.'); return; }
+  if (items.length === 0) { alert('Añade al menos un producto.'); return; }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  try {
+    if (id) {
+      // EDIT - PUT /api/admin/pedidos/{id}
+      const body = {
+        nombreCliente: nombre, metodoPago: metodo, estado: estado,
+        items: items.map(i => ({ nombre: i.nombre, precio: i.precio, cantidad: i.cantidad, total: i.total }))
+      };
+      const res = await fetch(`${API}/api/admin/pedidos/${id}`, {
+        method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    } else {
+      // CREATE - POST /api/admin/pedidos
+      const body = {
+        nombreCliente: nombre, metodoPago: metodo,
+        items: items.map(i => ({ nombre: i.nombre, precio: i.precio, cantidad: i.cantidad, total: i.total }))
+      };
+      const res = await fetch(`${API}/api/admin/pedidos`, {
+        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    }
+    cerrarForm(); await cargar();
+  } catch(e) {
+    alert('Error al guardar: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Guardar pedido';
+  }
+}
+
+function cerrarForm(e) {
+  if (!e || e.target.id === 'modal-form') document.getElementById('modal-form').classList.remove('open');
+}
+
+// ── BORRAR ────────────────────────────────────────────────────
+async function borrar(id, btn) {
+  if (!confirm(`¿Eliminar el pedido #PED-${String(id).padStart(3,'0')}? Esta acción no se puede deshacer.`)) return;
+  try {
+    const res = await fetch(`${API}/api/admin/pedidos/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      const tr = btn.closest('tr');
+      if (tr) { tr.style.opacity = '0'; tr.style.transition = '.25s'; }
+      setTimeout(() => cargar(), 300);
+    } else alert('No se pudo eliminar.');
+  } catch(e) { alert('Error de conexión.'); }
+}
+
+// Init
+cargar();
+</script>
+</body>
+</html>

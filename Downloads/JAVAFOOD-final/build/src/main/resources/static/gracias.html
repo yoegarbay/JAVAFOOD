@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAVAFOOD · ¡Gracias!</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #d17a22; --dark: #2b1b12; --bg: #0d0804;
+    --cream: #f5e8d3; --glass: rgba(43,27,18,0.92);
+    --glow: rgba(209,122,34,0.35); --border: rgba(209,122,34,0.25);
+  }
+  * { font-family:'Space Grotesk',sans-serif; box-sizing:border-box; margin:0; padding:0; }
+  body {
+    background:var(--bg); color:var(--cream);
+    min-height:100vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; padding:20px;
+  }
+
+  .card {
+    background:var(--glass); border:2px solid var(--border);
+    border-radius:28px; padding:54px 44px; text-align:center;
+    max-width:520px; width:100%;
+    box-shadow:0 0 80px rgba(0,0,0,.7), 0 0 60px var(--glow);
+    animation: fadeIn .5s ease;
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
+
+  .check {
+    font-size:4.5rem; display:block; margin-bottom:20px;
+    animation: pop .4s cubic-bezier(.175,.885,.32,1.275) .1s both;
+  }
+  @keyframes pop { from { transform:scale(0); } to { transform:scale(1); } }
+
+  h1 { font-size:2rem; font-weight:900; margin-bottom:10px; }
+  h1 span { color:var(--orange); }
+
+  .pedido-info {
+    background:rgba(209,122,34,.07); border:1px solid var(--border);
+    border-radius:14px; padding:18px 22px; margin:24px 0;
+    font-size:.95rem; line-height:1.8; text-align:left;
+  }
+  .pedido-info strong { color:var(--orange); }
+
+  p.sub { opacity:.5; font-size:.9rem; margin-bottom:28px; }
+
+  .btn-volver {
+    display:inline-block; padding:14px 36px;
+    background:linear-gradient(45deg,#d17a22,#f5e8d3);
+    color:var(--dark); font-weight:900; border-radius:14px;
+    text-decoration:none; font-size:1rem; transition:.2s;
+  }
+  .btn-volver:hover { transform:translateY(-2px); box-shadow:0 0 24px var(--glow); }
+
+  .brand { font-size:1.4rem; font-weight:900; color:#fff; margin-bottom:40px; }
+  .brand span { color:var(--orange); }
+
+  /* Sección reseñas */
+  .resenas-section {
+    margin-top:28px; text-align:left;
+    border-top:1px solid rgba(209,122,34,0.2); padding-top:22px;
+  }
+  .resenas-section h2 {
+    font-size:1rem; font-weight:700; margin-bottom:14px; color:#f5e8d3;
+  }
+  .resena-row {
+    background:rgba(209,122,34,0.07); border:1px solid rgba(209,122,34,0.2);
+    border-radius:14px; padding:12px 16px; margin-bottom:10px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .resena-row span { color:#f5e8d3; font-size:0.9rem; font-weight:600; }
+  .btn-resenar {
+    padding:8px 18px; border-radius:10px;
+    background:linear-gradient(45deg,#d17a22,#f5e8d3);
+    color:#1e1209; font-weight:700; border:none;
+    cursor:pointer; font-size:0.82rem; white-space:nowrap; transition:.2s;
+  }
+  .btn-resenar:hover { opacity:.85; transform:translateY(-1px); }
+  .btn-resenar:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+  .resena-ok { color:#6bff8a; font-size:0.8rem; }
+</style>
+</head>
+<body>
+
+<div class="brand">JAVA<span>FOOD</span></div>
+
+<div class="card">
+  <span class="check">✅</span>
+  <h1>¡Gracias por tu <span>pedido</span>!</h1>
+  <p class="sub">Tu pedido ha sido confirmado y está siendo procesado.</p>
+
+  <div class="pedido-info" id="info-pedido">
+    <!-- Relleno por JS -->
+  </div>
+
+  <!-- Reseñas de los productos pedidos -->
+  <div class="resenas-section" id="seccion-resenas" style="display:none;">
+    <h2>⭐ ¿Qué te han parecido tus productos?</h2>
+    <div id="lista-resenas-pedido"></div>
+  </div>
+
+  <div style="margin-top:28px;">
+    <a href="index.html" class="btn-volver">🛒 Seguir comprando</a>
+  </div>
+</div>
+
+<script>
+  // ── Info del pedido ───────────────────────────────────────────
+  const data = JSON.parse(sessionStorage.getItem('ultimoPedido') || '{}');
+  const el   = document.getElementById('info-pedido');
+
+  if (data.id_pedido) {
+    el.innerHTML = `
+      <div>🧾 Pedido <strong>#${data.id_pedido}</strong></div>
+      <div>👤 Cliente: <strong>${data.nombreCliente || '—'}</strong></div>
+      <div>💳 Pago: <strong>${data.metodoPago || '—'}</strong></div>
+      <div>💰 Total: <strong>${parseFloat(data.total).toFixed(2)} €</strong></div>
+      <div>📋 Estado: <strong>${data.estado || 'PAGADO'}</strong></div>
+    `;
+    sessionStorage.removeItem('ultimoPedido');
+  } else {
+    el.innerHTML = '<div>Pedido procesado correctamente 🎉</div>';
+  }
+
+  // ── Sección de reseñas ────────────────────────────────────────
+  (async function() {
+    const cliente = JSON.parse(sessionStorage.getItem('jfCliente') || 'null');
+    const items   = JSON.parse(localStorage.getItem('itemsPedido') || '[]');
+
+    if (!items.length) return;
+
+    const seccion    = document.getElementById('seccion-resenas');
+    const contenedor = document.getElementById('lista-resenas-pedido');
+    seccion.style.display = 'block';
+
+    if (!cliente) {
+      contenedor.innerHTML = '<p style="color:#777;font-size:0.85rem;">Inicia sesión para reseñar tus productos.</p>';
+      return;
+    }
+
+    // Obtener todos los productos para mapear nombre → id
+    const productos = await fetch('/api/productos').then(r => r.json()).catch(() => []);
+    const mapa = {};
+    productos.forEach(p => { mapa[p.nombre] = p.id_producto; });
+
+    // Nombres únicos del pedido
+    const nombresUnicos = [...new Set(items.map(i => i.nombre))];
+
+    nombresUnicos.forEach(nombre => {
+      const idProducto = mapa[nombre];
+      if (!idProducto) return;
+
+      const div = document.createElement('div');
+      div.className = 'resena-row';
+      div.id = `resena-row-${idProducto}`;
+      div.innerHTML = `
+        <span>${nombre}</span>
+        <button class="btn-resenar" onclick="resenarProducto(${idProducto}, '${nombre.replace(/'/g, "\\'")}', this)">
+          ⭐ Reseñar
+        </button>
+      `;
+      contenedor.appendChild(div);
+    });
+
+    localStorage.removeItem('itemsPedido');
+  })();
+
+  // ── Abrir modal de reseña desde gracias.html ──────────────────
+  function resenarProducto(idProducto, nombre, btn) {
+    if (window.abrirModalResena) {
+      window.abrirModalResena(idProducto, nombre);
+      // Marcar el botón como usado cuando se envíe la reseña
+      const observer = new MutationObserver(() => {
+        const msg = document.getElementById('resena-msg');
+        if (msg && msg.classList.contains('ok')) {
+          btn.disabled     = true;
+          btn.textContent  = '✅ Reseñado';
+          btn.style.background = 'rgba(80,200,80,0.2)';
+          btn.style.color  = '#6bff8a';
+          observer.disconnect();
+        }
+      });
+      const msgEl = document.getElementById('resena-msg');
+      if (msgEl) observer.observe(msgEl, { attributes: true, childList: true });
+    }
+  }
+</script>
+
+<script src="resenas.js"></script>
+
+</body>
+</html>

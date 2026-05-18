@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAVAFOOD · Mis Pedidos</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange:  #d17a22;
+    --orange2: #f0932b;
+    --dark:    #0d0804;
+    --dark2:   #140c06;
+    --card:    rgba(30,18,10,0.95);
+    --cream:   #f5e8d3;
+    --muted:   rgba(245,232,211,0.45);
+    --border:  rgba(209,122,34,0.20);
+    --glow:    rgba(209,122,34,0.30);
+    --green:   #4caf50;
+    --red:     #e05555;
+    --blue:    #4a9eff;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--dark);
+    color: var(--cream);
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: rgba(20,12,6,0.97);
+    border-bottom: 2px solid var(--orange);
+    box-shadow: 0 0 28px var(--glow);
+    padding: 14px 36px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .brand { font-size: 1.6rem; font-weight: 900; color: #fff; text-decoration: none; }
+  .brand span { color: var(--orange); }
+  .nav-links a {
+    color: var(--cream); text-decoration: none; margin-left: 22px;
+    font-weight: 600; opacity: .55; transition: .2s; font-size: .88rem;
+    letter-spacing: .02em;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--orange); opacity: 1; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #1e0e06 0%, #0d0804 60%, #160b04 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 44px 36px 34px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .hero-text h1 { font-size: 2rem; font-weight: 900; }
+  .hero-text h1 span { color: var(--orange); }
+  .hero-text p  { color: var(--muted); font-size: .88rem; margin-top: 5px; }
+  .hero-stats   { display: flex; gap: 28px; }
+  .hstat { text-align: center; }
+  .hstat .n { font-size: 1.8rem; font-weight: 900; color: var(--orange); line-height: 1; }
+  .hstat .l { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; opacity: .4; margin-top: 3px; }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    max-width: 960px; margin: 28px auto 0; padding: 0 20px;
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  }
+  .search-wrap {
+    flex: 1; min-width: 200px;
+    position: relative;
+  }
+  .search-wrap svg {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    opacity: .4; pointer-events: none;
+  }
+  .search-wrap input {
+    width: 100%; background: var(--card);
+    border: 1px solid var(--border); border-radius: 12px;
+    color: var(--cream); padding: 10px 14px 10px 42px;
+    font-family: inherit; font-size: .9rem; outline: none; transition: .2s;
+  }
+  .search-wrap input:focus { border-color: rgba(209,122,34,.6); box-shadow: 0 0 0 3px rgba(209,122,34,.1); }
+  .search-wrap input::placeholder { color: var(--muted); }
+
+  .filter-select {
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--cream); padding: 10px 16px; border-radius: 12px;
+    font-family: inherit; font-size: .88rem; outline: none;
+    cursor: pointer; appearance: none; min-width: 150px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23d17a22' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+    padding-right: 36px;
+  }
+  .filter-select:focus { border-color: rgba(209,122,34,.6); }
+
+  .count-label {
+    color: var(--muted); font-size: .82rem; white-space: nowrap;
+  }
+  .count-label strong { color: var(--orange); }
+
+  /* ── LISTA ── */
+  .main { max-width: 960px; margin: 20px auto 80px; padding: 0 20px; }
+
+  .pedido-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .pedido-card:hover {
+    border-color: rgba(209,122,34,.45);
+    box-shadow: 0 4px 28px rgba(0,0,0,.4), 0 0 0 1px rgba(209,122,34,.1);
+  }
+
+  .card-header {
+    background: rgba(43,27,18,0.7);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 8px; align-items: center;
+  }
+  .ch-block .label {
+    font-size: .62rem; text-transform: uppercase; letter-spacing: .1em;
+    opacity: .38; margin-bottom: 3px;
+  }
+  .ch-block .value { font-weight: 700; font-size: .9rem; }
+  .ch-block .value.total { color: var(--orange); }
+  .pedido-num {
+    font-size: .72rem; opacity: .45; text-align: right;
+    font-weight: 600; letter-spacing: .04em;
+  }
+
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: .7rem; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .badge-pagado  { background: rgba(76,175,80,.15); color: #6fcf72; border: 1px solid rgba(76,175,80,.3); }
+  .badge-pendiente { background: rgba(240,147,43,.15); color: var(--orange2); border: 1px solid rgba(240,147,43,.3); }
+  .badge-cancelado { background: rgba(224,85,85,.15); color: #e05555; border: 1px solid rgba(224,85,85,.25); }
+
+  /* ── Líneas de producto ── */
+  .card-body { padding: 18px 24px; }
+
+  .lineas-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+
+  .linea-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 10px 14px; border-radius: 10px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.05);
+  }
+  .linea-icon {
+    width: 38px; height: 38px; border-radius: 9px; flex-shrink: 0;
+    background: rgba(209,122,34,.12); border: 1px solid rgba(209,122,34,.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+  }
+  .linea-info { flex: 1; }
+  .linea-nombre { font-weight: 600; font-size: .9rem; }
+  .linea-meta   { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+  .linea-subtotal { font-weight: 700; font-size: .92rem; color: var(--orange); }
+
+  .arriving-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: .78rem; color: #6fcf72; font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .arriving-tag::before { content: '→'; }
+
+  /* ── Acciones ── */
+  .card-actions {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    border-top: 1px solid var(--border);
+    padding: 14px 24px;
+  }
+  .btn-action {
+    padding: 8px 18px; border-radius: 10px; cursor: pointer;
+    font-family: inherit; font-size: .83rem; font-weight: 600;
+    transition: .18s; border: 1px solid;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-outline {
+    background: transparent; border-color: rgba(209,122,34,.35);
+    color: var(--cream);
+  }
+  .btn-outline:hover { border-color: var(--orange); background: rgba(209,122,34,.08); color: var(--orange); }
+  .btn-solid {
+    background: linear-gradient(135deg, var(--orange), var(--orange2));
+    border-color: transparent; color: #fff;
+    box-shadow: 0 2px 12px rgba(209,122,34,.35);
+  }
+  .btn-solid:hover { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(209,122,34,.5); }
+  .btn-danger {
+    background: transparent; border-color: rgba(224,85,85,.3); color: #e05555;
+  }
+  .btn-danger:hover { border-color: #e05555; background: rgba(224,85,85,.08); }
+
+  /* ── Loading / Empty ── */
+  .spinner-wrap { text-align: center; padding: 70px 20px; }
+  .spinner {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 3px solid var(--border); border-top-color: var(--orange);
+    animation: spin .7s linear infinite; margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty {
+    text-align: center; padding: 80px 20px; opacity: .4;
+  }
+  .empty-icon { font-size: 3.2rem; display: block; margin-bottom: 14px; }
+  .empty p { font-size: 1rem; }
+
+  /* ── Modal detalle ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.75); z-index: 200;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #1a0f07; border: 1px solid rgba(209,122,34,.4);
+    border-radius: 20px; padding: 32px; max-width: 600px; width: 95%;
+    max-height: 85vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(209,122,34,.1);
+    animation: slideUp .25s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 24px;
+  }
+  .modal-header h2 { font-size: 1.3rem; font-weight: 900; }
+  .modal-header h2 span { color: var(--orange); }
+  .btn-close-modal {
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font-size: 1.4rem; line-height: 1; transition: color .15s;
+  }
+  .btn-close-modal:hover { color: var(--cream); }
+  .modal-table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+  }
+  .modal-table th {
+    text-align: left; font-size: .68rem; text-transform: uppercase;
+    letter-spacing: .1em; opacity: .38; padding: 6px 0; border-bottom: 1px solid var(--border);
+  }
+  .modal-table td {
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.04);
+    font-size: .88rem;
+  }
+  .modal-table td:last-child { text-align: right; color: var(--orange); font-weight: 700; }
+  .modal-total {
+    display: flex; justify-content: space-between; padding: 16px 0 0;
+    border-top: 2px solid var(--border); font-weight: 900; font-size: 1.1rem;
+  }
+  .modal-total span:last-child { color: var(--orange); }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .hero { flex-direction: column; gap: 20px; }
+    .hero-stats { gap: 20px; }
+    .card-header { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .pedido-num { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/complementos_Administrador.html" class="brand">JAVA<span>FOOD</span></a>
+  <div class="nav-links">
+    <a href="/complementos_Administrador.html">Menú</a>
+    <a href="/pedidos/index.html" class="active">Mis Pedidos</a>
+    <a href="/admin/pedidos/index.html">Admin</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-text">
+    <h1>Mis <span>Pedidos</span></h1>
+    <p>Historial completo de tus compras</p>
+  </div>
+  <div class="hero-stats">
+    <div class="hstat"><div class="n" id="stat-total">—</div><div class="l">Pedidos</div></div>
+    <div class="hstat"><div class="n" id="stat-hoy">—</div><div class="l">Hoy</div></div>
+    <div class="hstat"><div class="n" id="stat-gastado">—</div><div class="l">Total €</div></div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" id="buscador" placeholder="Buscar por cliente o producto..." oninput="filtrar()">
+  </div>
+  <select class="filter-select" id="filtro-estado" onchange="filtrar()">
+    <option value="">Todos los estados</option>
+    <option value="PAGADO">Pagado</option>
+    <option value="PENDIENTE">Pendiente</option>
+    <option value="CANCELADO">Cancelado</option>
+  </select>
+  <select class="filter-select" id="filtro-periodo" onchange="filtrar()">
+    <option value="0">Todos los períodos</option>
+    <option value="1">Hoy</option>
+    <option value="7">Últimos 7 días</option>
+    <option value="30">Últimos 30 días</option>
+  </select>
+  <span class="count-label" id="count-label"></span>
+</div>
+
+<div class="main">
+  <div id="lista">
+    <div class="spinner-wrap"><div class="spinner"></div><p style="opacity:.4;font-size:.85rem">Cargando pedidos...</p></div>
+  </div>
+</div>
+
+<!-- Modal detalle -->
+<div class="modal-overlay" id="modal-overlay" onclick="cerrarModal(event)">
+  <div class="modal" id="modal-content">
+    <div class="modal-header">
+      <h2>Pedido <span id="m-id"></span></h2>
+      <button class="btn-close-modal" onclick="cerrarModal()">✕</button>
+    </div>
+    <div id="m-info"></div>
+    <table class="modal-table">
+      <thead><tr><th>Producto</th><th>Cant.</th><th>P. Unit.</th><th>Subtotal</th></tr></thead>
+      <tbody id="m-lineas"></tbody>
+    </table>
+    <div class="modal-total"><span>Total</span><span id="m-total"></span></div>
+  </div>
+</div>
+
+<script>
+const API_BASE = 'http://localhost:8080';
+let todosLosPedidos = [];
+
+const EMOJIS = {
+  'hamburguesa': '🍔', 'burger': '🍔', 'pizza': '🍕', 'bocata': '🥖',
+  'kebab': '🌯', 'agua': '💧', 'coca': '🥤', 'refresco': '🥤',
+  'cerveza': '🍺', 'café': '☕', 'cafe': '☕', 'fries': '🍟',
+  'nugget': '🍗', 'alita': '🍗', 'ensalada': '🥗', 'nachos': '🌮',
+  'croqueta': '🫓', 'patata': '🍟', 'postre': '🍰', 'helado': '🍦',
+  'salsa': '🫙', 'ketchup': '🫙', 'mayo': '🫙'
+};
+
+function getEmoji(nombre) {
+  const n = (nombre || '').toLowerCase();
+  for (const [key, emoji] of Object.entries(EMOJIS)) {
+    if (n.includes(key)) return emoji;
+  }
+  return '🍽️';
+}
+
+function badgeHtml(estado) {
+  const cls = {
+    'PAGADO': 'badge-pagado',
+    'PENDIENTE': 'badge-pendiente',
+    'CANCELADO': 'badge-cancelado'
+  }[estado] || 'badge-pendiente';
+  return `<span class="badge ${cls}">${estado}</span>`;
+}
+
+function formatDate(fechaStr) {
+  const d = new Date(fechaStr);
+  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function formatHour(fechaStr) {
+  const d = new Date(fechaStr);
+  return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+}
+
+function isHoy(fechaStr) {
+  const hoy = new Date(); const d = new Date(fechaStr);
+  return d.toDateString() === hoy.toDateString();
+}
+
+function diasDesde(fechaStr) {
+  return Math.floor((Date.now() - new Date(fechaStr)) / 86400000);
+}
+
+async function cargar() {
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/pedidos`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    todosLosPedidos = await res.json();
+    actualizarStats();
+    renderizar(todosLosPedidos);
+  } catch (e) {
+    document.getElementById('lista').innerHTML = `
+      <div class="empty">
+        <span class="empty-icon">⚠️</span>
+        <p>No se pudo conectar con la API.<br><small style="opacity:.5">¿Está arrancado Spring en el puerto 8080?</small></p>
+      </div>`;
+  }
+}
+
+function actualizarStats() {
+  const total = todosLosPedidos.length;
+  const hoy   = todosLosPedidos.filter(p => isHoy(p.fecha)).length;
+  const gasto = todosLosPedidos.reduce((s, p) => s + p.total, 0);
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-hoy').textContent   = hoy;
+  document.getElementById('stat-gastado').textContent = gasto.toFixed(0) + '€';
+}
+
+function filtrar() {
+  const q       = document.getElementById('buscador').value.toLowerCase();
+  const estado  = document.getElementById('filtro-estado').value;
+  const periodo = parseInt(document.getElementById('filtro-periodo').value);
+
+  let filtrados = todosLosPedidos;
+
+  if (q) filtrados = filtrados.filter(p =>
+    (p.nombreCliente || '').toLowerCase().includes(q) ||
+    String(p.id_pedido).includes(q)
+  );
+  if (estado) filtrados = filtrados.filter(p => p.estado === estado);
+  if (periodo > 0) filtrados = filtrados.filter(p => diasDesde(p.fecha) <= periodo);
+
+  renderizar(filtrados);
+}
+
+function renderizar(lista) {
+  const label = document.getElementById('count-label');
+  label.innerHTML = lista.length > 0
+    ? `<strong>${lista.length}</strong> pedido${lista.length !== 1 ? 's' : ''} encontrado${lista.length !== 1 ? 's' : ''}`
+    : '0 pedidos encontrados';
+
+  if (lista.length === 0) {
+    document.getElementById('lista').innerHTML = `
+      <div class="empty">
+        <span class="empty-icon">🛒</span>
+        <p>No hay pedidos que coincidan con tu búsqueda</p>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('lista').innerHTML = lista.map(p => `
+    <div class="pedido-card">
+      <div class="card-header">
+        <div class="ch-block">
+          <div class="label">Pedido realizado</div>
+          <div class="value">${formatDate(p.fecha)}</div>
+        </div>
+        <div class="ch-block">
+          <div class="label">Total</div>
+          <div class="value total">${Number(p.total).toFixed(2)} €</div>
+        </div>
+        <div class="ch-block">
+          <div class="label">Cliente</div>
+          <div class="value">${p.nombreCliente || 'Cliente'}</div>
+        </div>
+        <div class="pedido-num">PEDIDO N.º PED-${String(p.id_pedido).padStart(3,'0')}</div>
+      </div>
+      <div class="card-body">
+        <div class="arriving-tag">
+          ${isHoy(p.fecha) ? 'Pedido realizado hoy a las ' + formatHour(p.fecha) : 'Realizado el ' + formatDate(p.fecha)}
+          &nbsp;&nbsp;${badgeHtml(p.estado)}
+          &nbsp;&nbsp;<span style="opacity:.4;font-size:.75rem">${p.metodoPago || 'EFECTIVO'}</span>
+        </div>
+        <div class="lineas-list" id="lineas-${p.id_pedido}">
+          <div style="opacity:.35;font-size:.82rem;padding:6px 0">Cargando productos...</div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="btn-action btn-solid" onclick="verDetalle(${p.id_pedido})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+          Ver detalles
+        </button>
+        <button class="btn-action btn-outline" onclick="imprimirTicket(${p.id_pedido})">
+          🧾 Ticket
+        </button>
+        <button class="btn-action btn-danger" onclick="eliminar(${p.id_pedido}, this)">
+          Cancelar pedido
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  // Cargar líneas de cada pedido en paralelo
+  lista.forEach(p => cargarLineas(p.id_pedido));
+}
+
+async function cargarLineas(id) {
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/pedidos/${id}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const lineas = data.lineas || [];
+    const contenedor = document.getElementById(`lineas-${id}`);
+    if (!contenedor) return;
+
+    if (lineas.length === 0) {
+      contenedor.innerHTML = `<div style="opacity:.35;font-size:.82rem">Sin productos registrados</div>`;
+      return;
+    }
+
+    contenedor.innerHTML = lineas.map(l => `
+      <div class="linea-item">
+        <div class="linea-icon">${getEmoji(l.nombre_producto)}</div>
+        <div class="linea-info">
+          <div class="linea-nombre">${l.nombre_producto}</div>
+          <div class="linea-meta">Cantidad: ${l.cantidad} &nbsp;·&nbsp; ${Number(l.precio_unitario).toFixed(2)} € / ud.</div>
+        </div>
+        <div class="linea-subtotal">${Number(l.subtotal).toFixed(2)} €</div>
+      </div>
+    `).join('');
+  } catch(e) {
+    const c = document.getElementById(`lineas-${id}`);
+    if (c) c.innerHTML = `<div style="opacity:.3;font-size:.8rem">Error al cargar productos</div>`;
+  }
+}
+
+async function verDetalle(id) {
+  document.getElementById('m-id').textContent = `#PED-${String(id).padStart(3,'0')}`;
+  document.getElementById('m-info').innerHTML = `<div style="opacity:.4;padding:20px 0;text-align:center">Cargando...</div>`;
+  document.getElementById('m-lineas').innerHTML = '';
+  document.getElementById('modal-overlay').classList.add('open');
+
+  try {
+    const res  = await fetch(`${API_BASE}/api/admin/pedidos/${id}`);
+    const data = await res.json();
+
+    document.getElementById('m-info').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;background:rgba(255,255,255,.03);
+          border-radius:10px;padding:14px;margin-bottom:4px;border:1px solid var(--border)">
+        <div><div style="font-size:.65rem;opacity:.35;text-transform:uppercase;letter-spacing:.08em">Cliente</div>
+             <div style="font-weight:700;margin-top:3px">${data.nombreCliente || '—'}</div></div>
+        <div><div style="font-size:.65rem;opacity:.35;text-transform:uppercase;letter-spacing:.08em">Método de pago</div>
+             <div style="font-weight:700;margin-top:3px">${data.metodoPago || '—'}</div></div>
+        <div><div style="font-size:.65rem;opacity:.35;text-transform:uppercase;letter-spacing:.08em">Fecha</div>
+             <div style="font-weight:700;margin-top:3px">${formatDate(data.fecha)} ${formatHour(data.fecha)}</div></div>
+        <div><div style="font-size:.65rem;opacity:.35;text-transform:uppercase;letter-spacing:.08em">Estado</div>
+             <div style="margin-top:3px">${badgeHtml(data.estado)}</div></div>
+      </div>`;
+
+    const lineas = data.lineas || [];
+    document.getElementById('m-lineas').innerHTML = lineas.map(l => `
+      <tr>
+        <td>${getEmoji(l.nombre_producto)} ${l.nombre_producto}</td>
+        <td style="opacity:.6">×${l.cantidad}</td>
+        <td style="opacity:.6">${Number(l.precio_unitario).toFixed(2)} €</td>
+        <td>${Number(l.subtotal).toFixed(2)} €</td>
+      </tr>
+    `).join('');
+
+    document.getElementById('m-total').textContent = `${Number(data.total).toFixed(2)} €`;
+  } catch(e) {
+    document.getElementById('m-info').innerHTML = `<p style="color:#e05555">Error al cargar el detalle.</p>`;
+  }
+}
+
+function cerrarModal(e) {
+  if (!e || e.target.id === 'modal-overlay') {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+}
+
+async function eliminar(id, btn) {
+  if (!confirm(`¿Cancelar el pedido #PED-${String(id).padStart(3,'0')}? Esta acción no se puede deshacer.`)) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/pedidos/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      btn.closest('.pedido-card').style.opacity = '0';
+      btn.closest('.pedido-card').style.transform = 'scaleY(0)';
+      btn.closest('.pedido-card').style.transition = '.3s';
+      setTimeout(() => cargar(), 350);
+    } else {
+      alert('No se pudo cancelar el pedido.');
+    }
+  } catch(e) { alert('Error de conexión.'); }
+}
+
+function imprimirTicket(id) {
+  window.open(`/admin/pedidos/show.html?id=${id}`, '_blank');
+}
+
+// Iniciar
+cargar();
+</script>
+</body>
+</html>
