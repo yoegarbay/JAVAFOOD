@@ -1,4 +1,4 @@
-package main.java.clientes.dto.auth;
+package main.java.usuarios.dto.auth;
 
 public record RegisterRequest(
 	String nombre, 

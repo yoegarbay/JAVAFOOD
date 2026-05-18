@@ -1,6 +1,6 @@
-package main.java.clientes.dto;
+package main.java.usuarios.dto;
 
-public record ClienteDetalle(
+public record UsuarioDetalle(
 	    int id,
 	    String nombre,
 	    String apellidos,

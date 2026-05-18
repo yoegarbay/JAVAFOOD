@@ -1,12 +1,12 @@
-package main.java.clientes.repository;
+package main.java.usuarios.repository;
 
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import main.java.clientes.db.DB;
-import main.java.clientes.mapper.RowMapper;
+import main.java.usuarios.db.DB;
+import main.java.usuarios.mapper.RowMapper;
 
 public abstract class BaseRepository<T> {
 

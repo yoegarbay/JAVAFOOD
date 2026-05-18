@@ -1,4 +1,4 @@
-package main.java.clientes.interceptor;
+package main.java.usuarios.interceptor;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;

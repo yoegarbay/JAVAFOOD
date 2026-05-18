@@ -1,4 +1,4 @@
-package main.java.clientes.config;
+package main.java.usuarios.config;
 
 public class Config {
 	private Config() {

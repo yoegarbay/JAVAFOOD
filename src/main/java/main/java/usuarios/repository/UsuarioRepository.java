@@ -1,17 +1,17 @@
-package main.java.clientes.repository;
+package main.java.usuarios.repository;
 
 import java.sql.Connection;
 import java.util.List;
 
-import main.java.clientes.db.DB;
-import main.java.clientes.dto.ClienteResumen;
-import main.java.clientes.entity.Cliente;
-import main.java.clientes.mapper.ClienteMapper;
+import main.java.usuarios.db.DB;
+import main.java.usuarios.dto.UsuarioResumen;
+import main.java.usuarios.entity.Usuario;
+import main.java.usuarios.mapper.UsuarioMapper;
 
-public class ClienteRepository extends BaseRepository<Cliente> {
+public class UsuarioRepository extends BaseRepository<Usuario> {
 
-    public ClienteRepository(Connection con) {
-        super(con, new ClienteMapper());
+    public UsuarioRepository(Connection con) {
+        super(con, new UsuarioMapper());
     }
 
     @Override
@@ -34,48 +34,48 @@ public class ClienteRepository extends BaseRepository<Cliente> {
     }
 
     @Override
-    public void setPrimaryKey(Cliente c, int id) {
-        c.setId(id);
+    public void setPrimaryKey(Usuario u, int id) {
+        u.setId(id);
     }
 
     //Insert
     @Override
-    public Object[] getInsertValues(Cliente c) {
+    public Object[] getInsertValues(Usuario u) {
     	
-    	String rol = c.getRol();
+    	String rol = u.getRol();
 
         if (rol == null || rol.isBlank()) {
             rol = "CLIENTE";
         }
     	
         return new Object[] {
-            c.getNombre(),
-            c.getApellidos(),
-            c.getDireccion(),
-            c.getTelefono(),
-            c.getEmail(),
-            c.getContrasenya(),
-            c.getRol()
+            u.getNombre(),
+            u.getApellidos(),
+            u.getDireccion(),
+            u.getTelefono(),
+            u.getEmail(),
+            u.getContrasenya(),
+            u.getRol()
         };
     }
 
     // update
     @Override
-    public Object[] getUpdateValues(Cliente c) {
+    public Object[] getUpdateValues(Usuario u) {
         return new Object[] {
-            c.getNombre(),
-            c.getApellidos(),
-            c.getDireccion(),
-            c.getTelefono(),
-            c.getEmail(),
-            c.getContrasenya(),
-            c.getRol(),
-            c.getId()
+            u.getNombre(),
+            u.getApellidos(),
+            u.getDireccion(),
+            u.getTelefono(),
+            u.getEmail(),
+            u.getContrasenya(),
+            u.getRol(),
+            u.getId()
         };
     }
 
     // lista admin
-    public List<ClienteResumen> findAllResumen() {
+    public List<UsuarioResumen> findAllResumen() {
 
         String sql = """
             SELECT id, nombre, apellidos, direccion, telefono, email, rol
@@ -84,7 +84,7 @@ public class ClienteRepository extends BaseRepository<Cliente> {
         """;
 
         return DB.queryMany(con, sql, rs ->
-            new ClienteResumen(
+            new UsuarioResumen(
                 rs.getInt("id"),
                 rs.getString("nombre"),
                 rs.getString("apellidos"),
@@ -97,10 +97,10 @@ public class ClienteRepository extends BaseRepository<Cliente> {
     }
     
     //LOGINS
-    public Cliente findByEmailAndPassword(String email, String pass) {
+    public Usuario findByEmailAndPassword(String email, String pass) {
 
         String sql = "SELECT * FROM clientes WHERE email = ? AND contrasenya = ?";
 
-        return DB.queryOne(con, sql, new ClienteMapper(), email, pass);
+        return DB.queryOne(con, sql, new UsuarioMapper(), email, pass);
     }
 }

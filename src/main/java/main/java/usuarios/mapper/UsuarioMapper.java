@@ -1,14 +1,14 @@
-package main.java.clientes.mapper;
+package main.java.usuarios.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import main.java.clientes.entity.Cliente;
+import main.java.usuarios.entity.Usuario;
 
-public class ClienteMapper implements RowMapper<Cliente> {
+public class UsuarioMapper implements RowMapper<Usuario> {
     @Override
-    public Cliente map(ResultSet rs) throws SQLException {
-        return new Cliente(
+    public Usuario map(ResultSet rs) throws SQLException {
+        return new Usuario(
             rs.getInt("id"),
             rs.getString("nombre"),
             rs.getString("apellidos"),

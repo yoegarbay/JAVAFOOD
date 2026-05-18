@@ -1,4 +1,4 @@
-package main.java.clientes.controller;
+package main.java.usuarios.controller;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -6,27 +6,27 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import main.java.clientes.dto.ClienteResumen;
-import main.java.clientes.entity.Cliente;
-import main.java.clientes.exception.DataAccessException;
-import main.java.clientes.repository.ClienteRepository;
+import main.java.usuarios.dto.UsuarioResumen;
+import main.java.usuarios.entity.Usuario;
+import main.java.usuarios.exceptions.DataAccessException;
+import main.java.usuarios.repository.UsuarioRepository;
 
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/clientes")
 
-public class ClienteController {
+public class UsuarioController {
     private final DataSource ds;
 
-    public ClienteController(DataSource ds) {
+    public UsuarioController(DataSource ds) {
         this.ds = ds;
     }
 
     @GetMapping
-    public List<ClienteResumen> index() {
+    public List<UsuarioResumen> index() {
         try (Connection con = ds.getConnection()) {
-            ClienteRepository repo = new ClienteRepository(con);
+            UsuarioRepository repo = new UsuarioRepository(con);
             return repo.findAllResumen();
         } catch (SQLException e) {
             throw new DataAccessException(e);
@@ -34,9 +34,9 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}")
-    public Cliente show(@PathVariable int id) {
+    public Usuario show(@PathVariable int id) {
         try (Connection con = ds.getConnection()) {
-            ClienteRepository repo = new ClienteRepository(con);
+            UsuarioRepository repo = new UsuarioRepository(con);
             return repo.find(id);
         } catch (SQLException e) {
             throw new DataAccessException(e);
@@ -45,7 +45,7 @@ public class ClienteController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable int id) {
         try (Connection con = ds.getConnection()) {
-            ClienteRepository repo = new ClienteRepository(con);
+            UsuarioRepository repo = new UsuarioRepository(con);
             repo.delete(id);
         } catch (SQLException e) {
             throw new DataAccessException(e);
@@ -53,21 +53,21 @@ public class ClienteController {
     }
     
     @PutMapping("/{id}")
-    public Cliente update(@RequestBody Cliente cliente, @PathVariable int id) {
+    public Usuario update(@RequestBody Usuario usuario, @PathVariable int id) {
 
         try (Connection con = ds.getConnection()) {
 
-            ClienteRepository repo = new ClienteRepository(con);
+            UsuarioRepository repo = new UsuarioRepository(con);
 
-            Cliente existente = repo.find(id);
+            Usuario existente = repo.find(id);
 
-            cliente.setId(id);
-            cliente.setRol(existente.getRol());
-            cliente.setContrasenya(existente.getContrasenya());
+            usuario.setId(id);
+            usuario.setRol(existente.getRol());
+            usuario.setContrasenya(existente.getContrasenya());
 
-            repo.update(cliente);
+            repo.update(usuario);
 
-            return cliente;
+            return usuario;
 
         } catch (SQLException e) {
             throw new DataAccessException(e);
@@ -77,24 +77,24 @@ public class ClienteController {
     @PutMapping("/{id}/rol")
     public void updateRol(@PathVariable int id, @RequestBody java.util.Map<String, String> body) {
         try (Connection con = ds.getConnection()) {
-            ClienteRepository repo = new ClienteRepository(con);
-            Cliente existente = repo.find(id);
+            UsuarioRepository repo = new UsuarioRepository(con);
+            Usuario existente = repo.find(id);
             
             if (existente != null && body.containsKey("rol")) {
                 existente.setRol(body.get("rol"));
                 repo.update(existente);
             }
         } catch (SQLException e) {
-            throw new main.java.clientes.exception.DataAccessException(e);
+            throw new main.java.usuarios.exceptions.DataAccessException(e);
         }
     }
 
     @PostMapping
-    public Cliente store(@RequestBody Cliente cliente) {
+    public Usuario store(@RequestBody Usuario usuario) {
         try (Connection con = ds.getConnection()) {
-            ClienteRepository repo = new ClienteRepository(con);
-            repo.insert(cliente);
-            return cliente;
+            UsuarioRepository repo = new UsuarioRepository(con);
+            repo.insert(usuario);
+            return usuario;
         } catch (SQLException e) {
             throw new DataAccessException(e);
         }

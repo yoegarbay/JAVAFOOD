@@ -1,4 +1,4 @@
-package main.java.clientes.db;
+package main.java.usuarios.db;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import main.java.clientes.config.Config;
-import main.java.clientes.exception.DataAccessException;
-import main.java.clientes.mapper.RowMapper;
+import main.java.usuarios.config.Config;
+import main.java.usuarios.exceptions.DataAccessException;
+import main.java.usuarios.mapper.RowMapper;
 
 public class DB {
 	private DB() {

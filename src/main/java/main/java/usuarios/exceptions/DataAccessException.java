@@ -1,4 +1,4 @@
-package main.java.clientes.exception;
+package main.java.usuarios.exceptions;
 
 @SuppressWarnings("serial")
 public class DataAccessException extends RuntimeException {

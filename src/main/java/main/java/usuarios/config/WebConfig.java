@@ -1,11 +1,10 @@
-package main.java.clientes.config;
+package main.java.usuarios.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-
-import main.java.clientes.interceptor.*;
+import main.java.usuarios.interceptor.*;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {

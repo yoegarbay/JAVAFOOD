@@ -1,6 +1,6 @@
-package main.java.clientes.entity;
+package main.java.usuarios.entity;
 
-public class Cliente {
+public class Usuario {
 
 	private Integer id;
 	private String nombre;
@@ -12,7 +12,7 @@ public class Cliente {
 	private String rol = "CLIENTE";
 
 
-	public Cliente(Integer id, String nombre, String apellidos, String direccion, int telefono, String email, String contrasenya, String rol) {
+	public Usuario(Integer id, String nombre, String apellidos, String direccion, int telefono, String email, String contrasenya, String rol) {
 		this.setId(id);
 		this.setNombre(nombre);
 		this.setApellidos(apellidos);

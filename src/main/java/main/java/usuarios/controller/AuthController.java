@@ -1,4 +1,4 @@
-package main.java.clientes.controller;
+package main.java.usuarios.controller;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -8,11 +8,11 @@ import javax.sql.DataSource;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpSession;
-import main.java.clientes.dto.auth.LoginRequest;
-import main.java.clientes.dto.auth.RegisterRequest;
-import main.java.clientes.entity.Cliente;
-import main.java.clientes.repository.ClienteRepository;
-import main.java.clientes.exception.DataAccessException;
+import main.java.usuarios.dto.auth.LoginRequest;
+import main.java.usuarios.dto.auth.RegisterRequest;
+import main.java.usuarios.entity.Usuario;
+import main.java.usuarios.exceptions.DataAccessException;
+import main.java.usuarios.repository.UsuarioRepository;
 
 @RestController
 @RequestMapping("/auth")
@@ -29,9 +29,9 @@ public class AuthController {
 
         try (Connection con = ds.getConnection()) {
 
-            ClienteRepository repo = new ClienteRepository(con);
+            UsuarioRepository repo = new UsuarioRepository(con);
 
-            Cliente cliente = new Cliente(
+            Usuario cliente = new Usuario(
                 null,
                 req.nombre(),
                 req.apellidos(),
@@ -52,13 +52,13 @@ public class AuthController {
     }
     
     @PostMapping("/login")
-    public Cliente login(@RequestBody LoginRequest req, HttpSession session) {
+    public Usuario login(@RequestBody LoginRequest req, HttpSession session) {
 
         try (Connection con = ds.getConnection()) {
 
-            ClienteRepository repo = new ClienteRepository(con);
+            UsuarioRepository repo = new UsuarioRepository(con);
 
-            Cliente usuario = repo.findByEmailAndPassword(
+            Usuario usuario = repo.findByEmailAndPassword(
                 req.email(),
                 req.contrasenya()
             );

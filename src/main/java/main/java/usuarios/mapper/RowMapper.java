@@ -1,4 +1,4 @@
-package main.java.clientes.mapper;
+package main.java.usuarios.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
