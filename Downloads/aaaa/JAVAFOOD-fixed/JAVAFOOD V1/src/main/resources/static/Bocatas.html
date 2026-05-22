@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaFood | Bocatas & Kebabs</title>
+    <link rel="stylesheet" href="JAVAFOOD.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        .sub-nav { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .sub-btn { padding: 8px 18px; border-radius: 10px; border: 1px solid var(--primary-orange); background: transparent; color: var(--cream); cursor: pointer; font-family: inherit; font-size: 0.85rem; transition: 0.2s; }
+        .sub-btn.active, .sub-btn:hover { background: var(--primary-orange); color: var(--coffee-dark); font-weight: bold; }
+        .section-title {
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--primary-orange); font-weight: bold;
+            padding: 6px 0; margin: 20px 0 10px;
+            border-bottom: 1px solid rgba(209,122,34,0.2);
+        }
+        .card-desc { font-size: 0.72rem; color: rgba(245,232,211,0.5); margin: 4px 0 8px; line-height: 1.4; }
+        .search-container { display:flex; gap:10px; margin-bottom:16px; }
+        .search-container input { flex:1; padding:10px 15px; background:rgba(0,0,0,0.4); border:1px solid rgba(209,122,34,0.3); color:white; border-radius:10px; outline:none; font-family:inherit; }
+        .search-container input:focus { border-color:var(--primary-orange); }
+        .search-container button { padding:10px 15px; background:var(--primary-orange); border:none; border-radius:10px; cursor:pointer; }
+    </style>
+</head>
+<body>
+    <div class="code-overlay"></div>
+    <div class="kiosk-container">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <img src="Javafoodlogo.png" alt="Logo" class="main-logo">
+                <h1>Java<span>Food</span></h1>
+            </div>
+            <nav class="nav-links">
+                <button class="nav-btn" onclick="location.href='Menus.html'">🍱 MENÚS</button>
+                <button class="nav-btn active" onclick="location.href='Principales.html'">🍔 PRINCIPALES</button>
+                <button class="nav-btn" onclick="location.href='Complementos.html'">🍟 COMPLEMENTOS</button>
+                <button class="nav-btn" onclick="location.href='Salsas.html'">🍯 SALSAS</button>
+                <button class="nav-btn" onclick="location.href='Bebidas.html'">🥤 BEBIDAS</button>
+                <button class="nav-btn" onclick="location.href='Postres.html'">🎂 POSTRES</button>
+				<button class="nav-btn" onclick="location.href='Promociones.html'">🎁 PROMOCIONES</button>
+            </nav>
+            <div class="cart-box">
+                <h3 class="cart-title">Tu Pedido</h3>
+                <div class="cart-items-list"></div>
+                <div class="total-row">
+                    <span>Total:</span>
+                    <span class="total-price">0.00€</span>
+                </div>
+                <button class="pay-btn">PAGAR AHORA</button>
+                <button class="clear-btn" onclick="carrito=[];guardarCarrito();">🗑️ Vaciar pedido</button>
+            </div>
+        </aside>
+        <main class="main-view">
+            <header class="top-info">
+                <span>Explorando: <strong>BOCATAS & KEBABS</strong></span>
+                <span class="highlight" id="contador-bocatas">12 Disponibles</span>
+          <div id="auth-area"></div>
+        </header>
+            <div class="promo-banner" style="background: linear-gradient(90deg, #1a0e08, #7d4e1e);">
+                <div class="promo-content">
+                    <h2>WRAP & <br><span>ROLL</span></h2>
+                    <p>Bocatas artesanales y kebabs cargados al máximo.</p>
+                </div>
+                <span style="font-size: 80px;">🥙</span>
+            </div>
+            <div class="sub-nav">
+                <button class="sub-btn" onclick="location.href='Hamburguesas.html'">🍔 Hamburguesas</button>
+                <button class="sub-btn" onclick="location.href='Pizzas.html'">🍕 Pizzas</button>
+                <button class="sub-btn active">🥙 Bocatas & Kebabs</button>
+            </div>
+            <div class="search-container">
+                <input type="text" id="buscador" placeholder="Busca tu bocata o kebab..." oninput="filtrar()">
+                <button>🔍</button>
+            </div>
+            <div id="grid-bocatas" class="food-grid"></div>
+        </main>
+    </div>
+<script src="main.js"></script>
+<script>
+    const KEBAB_DESC = 'Proteína, lechuga, tomate, cebolla, maíz, salsa de yogurt, salsa picante';
+
+    const bocatas = [
+        // Bocatas artesanales
+        { nombre: 'Bocata Especial 1',        precio: 6.50, desc: 'El bocata de la casa — pregunta al empleado por el especial del día', tipo: 'bocata' },
+        { nombre: 'Bocata Especial 2',        precio: 6.50, desc: 'Relleno sorpresa de la semana', tipo: 'bocata' },
+        { nombre: 'Bocata Especial 3',        precio: 6.50, desc: 'Temporada limitada — pregunta en caja', tipo: 'bocata' },
+        { nombre: 'Bocata Especial 4',        precio: 6.50, desc: 'Receta exclusiva del chef', tipo: 'bocata' },
+        { nombre: 'Bocata Especial 5',        precio: 6.50, desc: 'Edición especial de temporada', tipo: 'bocata' },
+        { nombre: 'Bocata Especial 6',        precio: 6.50, desc: 'Creación del día con ingredientes frescos', tipo: 'bocata' },
+        // Durums
+        { nombre: 'Durum Pollo',              precio: 7.00, desc: KEBAB_DESC, tipo: 'durum' },
+        { nombre: 'Durum Ternera',            precio: 7.00, desc: KEBAB_DESC, tipo: 'durum' },
+        { nombre: 'Durum Mixto',              precio: 7.50, desc: KEBAB_DESC + ' · Pollo + Ternera', tipo: 'durum' },
+        // Kebabs
+        { nombre: 'Kebab Pollo',              precio: 7.00, desc: KEBAB_DESC, tipo: 'kebab' },
+        { nombre: 'Kebab Ternera',            precio: 7.00, desc: KEBAB_DESC, tipo: 'kebab' },
+        { nombre: 'Kebab Mixto',              precio: 7.50, desc: KEBAB_DESC + ' · Pollo + Ternera', tipo: 'kebab' }
+    ];
+
+    async function cargarBocatas() {
+        let items = bocatas;
+        try {
+            const res = await fetch('/api/productos/categoria/Bocatas');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.length > 0) items = data.map(p => ({ id_producto: p.id_producto, nombre: p.nombre, precio: p.precio, desc: '', tipo: 'api' }));
+            }
+        } catch (e) {}
+
+        renderBocatas(items);
+    }
+
+    function renderBocatas(items) {
+        const grid = document.getElementById('grid-bocatas');
+        document.getElementById('contador-bocatas').textContent = items.length + ' Disponibles';
+
+        const seccionesHtml = {
+            bocata: `<div class="section-title">🥖 Bocatas Artesanales</div>`,
+            durum: `<div class="section-title">🌯 Durums</div>`,
+            kebab: `<div class="section-title">🥙 Kebabs</div>`,
+            api: ''
+        };
+
+        let html = '';
+        let ultimoTipo = '';
+
+        items.forEach(p => {
+            const tipo = p.tipo || 'api';
+            if (tipo !== ultimoTipo) {
+                html += seccionesHtml[tipo] || '';
+                ultimoTipo = tipo;
+            }
+            html += `
+                <div class="card" data-nombre="${p.nombre.toLowerCase()}">
+                    <img src="Imagenes/Bocatas/${encodeURIComponent(p.nombre)}.jpg"
+                         onerror="this.style.display='none'" alt="${p.nombre}"
+                         style="width:100%;height:140px;object-fit:cover;border-radius:15px;">
+                    <div class="card-body">
+                        <h4>${p.nombre}</h4>
+                        <p class="card-desc">${p.desc}</p>
+                        <div class="card-price">
+                            <span>${p.precio.toFixed(2)}€</span>
+                            <button>+</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Wrap with grid div but sections need to span full width
+        grid.style.display = 'block';
+        grid.innerHTML = `<div class="food-grid" id="inner-grid">${html}</div>`;
+
+        // Move section titles outside the inner grid
+        document.querySelectorAll('.section-title').forEach(el => {
+            grid.insertBefore(el, grid.querySelector('#inner-grid'));
+            el.style.gridColumn = '1 / -1';
+        });
+
+        // Re-render properly
+        grid.innerHTML = '';
+        let currentSection = null;
+        let currentGrid = null;
+
+        items.forEach((p, i) => {
+            const tipo = p.tipo || 'api';
+            if (tipo !== ultimoTipo || i === 0) {
+                if (tipo in seccionesHtml && seccionesHtml[tipo]) {
+                    const title = document.createElement('div');
+                    title.className = 'section-title';
+                    title.innerHTML = seccionesHtml[tipo].replace(/<div.*?>/, '').replace('</div>', '');
+                    grid.appendChild(title);
+                }
+                currentGrid = document.createElement('div');
+                currentGrid.className = 'food-grid';
+                currentGrid.style.marginBottom = '10px';
+                grid.appendChild(currentGrid);
+                ultimoTipo = tipo;
+            }
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.nombre = p.nombre.toLowerCase();
+            if (p.id_producto) card.dataset.id = p.id_producto;
+            card.innerHTML = `
+                <img src="Imagenes/Bocatas/${encodeURIComponent(p.nombre)}.jpg"
+                     onerror="this.style.display='none'" alt="${p.nombre}"
+                     style="width:100%;height:140px;object-fit:cover;border-radius:15px;">
+                <div class="card-body">
+                    <h4>${p.nombre}</h4>
+                    <p class="card-desc">${p.desc}</p>
+                    <div class="card-price">
+                        <span>${p.precio.toFixed(2)}€</span>
+                        <button>+</button>
+                    </div>
+                    <div class="card-stars">★★★★★</div>
+                </div>
+            `;
+            currentGrid.appendChild(card);
+        });
+        if (typeof cargarEstrellasGrid === 'function') cargarEstrellasGrid('grid-bocatas');
+    }
+
+    function filtrar() {
+        const texto = document.getElementById('buscador').value.toLowerCase();
+        document.querySelectorAll('#grid-bocatas .card').forEach(card => {
+            const nombre = card.dataset.nombre || '';
+            card.style.display = nombre.includes(texto) ? '' : 'none';
+        });
+    }
+
+    cargarBocatas();
+</script>
+<script src="resenas.js"></script>
+<script src="auth-rol.js"></script>
+</body>
+</html>

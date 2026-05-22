@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaFood | Pizzas</title>
+    <link rel="stylesheet" href="JAVAFOOD.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        .sub-nav { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .sub-btn { padding: 8px 18px; border-radius: 10px; border: 1px solid var(--primary-orange); background: transparent; color: var(--cream); cursor: pointer; font-family: inherit; font-size: 0.85rem; transition: 0.2s; }
+        .sub-btn.active, .sub-btn:hover { background: var(--primary-orange); color: var(--coffee-dark); font-weight: bold; }
+        .card-desc { font-size: 0.72rem; color: rgba(245,232,211,0.5); margin: 4px 0 8px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+    <div class="code-overlay"></div>
+    <div class="kiosk-container">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <img src="Javafoodlogo.png" alt="Logo" class="main-logo">
+                <h1>Java<span>Food</span></h1>
+            </div>
+            <nav class="nav-links">
+                <button class="nav-btn" onclick="location.href='Menus.html'">🍱 MENÚS</button>
+                <button class="nav-btn active" onclick="location.href='Principales.html'">🍔 PRINCIPALES</button>
+                <button class="nav-btn" onclick="location.href='Complementos.html'">🍟 COMPLEMENTOS</button>
+                <button class="nav-btn" onclick="location.href='Salsas.html'">🍯 SALSAS</button>
+                <button class="nav-btn" onclick="location.href='Bebidas.html'">🥤 BEBIDAS</button>
+                <button class="nav-btn" onclick="location.href='Postres.html'">🎂 POSTRES</button>
+				<button class="nav-btn" onclick="location.href='Promociones.html'">🎁 PROMOCIONES</button>
+            </nav>
+            <div class="cart-box">
+                <h3 class="cart-title">Tu Pedido</h3>
+                <div class="cart-items-list"></div>
+                <div class="total-row">
+                    <span>Total:</span>
+                    <span class="total-price">0.00€</span>
+                </div>
+                <button class="pay-btn">PAGAR AHORA</button>
+                <button class="clear-btn" onclick="carrito=[];guardarCarrito();">🗑️ Vaciar pedido</button>
+            </div>
+        </aside>
+        <main class="main-view">
+            <header class="top-info">
+                <span>Explorando: <strong>PIZZAS</strong></span>
+                <span class="highlight">6 Disponibles</span>
+          <div id="auth-area"></div>
+        </header>
+            <div class="promo-banner" style="background: linear-gradient(90deg, #1a0e08, #c0392b);">
+                <div class="promo-content">
+                    <h2>PIZZA <br><span>FACTORY</span></h2>
+                    <p>Masa artesanal. Ingredientes frescos. Sabor compilado.</p>
+                </div>
+                <span style="font-size: 80px;">🍕</span>
+            </div>
+            <div class="sub-nav">
+                <button class="sub-btn" onclick="location.href='Hamburguesas.html'">🍔 Hamburguesas</button>
+                <button class="sub-btn active">🍕 Pizzas</button>
+                <button class="sub-btn" onclick="location.href='Bocatas.html'">🥙 Bocatas & Kebabs</button>
+            </div>
+            <div class="food-grid" id="grid-pizzas"></div>
+        </main>
+    </div>
+<script src="main.js"></script>
+<script>
+    const pizzas = [
+        { nombre: 'Pizza Pepperoni',  precio: 10.50, desc: 'Tomate, queso, pepperoni' },
+        { nombre: 'Pizza Carbonara',  precio: 11.00, desc: 'Crema, queso, bacon, cebolla, champiñón' },
+        { nombre: 'Pizza BBQ',        precio: 12.00, desc: 'Tomate, queso, carne picada, pollo, bacon, maíz, cebolla, salsa BBQ' },
+        { nombre: 'Pizza Hawaiana',   precio: 10.00, desc: 'Tomate, queso, jamón cocido, piña' },
+        { nombre: 'Pizza Kebab',      precio: 11.50, desc: 'Tomate, queso, carne kebab pollo, carne kebab ternera, salsa de yogurt' },
+        { nombre: 'Pizza Marinera',   precio: 11.00, desc: 'Tomate, queso, gambas, atún, cebolla, pimiento verde' }
+    ];
+
+    async function cargarPizzas() {
+        let items = pizzas;
+        try {
+            const res = await fetch('/api/productos/categoria/Pizzas');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.length > 0) items = data.map(p => ({ id_producto: p.id_producto, nombre: p.nombre, precio: p.precio, desc: '' }));
+            }
+        } catch (e) {}
+
+        const grid = document.getElementById('grid-pizzas');
+        grid.innerHTML = items.map(p => `
+            <div class="card" ${p.id_producto ? 'data-id="' + p.id_producto + '"' : ''}>
+                <img src="Imagenes/Pizzas/${encodeURIComponent(p.nombre)}.jpg"
+                     onerror="this.style.display='none'" alt="${p.nombre}"
+                     style="width:100%;height:140px;object-fit:cover;border-radius:15px;">
+                <div class="card-body">
+                    <h4>${p.nombre}</h4>
+                    <p style="font-size:0.72rem;color:rgba(245,232,211,0.5);margin:4px 0 8px;line-height:1.4;">${p.desc}</p>
+                    <div class="card-price">
+                        <span>${p.precio.toFixed(2)}€</span>
+                        <button>+</button>
+                    </div>
+                    <div class="card-stars">★★★★★</div>
+                </div>
+            </div>
+        `).join('');
+        if (typeof cargarEstrellasGrid === 'function') cargarEstrellasGrid('grid-pizzas');
+    }
+
+    cargarPizzas();
+</script>
+<script src="resenas.js"></script>
+<script src="auth-rol.js"></script>
+</body>
+</html>

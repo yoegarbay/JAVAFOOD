@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaFood — Fichaje</title>
+    <link rel="stylesheet" href="JAVAFOOD.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        .top-bar { width:95%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:14px; }
+        .clock-time { font-size:2.6rem;font-weight:900;color:var(--primary-orange);text-shadow:0 0 18px var(--primary-orange); }
+        .nav-top { display:flex;gap:8px;flex-wrap:wrap; }
+        .nav-top a { padding:8px 16px;border-radius:10px;text-decoration:none;font-size:0.82rem;font-weight:bold;border:1px solid rgba(245,232,211,0.15);color:var(--cream);transition:0.2s; }
+        .nav-top a:hover { background:var(--primary-orange);color:var(--coffee-dark);border-color:var(--primary-orange); }
+        .nav-top a.admin-link { border-color:rgba(231,76,60,0.3);color:#ff8a80; }
+        .nav-top a.admin-link:hover { background:#e74c3c;color:white;border-color:#e74c3c; }
+        .main-layout { width:95%;max-width:1100px;display:flex;gap:20px;flex-wrap:wrap; }
+        .panel-fichar { width:310px;background:var(--glass-bg);border:2px solid var(--primary-orange);border-radius:28px;padding:28px;box-shadow:0 0 40px rgba(209,122,34,0.2); }
+        .panel-historial { flex:1;background:var(--glass-bg);border:1px solid rgba(209,122,34,0.35);border-radius:28px;padding:26px;min-height:500px;display:flex;flex-direction:column; }
+        .section-label { font-size:0.68rem;text-transform:uppercase;letter-spacing:3px;color:var(--primary-orange);border-bottom:1px solid rgba(209,122,34,0.3);padding-bottom:7px;margin-bottom:16px; }
+        select { width:100%;padding:13px;background:rgba(0,0,0,0.45);border:1px solid var(--primary-orange);color:white;border-radius:12px;margin-bottom:15px;font-family:inherit;font-size:1rem;outline:none; }
+        .btn-group { display:flex;gap:12px; }
+        .btn-entrada { flex:1;padding:15px;background:linear-gradient(45deg,#1e6e1e,#4caf50);border:none;border-radius:12px;color:white;font-weight:900;cursor:pointer;font-family:inherit;font-size:1rem; }
+        .btn-salida  { flex:1;padding:15px;background:linear-gradient(45deg,#962020,#e74c3c);border:none;border-radius:12px;color:white;font-weight:900;cursor:pointer;font-family:inherit;font-size:1rem; }
+        .hist-fila { display:grid;grid-template-columns:1fr 80px 95px 80px;gap:10px;padding:10px;border-bottom:1px solid rgba(209,122,34,0.1);font-size:0.85rem;align-items:center; }
+        .badge { padding:3px 8px;border-radius:20px;font-size:0.7rem;font-weight:bold; }
+        .badge-entrada { color:#4caf50;border:1px solid #4caf50;background:rgba(76,175,80,0.1); }
+        .badge-salida  { color:#e74c3c;border:1px solid #e74c3c;background:rgba(231,76,60,0.1); }
+        .msg-flash { margin-top:15px;padding:12px;border-radius:10px;display:none;text-align:center;font-weight:bold; }
+        .turno-info { margin-top:18px;padding:12px;background:rgba(0,0,0,0.3);border-radius:12px;border:1px solid rgba(209,122,34,0.2);font-size:0.85rem; }
+        .turno-info .label { font-size:0.65rem;color:var(--primary-orange);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px; }
+    </style>
+</head>
+<body>
+<div class="code-overlay"></div>
+
+<div class="top-bar">
+    <div>
+        <h1 style="color:white;font-size:1.6rem;">Java<span style="color:var(--primary-orange)">Food</span></h1>
+        <p style="font-size:0.8rem;color:rgba(245,232,211,0.5);">Control de Presencia</p>
+    </div>
+    <nav class="nav-top">
+        <a href="horarios.html">📅 Horarios</a>
+        <a href="AdminFichar.html" class="admin-link">🔐 Admin Fichajes</a>
+        <a href="AdminHorario.html" class="admin-link">⚙️ Admin Horarios</a>
+    </nav>
+    <div class="clock-time" id="clock">00:00:00</div>
+</div>
+
+<div class="main-layout">
+    <div class="panel-fichar">
+        <div class="section-label">Tu Fichaje</div>
+        <select id="sel-empleado" onchange="onEmpleadoChange()">
+            <option value="">— Selecciona tu nombre —</option>
+        </select>
+        <div id="turno-hoy" class="turno-info" style="display:none;">
+            <div class="label">Tu turno hoy</div>
+            <div id="turno-hoy-texto">—</div>
+        </div>
+        <div style="height:14px;"></div>
+        <div class="btn-group">
+            <button class="btn-entrada" onclick="fichar('entrada')">▶ Entrada</button>
+            <button class="btn-salida"  onclick="fichar('salida')">■ Salida</button>
+        </div>
+        <div id="msg-flash" class="msg-flash"></div>
+    </div>
+
+    <div class="panel-historial">
+        <div class="section-label">Mis fichajes recientes</div>
+        <div style="display:grid;grid-template-columns:1fr 80px 95px 80px;gap:10px;padding:7px 10px;font-size:0.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--primary-orange);border-bottom:1px solid rgba(209,122,34,0.25);margin-bottom:6px;">
+            <span>Fecha</span><span>Hora</span><span>Tipo</span><span>Horas</span>
+        </div>
+        <div id="hist-lista" style="overflow-y:auto;flex:1;">
+            <p style="opacity:0.5;text-align:center;margin-top:20px;">Selecciona tu nombre para ver tu historial.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+const TURNOS_LABEL = { manana:'🌅 Mañana', tarde:'🌆 Tarde', noche:'🌙 Noche', partido:'⚡ Partido', libre:'✓ Libre', baja:'🏥 Baja' };
+const TURNOS_HORAS = { manana:'07:00–15:00', tarde:'15:00–23:00', noche:'23:00–07:00', partido:'10:00–14:00 / 18:00–22:00', libre:'—', baja:'—' };
+let EMPLEADOS = [];
+
+function tick() { document.getElementById('clock').textContent = new Date().toLocaleTimeString(); }
+setInterval(tick, 1000); tick();
+
+async function cargarEmpleados() {
+    const res = await fetch('/api/empleados');
+    EMPLEADOS = await res.json();
+    const sel = document.getElementById('sel-empleado');
+    sel.innerHTML = '<option value="">— Selecciona tu nombre —</option>' +
+        EMPLEADOS.map(e => `<option value="${e.id}">${e.nombre} ${e.apellidos || ''}</option>`).join('');
+}
+
+async function onEmpleadoChange() {
+    const idCliente = document.getElementById('sel-empleado').value;
+    if (!idCliente) {
+        document.getElementById('turno-hoy').style.display = 'none';
+        document.getElementById('hist-lista').innerHTML = '';
+        return;
+    }
+    // Mostrar turno de hoy
+    const hoy  = new Date();
+    const anyo = hoy.getFullYear();
+    const mes  = hoy.getMonth() + 1;
+    const res  = await fetch(`/api/horarios/empleado/${idCliente}?anyo=${anyo}&mes=${mes}`);
+    const horarios = await res.json();
+    const diaHoy = hoy.getDate();
+    const horHoy = horarios.find(h => h.anyo === anyo && h.mes === mes && h.dia === diaHoy);
+    const turno  = horHoy ? horHoy.turnoCod : 'libre';
+    document.getElementById('turno-hoy-texto').innerHTML =
+        `<span style="font-weight:bold;color:var(--primary-orange)">${TURNOS_LABEL[turno]}</span>
+         <span style="opacity:0.5;font-size:0.8rem;margin-left:8px;">${TURNOS_HORAS[turno]}</span>`;
+    document.getElementById('turno-hoy').style.display = 'block';
+
+    await renderHistorial(idCliente);
+}
+
+async function fichar(tipo) {
+    const idCliente = document.getElementById('sel-empleado').value;
+    if (!idCliente) { alert('Selecciona tu nombre primero'); return; }
+
+    const ahora = new Date();
+    const fecha = ahora.toISOString().split('T')[0];
+    const hora  = ahora.toTimeString().substring(0, 8); // HH:MM:SS
+
+    const res = await fetch('/api/fichajes', {
+        method:  'POST',
+        headers: {'Content-Type':'application/json'},
+        body:    JSON.stringify({ empleadoId: parseInt(idCliente), tipo, fecha, hora })
+    });
+    const data = await res.json();
+    if (data && data.id != null) {
+        flash(tipo === 'entrada' ? '✅ Entrada registrada' : '🔴 Salida registrada', tipo);
+        await renderHistorial(idCliente);
+    }
+}
+
+async function renderHistorial(idCliente) {
+    const res      = await fetch(`/api/fichajes/empleado/${idCliente}`);
+    const fichajes = await res.json();
+    document.getElementById('hist-lista').innerHTML = fichajes.length
+        ? fichajes.map(f => `
+            <div class="hist-fila">
+                <span style="color:rgba(245,232,211,0.7)">${f.fecha}</span>
+                <span style="color:var(--primary-orange);font-weight:bold">${f.hora}</span>
+                <span><span class="badge badge-${f.tipo}">${f.tipo.toUpperCase()}</span></span>
+                <span style="opacity:0.6">${f.horasCalc != null ? f.horasCalc + 'h' : '—'}</span>
+            </div>`).join('')
+        : '<p style="opacity:0.5;padding:10px;text-align:center;">No tienes fichajes aún.</p>';
+}
+
+function flash(m, tipo) {
+    const el = document.getElementById('msg-flash');
+    el.textContent   = m;
+    el.style.display = 'block';
+    el.style.background = tipo === 'entrada' ? 'rgba(76,175,80,0.2)' : 'rgba(231,76,60,0.2)';
+    el.style.color      = tipo === 'entrada' ? '#4caf50' : '#e74c3c';
+    setTimeout(() => el.style.display = 'none', 3500);
+}
+
+cargarEmpleados();
+</script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAVAFOOD · Detalle Pedido</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #d17a22;
+    --dark:   #2b1b12;
+    --bg:     #0d0804;
+    --cream:  #f5e8d3;
+    --glass:  rgba(43,27,18,0.92);
+    --glow:   rgba(209,122,34,0.35);
+    --border: rgba(209,122,34,0.25);
+    --red:    #e05555;
+  }
+
+  * { font-family:'Space Grotesk',sans-serif; box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--cream); min-height:100vh; }
+
+  /* ── Navbar ─────────────────────────────────────────────────── */
+  nav {
+    background:var(--glass); border-bottom:2px solid var(--orange);
+    box-shadow:0 0 24px var(--glow);
+    padding:14px 32px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand { font-size:1.6rem; font-weight:900; color:#fff; text-decoration:none; }
+  .brand span { color:var(--orange); }
+  .nav-back {
+    color:var(--cream); text-decoration:none; opacity:.6;
+    font-size:.9rem; font-weight:600; transition:.2s;
+  }
+  .nav-back:hover { color:var(--orange); opacity:1; }
+
+  /* ── Page ───────────────────────────────────────────────────── */
+  .page { max-width:620px; margin:50px auto; padding:0 20px 80px; }
+
+  /* ── Ticket ─────────────────────────────────────────────────── */
+  .ticket {
+    background:var(--glass);
+    border:2px solid var(--border);
+    border-radius:24px; overflow:hidden;
+    box-shadow:0 0 50px rgba(0,0,0,.6), 0 0 80px rgba(209,122,34,.06);
+  }
+
+  /* Cabecera del ticket */
+  .ticket-head {
+    background:linear-gradient(135deg,#2b1b12,#1a0f07);
+    border-bottom:1px solid var(--border);
+    padding:30px; text-align:center;
+  }
+  .ticket-head .emoji   { font-size:2.8rem; display:block; margin-bottom:12px; }
+  .ticket-head .titulo  { font-size:1rem; font-weight:700; color:var(--orange); text-transform:uppercase; letter-spacing:2px; }
+  .ticket-head .subtit  { font-size:.8rem; opacity:.4; margin-top:5px; }
+
+  /* Resumen (total grande) */
+  .ticket-total {
+    background:rgba(209,122,34,.07);
+    border-bottom:1px solid var(--border);
+    padding:26px 30px; text-align:center;
+  }
+  .total-num { font-size:3.5rem; font-weight:900; color:var(--orange); line-height:1; }
+  .total-lbl { font-size:.72rem; opacity:.45; text-transform:uppercase; letter-spacing:2px; margin-top:6px; }
+
+  /* Datos del pedido */
+  .ticket-meta { padding:8px 30px 4px; }
+  .meta-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 0; border-bottom:1px solid rgba(209,122,34,.07);
+  }
+  .meta-row:last-child { border-bottom:none; }
+  .meta-lbl { font-size:.72rem; text-transform:uppercase; letter-spacing:1px; color:var(--orange); font-weight:700; }
+  .meta-val { font-size:.95rem; font-weight:600; }
+
+  /* Separador dashed */
+  .dashed { border:none; border-top:2px dashed rgba(209,122,34,.2); margin:0 30px; }
+
+  /* Líneas de productos */
+  .lineas-title {
+    padding:18px 30px 10px;
+    font-size:.72rem; text-transform:uppercase;
+    letter-spacing:1px; color:var(--orange); font-weight:700;
+  }
+  .lineas-lista { padding:0 24px 20px; }
+  .linea {
+    display:flex; justify-content:space-between; align-items:center;
+    background:rgba(0,0,0,.25); border:1px solid rgba(209,122,34,.1);
+    border-radius:12px; padding:12px 16px; margin-bottom:8px;
+  }
+  .linea-nombre { font-size:.9rem; font-weight:600; }
+  .linea-qty    { font-size:.78rem; opacity:.5; margin-top:2px; }
+  .linea-sub    { font-size:.92rem; font-weight:700; color:var(--orange); }
+
+  /* Footer */
+  .ticket-foot {
+    padding:22px 30px;
+    display:flex; gap:12px; flex-wrap:wrap;
+  }
+  .btn-back {
+    flex:1; padding:13px; text-align:center;
+    background:transparent; border:1px solid var(--border);
+    color:var(--cream); font-weight:700; border-radius:12px;
+    text-decoration:none; font-size:.9rem; transition:.2s;
+  }
+  .btn-back:hover { background:rgba(209,122,34,.08); border-color:var(--orange); color:var(--orange); }
+  .btn-del {
+    flex:1; padding:13px; text-align:center;
+    background:rgba(224,85,85,.08); border:1px solid rgba(224,85,85,.25);
+    color:var(--red); font-weight:700; border-radius:12px;
+    font-size:.9rem; cursor:pointer; font-family:inherit; transition:.2s;
+  }
+  .btn-del:hover { background:rgba(224,85,85,.18); }
+
+  /* Loading */
+  .loading { text-align:center; padding:80px 20px; opacity:.5; }
+  .spinner {
+    width:34px; height:34px;
+    border:3px solid rgba(209,122,34,.2);
+    border-top-color:var(--orange);
+    border-radius:50%; animation:spin .7s linear infinite;
+    margin:0 auto 14px;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/index.html" class="brand">JAVA<span>FOOD</span></a>
+  <a href="index.html" class="nav-back">← Volver a Pagos</a>
+</nav>
+
+<div class="page">
+
+  <!-- Spinner mientras carga -->
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Cargando pedido…</p>
+  </div>
+
+  <!-- Ticket (oculto hasta que cargue) -->
+  <div id="ticket" class="ticket" style="display:none">
+
+    <div class="ticket-head">
+      <span class="emoji">🧾</span>
+      <div class="titulo">Comprobante de Pedido</div>
+      <div class="subtit" id="t-id">—</div>
+    </div>
+
+    <div class="ticket-total">
+      <div class="total-num" id="t-total">—</div>
+      <div class="total-lbl">Total €</div>
+    </div>
+
+    <div class="ticket-meta">
+      <div class="meta-row">
+        <span class="meta-lbl">Estado</span>
+        <span class="meta-val" id="t-estado">—</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-lbl">Fecha</span>
+        <span class="meta-val" id="t-fecha">—</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-lbl">Nº líneas</span>
+        <span class="meta-val" id="t-nlineas">—</span>
+      </div>
+    </div>
+
+    <hr class="dashed">
+
+    <div class="lineas-title">Productos del pedido</div>
+    <div class="lineas-lista" id="lineas-lista">
+      <!-- Se rellena con JS -->
+    </div>
+
+    <hr class="dashed">
+
+    <div class="ticket-foot">
+      <a href="index.html" class="btn-back">← Volver</a>
+      <button class="btn-del" id="btn-eliminar" onclick="eliminar()">🗑 Eliminar pedido</button>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="js/show.js"></script>
+</body>
+</html>
