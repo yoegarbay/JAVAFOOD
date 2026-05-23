@@ -30,8 +30,7 @@
             <button class="nav-btn" onclick="location.href='Complementos.html'">🍟 COMPLEMENTOS</button>
             <button class="nav-btn" onclick="location.href='Salsas.html'">🍯 SALSAS</button>
             <button class="nav-btn" onclick="location.href='Bebidas.html'">🥤 BEBIDAS</button>
-			 <button class="nav-btn active">🎂 POSTRES</button>
-			<button class="nav-btn" onclick="location.href='Promociones.html'">🎁 PROMOCIONES</button>
+            <button class="nav-btn active">🎂 POSTRES</button>
         </nav>
 
         <div class="cart-box">
@@ -97,20 +96,20 @@
       return;
     }
     grid.innerHTML = items.map(p => {
-      const idAttr = p.id_producto ? ' data-id="' + p.id_producto + '"' : '';
-      const imgSrc = p.id_producto ? 'Imagenes/Postres/' + encodeURIComponent(p.nombre) + '.jpg' : '';
-      return '<div class="card"' + idAttr + '>' +
-        '<img src="' + imgSrc + '" alt="' + p.nombre + '" onerror="this.style.display='none'" ' +
-          'style="width:100%;height:140px;object-fit:cover;border-radius:15px;">' +
-        '<div class="card-body">' +
-          '<h4>' + p.nombre + '</h4>' +
-          '<div class="card-price">' +
-            '<span>' + Number(p.precio).toFixed(2) + '€</span>' +
-            '<button class="add-btn">+</button>' +
-          '</div>' +
-          '<div class="card-stars">★★★★★</div>' +
-        '</div>' +
-      '</div>';
+      const idAttr = p.id_producto ? ` data-id="${p.id_producto}"` : '';
+      const imgSrc = p.id_producto ? `Imagenes/Postres/${encodeURIComponent(p.nombre)}.jpg` : '';
+      return `
+      <div class="card"${idAttr}>
+        <img src="${imgSrc}" alt="${p.nombre}" onerror="this.style.display='none'" style="width:100%;height:140px;object-fit:cover;border-radius:15px;">
+        <div class="card-body">
+          <h4>${p.nombre}</h4>
+          <div class="card-price">
+            <span>${Number(p.precio).toFixed(2)}€</span>
+            <button class="add-btn">+</button>
+          </div>
+          <div class="card-stars">★★★★★</div>
+        </div>
+      </div>`;
     }).join('');
     if (typeof cargarEstrellasGrid === 'function') cargarEstrellasGrid('grid-postres');
   }

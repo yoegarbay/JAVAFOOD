@@ -8,7 +8,11 @@ import com.productos.mapper.RowMapper;
 public class EmpleadoMapper implements RowMapper<Empleado> {
     @Override
     public Empleado map(ResultSet rs) throws SQLException {
-        return new Empleado(rs.getInt("id"), rs.getString("nombre"), rs.getString("iniciales"),
-                            rs.getString("color"), rs.getBoolean("activo"));
+        String pin = null;
+        try { pin = rs.getString("pin"); } catch (SQLException ignored) {}
+        return new Empleado(
+            rs.getInt("id"), rs.getString("nombre"), rs.getString("iniciales"),
+            rs.getString("color"), rs.getBoolean("activo"), pin
+        );
     }
 }

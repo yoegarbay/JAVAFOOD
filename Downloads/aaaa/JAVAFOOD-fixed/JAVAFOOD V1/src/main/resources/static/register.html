@@ -1,147 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JAVAFOOD · Crear cuenta</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
-<style>
-  :root{--orange:#d17a22;--dark:#2b1b12;--bg:#0d0804;--cream:#f5e8d3;
-        --glass:rgba(43,27,18,0.92);--glow:rgba(209,122,34,0.35);--border:rgba(209,122,34,0.25);--red:#e05555;}
-  *{font-family:'Space Grotesk',sans-serif;box-sizing:border-box;margin:0;padding:0;}
-  body{background:var(--bg);color:var(--cream);min-height:100vh;display:flex;
-       flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;}
-  .brand{font-size:1.8rem;font-weight:900;color:#fff;margin-bottom:28px;
-         text-decoration:none;display:flex;align-items:center;gap:12px;}
-  .brand img{width:48px;height:48px;border-radius:50%;border:2px solid var(--orange);}
-  .brand span{color:var(--orange);}
-  .card{background:var(--glass);border:1px solid var(--border);border-radius:24px;
-        overflow:hidden;width:100%;max-width:480px;box-shadow:0 0 60px rgba(0,0,0,.7);}
-  .card-header{padding:20px 30px 16px;border-bottom:1px solid var(--border);
-               background:rgba(209,122,34,0.06);}
-  .card-header h2{font-size:1rem;letter-spacing:2px;color:var(--orange);font-weight:900;}
-  .card-header p{font-size:.8rem;opacity:.45;margin-top:4px;}
-  .card-body{padding:28px 30px;}
-  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-  .field{margin-bottom:16px;}
-  .field label{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:1px;
-               color:var(--orange);font-weight:700;margin-bottom:6px;}
-  .field input{width:100%;padding:11px 14px;background:rgba(0,0,0,.5);
-               border:1px solid rgba(209,122,34,.35);color:#fff;border-radius:10px;
-               font-family:inherit;font-size:.9rem;outline:none;transition:.2s;}
-  .field input:focus{border-color:var(--orange);box-shadow:0 0 8px var(--glow);}
-  .field input::placeholder{opacity:.35;}
-  .field input.invalid{border-color:var(--red)!important;}
-  .btn-submit{width:100%;padding:14px;background:linear-gradient(45deg,#d17a22,#f5e8d3);
-    color:var(--dark);font-weight:900;border:none;border-radius:12px;cursor:pointer;
-    font-size:.95rem;font-family:inherit;transition:.2s;margin-top:8px;}
-  .btn-submit:hover{transform:translateY(-2px);box-shadow:0 0 18px var(--glow);}
-  .btn-submit:disabled{opacity:.4;cursor:not-allowed;transform:none;}
-  .msg{padding:12px 14px;border-radius:10px;margin-top:14px;font-size:.85rem;
-       font-weight:600;text-align:center;display:none;}
-  .msg.ok {background:rgba(76,175,80,.15);border:1px solid rgba(76,175,80,.3);color:#4caf50;}
-  .msg.err{background:rgba(224,85,85,.15);border:1px solid rgba(224,85,85,.3);color:var(--red);}
-  .foot{display:flex;justify-content:space-between;align-items:center;
-        margin-top:20px;font-size:.82rem;}
-  .foot a{color:var(--cream);opacity:.5;text-decoration:none;transition:.2s;}
-  .foot a:hover{opacity:.9;color:var(--orange);}
-  .foot .login-link{color:var(--orange);font-weight:700;opacity:1;}
-</style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaFood - Registro</title>
+    <link rel="stylesheet" href="/css/app.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-<a href="index.html" class="brand">
-  <img src="Javafoodlogo.png" alt="Logo" onerror="this.style.display='none'">
-  JAVA<span>FOOD</span>
-</a>
+  <body>
+    <div class="code-overlay"></div>
 
-<div class="card">
-  <div class="card-header">
-    <h2>CREAR CUENTA</h2>
-    <p>Todos los campos son obligatorios</p>
-  </div>
-  <div class="card-body">
-    <div class="row-2">
-      <div class="field"><label>Nombre</label>
-        <input id="r-nombre" type="text" placeholder="Tu nombre"></div>
-      <div class="field"><label>Apellidos</label>
-        <input id="r-apellidos" type="text" placeholder="Tus apellidos"></div>
+    <div
+      class="kiosk-container"
+      style="justify-content: center; align-items: center"
+    >
+      <div class="sidebar" style="width: 400px; margin: auto">
+        <div class="logo-area">
+          <h1>Java<span>Food</span></h1>
+          <p>Regístrate Aquí:</p>
+        </div>
+
+        <form class="form" onsubmit="registrarUsuario(event)">
+          <input id="nombre" type="text" placeholder="Nombre" required />
+          <input id="apellidos" type="text" placeholder="Apellidos" required />
+          <input id="direccion" type="text" placeholder="Dirección" required />
+          <input id="telefono" type="tel" placeholder="Teléfono" required />
+          <input
+            id="email"
+            type="email"
+            placeholder="Correo Electrónico"
+            required
+          />
+          <input
+            id="password"
+            type="password"
+            placeholder="Contraseña"
+            required
+          />
+
+          <button type="submit" class="pay-btn">Registrarse</button>
+        </form>
+
+        <p style="margin-top: 15px; text-align: center">
+          ¿Ya tienes cuenta?
+          <a href="login.html" class="link">Inicia sesión</a>
+        </p>
+
+        <p id="mensaje" class="message"></p>
+      </div>
     </div>
-    <div class="field"><label>Email</label>
-      <input id="r-email" type="email" placeholder="tu@email.com"></div>
-    <div class="row-2">
-      <div class="field"><label>Teléfono</label>
-        <input id="r-telefono" type="tel" placeholder="600 000 000"></div>
-      <div class="field"><label>Contraseña</label>
-        <input id="r-pass" type="password" placeholder="Mínimo 4 caracteres"
-               onkeydown="if(event.key==='Enter')doRegistro()"></div>
-    </div>
-    <div class="field"><label>Dirección</label>
-      <input id="r-direccion" type="text" placeholder="Calle, número, ciudad"></div>
 
-    <button class="btn-submit" id="btn-reg" onclick="doRegistro()">Crear cuenta →</button>
-    <div class="msg" id="msg-reg"></div>
-  </div>
-</div>
-
-<div class="foot">
-  <a href="index.html" class="volver">← Volver sin registrarse</a>
-  <span>¿Ya tienes cuenta? <a href="login.html" class="login-link">Inicia sesión</a></span>
-</div>
-
-<script>
-const redirect = new URLSearchParams(location.search).get("next") || "index.html";
-
-async function doRegistro() {
-    const nombre    = document.getElementById("r-nombre").value.trim();
-    const apellidos = document.getElementById("r-apellidos").value.trim();
-    const email     = document.getElementById("r-email").value.trim();
-    const telefono  = document.getElementById("r-telefono").value.trim();
-    const pass      = document.getElementById("r-pass").value;
-    const direccion = document.getElementById("r-direccion").value.trim();
-    const btn = document.getElementById("btn-reg");
-    const msg = document.getElementById("msg-reg");
-
-    // Validación básica
-    if (!nombre || !apellidos || !email || !telefono || !pass || !direccion) {
-        showMsg(msg, "err", "❌ Rellena todos los campos");
-        return;
-    }
-    if (pass.length < 4) {
-        showMsg(msg, "err", "❌ La contraseña debe tener mínimo 4 caracteres");
-        return;
-    }
-
-    btn.disabled = true; btn.textContent = "Creando cuenta…";
-
-    try {
-        const res = await fetch("/api/clientes/registro", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ nombre, apellidos, email, telefono, password: pass, direccion })
-        });
-
-        let data = {};
-        try { data = await res.json(); } catch (_) {}
-
-        if (!res.ok) {
-            throw new Error(data.detalle || data.mensaje || "Error al registrar la cuenta");
-        }
-
-        // Guardar sesión con el mismo objeto que devuelve el backend
-        sessionStorage.setItem("javafoodUser", JSON.stringify(data));
-        showMsg(msg, "ok", "✅ ¡Cuenta creada! Bienvenido, " + (data.nom || data.nombre || nombre) + " 🎉");
-        setTimeout(() => location.href = redirect, 1000);
-
-    } catch (e) {
-        showMsg(msg, "err", "❌ " + e.message);
-        btn.disabled = false; btn.textContent = "Crear cuenta →";
-    }
-}
-
-function showMsg(el, tipo, txt) {
-    el.className = "msg " + tipo; el.textContent = txt; el.style.display = "block";
-}
-</script>
-</body>
+    <script src="/js/inicioRegistro/register.js"></script>
+  </body>
 </html>

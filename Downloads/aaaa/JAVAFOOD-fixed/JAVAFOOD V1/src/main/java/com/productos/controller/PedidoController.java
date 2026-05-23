@@ -2,11 +2,13 @@ package com.productos.controller;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.springframework.web.bind.annotation.*;
 
+import com.productos.dto.PedidoAdminResponse;
 import com.productos.dto.PedidoRequest;
 import com.productos.dto.PedidoResponse;
 import com.productos.exception.DataAccessException;
@@ -24,14 +26,6 @@ public class PedidoController {
 
     /**
      * POST /api/pedidos
-     * Body JSON:
-     * {
-     *   "nombreCliente": "Juan",
-     *   "metodoPago": "TARJETA",
-     *   "items": [
-     *     { "nombre": "Nachos", "precio": 4.80, "cantidad": 2, "total": 9.60 }
-     *   ]
-     * }
      */
     @PostMapping
     public PedidoResponse pagar(@RequestBody PedidoRequest request) {
@@ -43,6 +37,20 @@ public class PedidoController {
                 request.getMetodoPago(),
                 request.getIdCliente()
             );
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
+    }
+
+    /**
+     * GET /api/pedidos/mis/{idCliente}
+     * Devuelve solo los pedidos del cliente logueado.
+     * El frontend lee idCliente de sessionStorage y llama a este endpoint.
+     */
+    @GetMapping("/mis/{idCliente}")
+    public List<PedidoAdminResponse> misPedidos(@PathVariable int idCliente) {
+        try (Connection con = ds.getConnection()) {
+            return new PedidoRepository(con).findByCliente(idCliente);
         } catch (SQLException e) {
             throw new DataAccessException(e);
         }

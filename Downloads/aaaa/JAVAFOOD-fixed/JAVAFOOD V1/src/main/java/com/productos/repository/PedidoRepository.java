@@ -31,11 +31,9 @@ public class PedidoRepository {
             con.setAutoCommit(false);
 
             // ── Validación de stock con SELECT FOR UPDATE ─────────────────────
-            // Solo para items que vienen con id_producto conocido
             ProductosRepository prodRepo = new ProductosRepository(con);
             for (PedidoRequest.LineaPedido item : items) {
                 if (item.getIdProducto() != null && item.getIdProducto() > 0) {
-                    // Lanza DataAccessException si stock insuficiente
                     prodRepo.decrementarStock(item.getIdProducto(), item.getCantidad());
                 }
             }
@@ -74,7 +72,7 @@ public class PedidoRepository {
 
         } catch (DataAccessException dae) {
             try { con.rollback(); } catch (SQLException ex) { /* ignorar */ }
-            throw dae;   // re-lanzar tal cual para que el controller devuelva 400
+            throw dae;
         } catch (SQLException e) {
             try { con.rollback(); } catch (SQLException ex) { /* ignorar */ }
             throw new DataAccessException("Error al procesar el pedido", e);
@@ -83,12 +81,54 @@ public class PedidoRepository {
         }
     }
 
+    // ── CLIENTE: mis pedidos (filtrado por id_cliente) ────────────────────────
+    public List<PedidoAdminResponse> findByCliente(int idCliente) {
+        List<PedidoAdminResponse> lista = new ArrayList<>();
+        String sql = "SELECT id_pedido, fecha, total, estado, nombre_cliente, metodo_pago " +
+                     "FROM pedidos WHERE id_cliente = ? ORDER BY fecha DESC";
+        try (PreparedStatement st = con.prepareStatement(sql)) {
+            st.setInt(1, idCliente);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id_pedido");
+                PedidoAdminResponse p = new PedidoAdminResponse(
+                    id,
+                    rs.getTimestamp("fecha").toLocalDateTime().toString(),
+                    rs.getFloat("total"),
+                    rs.getString("estado"),
+                    new ArrayList<>(),
+                    rs.getString("nombre_cliente"),
+                    rs.getString("metodo_pago")
+                );
+                lista.add(p);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error al listar pedidos del cliente #" + idCliente, e);
+        }
+
+        // Cargar líneas de cada pedido
+        for (PedidoAdminResponse p : lista) {
+            String sqlLineas = "SELECT id_linea, nombre_producto, cantidad, precio_unitario, subtotal " +
+                               "FROM pedido_detalle WHERE id_pedido = ? ORDER BY id_linea";
+            try (PreparedStatement st = con.prepareStatement(sqlLineas)) {
+                st.setInt(1, p.getId_pedido());
+                ResultSet rs = st.executeQuery();
+                while (rs.next())
+                    p.getLineas().add(new PedidoAdminResponse.LineaDetalle(
+                        rs.getInt("id_linea"), rs.getString("nombre_producto"),
+                        rs.getInt("cantidad"), rs.getFloat("precio_unitario"), rs.getFloat("subtotal")));
+            } catch (SQLException e) {
+                throw new DataAccessException("Error al cargar líneas del pedido #" + p.getId_pedido(), e);
+            }
+        }
+        return lista;
+    }
+
     // ── ADMIN: listar todos ───────────────────────────────────────────────────
-    
     public List<PedidoAdminResponse> findAllPedidoAdminResponse() {
         List<PedidoAdminResponse> lista = new ArrayList<>();
         try (PreparedStatement st = con.prepareStatement(
-                "SELECT id_pedido, fecha, total, estado FROM pedidos ORDER BY fecha DESC")) { // JOIN con tabla users
+                "SELECT id_pedido, fecha, total, estado FROM pedidos ORDER BY fecha DESC")) {
             ResultSet rs = st.executeQuery();
             while (rs.next())
                 lista.add(new PedidoAdminResponse(rs.getInt("id_pedido"),
@@ -126,7 +166,7 @@ public class PedidoRepository {
         return pedido;
     }
 
-    // ── ADMIN: actualizar pedido completo (estado + cliente + pago + líneas) ──
+    // ── ADMIN: actualizar pedido completo ─────────────────────────────────────
     public void updateFull(int id, PedidoEditRequest req) {
         if (req.getItems() == null || req.getItems().isEmpty())
             throw new DataAccessException("El pedido debe tener al menos un producto");
@@ -149,7 +189,6 @@ public class PedidoRepository {
                 if (st.executeUpdate() == 0) throw new DataAccessException("Pedido #" + id + " no encontrado");
             }
 
-            // Borrar líneas viejas e insertar las nuevas
             try (PreparedStatement st = con.prepareStatement(
                     "DELETE FROM pedido_detalle WHERE id_pedido=?")) {
                 st.setInt(1, id); st.executeUpdate();
@@ -174,7 +213,7 @@ public class PedidoRepository {
         }
     }
 
-    // ── ADMIN: solo estado (usado por la página de usuario) ──────────────────
+    // ── ADMIN: solo estado ────────────────────────────────────────────────────
     public void updateEstado(int id, String estado) {
         try (PreparedStatement st = con.prepareStatement(
                 "UPDATE pedidos SET estado=? WHERE id_pedido=?")) {
@@ -183,7 +222,7 @@ public class PedidoRepository {
         } catch (SQLException e) { throw new DataAccessException("Error al actualizar estado #" + id, e); }
     }
 
-    // ── ADMIN: nombres de clientes distintos (para datalist) ─────────────────
+    // ── ADMIN: nombres de clientes distintos ──────────────────────────────────
     public List<String> findClientes() {
         List<String> lista = new ArrayList<>();
         try (PreparedStatement st = con.prepareStatement(

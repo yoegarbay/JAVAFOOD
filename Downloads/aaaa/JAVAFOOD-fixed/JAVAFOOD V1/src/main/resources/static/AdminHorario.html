@@ -1,66 +1,114 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JavaFood — Admin Horarios</title>
-    <link rel="stylesheet" href="/css/JAVAFOOD.css">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaFood — Admin Horarios</title>
+<link rel="stylesheet" href="/JAVAFOOD.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+.btn-editar {
+  background: rgba(209,122,34,0.15); border: 1px solid var(--primary-orange);
+  color: var(--primary-orange); padding: 10px 18px; border-radius: 12px;
+  font-weight: bold; cursor: pointer; font-family: inherit; transition: 0.2s;
+}
+.btn-editar:hover { background: rgba(209,122,34,0.3); }
+.btn-delete {
+  background: rgba(231,76,60,0.12); border: 1px solid #e74c3c;
+  color: #e74c3c; padding: 10px 18px; border-radius: 12px;
+  font-weight: bold; cursor: pointer; font-family: inherit; transition: 0.2s;
+}
+.btn-delete:hover { background: rgba(231,76,60,0.28); }
+.cal-celda.clickable { cursor: pointer; }
+.cal-celda.clickable:hover { border-color: var(--primary-orange); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(209,122,34,0.2); }
+</style>
 </head>
 <body>
 <div class="code-overlay"></div>
-
 <div class="page-wrapper">
-    <div class="page-header">
-        <div class="header-left">
-            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="32" cy="32" r="30" stroke="#d17a22" stroke-width="3"/>
-                <path d="M32 20V32L40 36" stroke="#d17a22" stroke-width="3" stroke-linecap="round"/>
-            </svg>
-            <div>
-                <h1>Java<span>Admin</span></h1>
-                <p>Panel de Gestión de Turnos</p>
-            </div>
-        </div>
-        <div class="header-controls">
-            <a href="/" class="nav-btn" style="text-decoration:none;padding:10px 16px;border-radius:10px;border:1px solid rgba(245,232,211,0.15);color:var(--cream);font-size:.82rem;">🏠 Inicio</a>
-            <a href="/horarios" class="nav-btn" style="text-decoration:none;padding:10px 16px;border-radius:10px;border:1px solid rgba(209,122,34,0.35);color:var(--primary-orange);font-size:.82rem;">📅 Ver Horarios</a>
-            <a href="/admin/fichar" class="nav-btn" style="text-decoration:none;padding:10px 16px;border-radius:10px;border:1px solid rgba(231,76,60,0.35);color:#e74c3c;font-size:.82rem;">📋 Admin Fichajes</a>
-            <div class="mes-nav">
-                <button class="mes-btn" onclick="cambiarMes(-1)">‹</button>
-                <div class="mes-nombre" id="mes-label">—</div>
-                <button class="mes-btn" onclick="cambiarMes(1)">›</button>
-            </div>
-        </div>
+
+  <div class="page-header">
+    <div class="header-left">
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="32" cy="32" r="30" stroke="#d17a22" stroke-width="3"/>
+        <path d="M32 20V32L40 36" stroke="#d17a22" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <div><h1>Java<span>Admin</span></h1><p>Panel de Gestión de Turnos</p></div>
     </div>
-
-    <div class="admin-controls">
-        <div class="empleados-tabs" id="empleados-tabs"></div>
-        <button class="btn-save" onclick="agregarEmpleado()">+ Añadir Empleado</button>
+    <div class="header-controls">
+      <a href="/" class="nav-btn">🏠 Inicio</a>
+      <a href="/horarios.html" class="nav-btn">📅 Ver Horarios</a>
+      <a href="/AdminFichar.html" class="nav-btn admin-btn">📋 Admin Fichajes</a>
+      <div class="mes-nav">
+        <button class="mes-btn" onclick="cambiarMes(-1)">‹</button>
+        <div class="mes-nombre" id="mes-label">—</div>
+        <button class="mes-btn" onclick="cambiarMes(1)">›</button>
+      </div>
     </div>
+  </div>
 
-    <div class="resumen-mes" id="resumen-admin"></div>
+  <div class="admin-controls">
+    <div class="empleados-tabs" id="empleados-tabs"></div>
+    <div style="display:flex;gap:10px;flex-shrink:0;">
+      <button class="btn-save" onclick="abrirModal('modal-nuevo-emp')">+ Añadir Empleado</button>
+      <button class="btn-editar" id="btn-editar-emp" onclick="abrirModalEditarEmpleado()" style="display:none;">✏ Editar</button>
+      <button class="btn-delete" id="btn-delete-emp" onclick="confirmarBorrarEmpleado()" style="display:none;">✕ Borrar</button>
+    </div>
+  </div>
 
-    <div class="cal-grid" id="cal-grid"></div>
+  <div class="resumen-mes" id="resumen-admin"></div>
+  <div class="cal-grid" id="cal-grid"></div>
 </div>
 
-<!-- Modal editar turno -->
-<div class="modal-overlay" id="modal-admin" onclick="if(event.target===this)cerrarAdminModal()">
-    <div class="modal-content">
-        <button class="modal-close" onclick="cerrarAdminModal()">×</button>
-        <h2 id="admin-modal-titulo">Editar Turno</h2>
-        <div class="modal-body">
-            <label>Empleado</label>
-            <input type="text" id="edit-emp-nombre" readonly style="margin-bottom:15px;">
-            <label>Seleccionar Turno</label>
-            <select id="edit-turno-select" style="margin-bottom:20px;"></select>
-            <button class="confirm-btn" onclick="aplicarCambioTurno()">Actualizar Turno</button>
-        </div>
+<!-- Modal asignar turno -->
+<div class="modal-overlay" id="modal-turno" onclick="if(event.target===this)cerrarModal('modal-turno')">
+  <div class="modal-content">
+    <button class="modal-close" onclick="cerrarModal('modal-turno')">×</button>
+    <h2 id="modal-turno-titulo">Editar Turno</h2>
+    <div class="modal-sub" id="modal-turno-sub"></div>
+    <div class="modal-body">
+      <label>Empleado</label>
+      <select id="modal-emp-select" style="margin-bottom:16px;" onchange="actualizarTurnoSeleccionado()"></select>
+      <label>Turno</label>
+      <select id="modal-turno-select" style="margin-bottom:4px;"></select>
+      <button class="confirm-btn" onclick="aplicarCambioTurno()">Actualizar Turno</button>
     </div>
+  </div>
+</div>
+
+<!-- Modal nuevo empleado -->
+<div class="modal-overlay" id="modal-nuevo-emp" onclick="if(event.target===this)cerrarModal('modal-nuevo-emp')">
+  <div class="modal-content">
+    <button class="modal-close" onclick="cerrarModal('modal-nuevo-emp')">×</button>
+    <h2>Nuevo Empleado</h2>
+    <div class="modal-body">
+      <label>Nombre completo</label>
+      <input type="text" id="new-nombre" placeholder="Nombre completo..." style="margin-bottom:12px;">
+      <label>Color</label>
+      <input type="color" id="new-color" value="#d17a22" style="width:100%;height:42px;border-radius:10px;border:1px solid var(--primary-orange);background:transparent;cursor:pointer;margin-bottom:4px;">
+      <button class="confirm-btn" onclick="guardarNuevoEmpleado()">Guardar Empleado</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal editar empleado (visual) -->
+<div class="modal-overlay" id="modal-editar-emp" onclick="if(event.target===this)cerrarModal('modal-editar-emp')">
+  <div class="modal-content">
+    <button class="modal-close" onclick="cerrarModal('modal-editar-emp')">×</button>
+    <h2>Editar Empleado</h2>
+    <div class="modal-body">
+      <label>Nombre</label>
+      <input type="text" id="edit-nombre" style="margin-bottom:12px;">
+      <label>Color</label>
+      <input type="color" id="edit-color" style="width:100%;height:42px;border-radius:10px;border:1px solid var(--primary-orange);background:transparent;cursor:pointer;margin-bottom:4px;">
+      <button class="confirm-btn" style="background:rgba(209,122,34,0.2);cursor:not-allowed;opacity:0.6;" disabled>Próximamente</button>
+    </div>
+  </div>
 </div>
 
 <script>
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DIAS_SEMANA = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
 
 let añoActual = new Date().getFullYear();
 let mesActual = new Date().getMonth() + 1;
@@ -68,137 +116,231 @@ let empSelec = null;
 let diaEditando = null;
 let EMPLEADOS = [];
 let TURNOS = [];
-let HORARIOS = {}; // "empId-dia" => turnoCod
+let HORARIOS = {};
 
 async function loadAll() {
+  try {
     const [emps, turnos, hors] = await Promise.all([
-        fetch('/api/empleados').then(r => r.json()),
-        fetch('/api/horarios/turnos').then(r => r.json()),
-        fetch(`/api/horarios?anyo=${añoActual}&mes=${mesActual}`).then(r => r.json())
+      fetch('/api/empleados').then(r => r.json()),
+      fetch('/api/horarios/turnos').then(r => r.json()),
+      fetch(`/api/horarios?anyo=${añoActual}&mes=${mesActual}`).then(r => r.json())
     ]);
     EMPLEADOS = emps;
     TURNOS = turnos;
     HORARIOS = {};
-    hors.forEach(h => { HORARIOS[`${h.empleadoId}-${h.dia}`] = h.turnoCod; });
-    if (!empSelec && EMPLEADOS.length > 0) empSelec = EMPLEADOS[0].id;
-    populateTurnoSelect();
+    // FIX: el servidor devuelve snake_case → leer empleado_id y turno_cod
+    hors.forEach(h => {
+      const empId = h.empleado_id ?? h.empleadoId;
+      const cod   = h.turno_cod   ?? h.turnoCod;
+      if (empId != null) HORARIOS[`${empId}-${h.dia}`] = cod;
+    });
     render();
-}
-
-function populateTurnoSelect() {
-    const sel = document.getElementById('edit-turno-select');
-    sel.innerHTML = TURNOS.map(t => `<option value="${t.codigo}">${t.emoji} ${t.nombre}</option>`).join('');
+  } catch(err) { console.error('Error loadAll:', err); }
 }
 
 function getTurno(empId, dia) {
-    return HORARIOS[`${empId}-${dia}`] || 'libre';
+  return HORARIOS[`${empId}-${dia}`] || 'libre';
 }
 
 function render() {
-    document.getElementById('mes-label').textContent = `${MESES[mesActual-1]} ${añoActual}`;
-    buildTabs();
-    buildResumen();
-    buildCalendarioAdmin();
+  document.getElementById('mes-label').textContent = `${MESES[mesActual-1]} ${añoActual}`;
+  buildTabs();
+  buildResumen();
+  buildCalendario();
 }
 
 function buildTabs() {
-    const cont = document.getElementById('empleados-tabs');
-    cont.innerHTML = '';
-    EMPLEADOS.forEach(e => {
-        const btn = document.createElement('button');
-        btn.className = 'tab-emp' + (empSelec === e.id ? ' active' : '');
-        btn.innerHTML = `<span class="tab-dot" style="background:${e.color};"></span> ${e.nombre}`;
-        btn.onclick = () => { empSelec = e.id; render(); };
-        cont.appendChild(btn);
-    });
+  const cont = document.getElementById('empleados-tabs');
+  cont.innerHTML = '';
+  const btnTodos = document.createElement('button');
+  btnTodos.className = 'tab-emp' + (empSelec === null ? ' active' : '');
+  btnTodos.innerHTML = `<span class="tab-dot" style="background:var(--primary-orange);"></span> Todos`;
+  btnTodos.onclick = () => { empSelec = null; actualizarBotonesEmp(); render(); };
+  cont.appendChild(btnTodos);
+  EMPLEADOS.forEach(e => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-emp' + (empSelec === e.id ? ' active' : '');
+    btn.innerHTML = `<span class="tab-dot" style="background:${e.color||'#d17a22'};"></span> ${e.nombre}`;
+    btn.onclick = () => { empSelec = e.id; actualizarBotonesEmp(); render(); };
+    cont.appendChild(btn);
+  });
+}
+
+function actualizarBotonesEmp() {
+  const v = empSelec !== null;
+  document.getElementById('btn-editar-emp').style.display = v ? 'block' : 'none';
+  document.getElementById('btn-delete-emp').style.display = v ? 'block' : 'none';
 }
 
 function buildResumen() {
-    const totalDias = new Date(añoActual, mesActual, 0).getDate();
-    const cont = document.getElementById('resumen-admin');
-    let cuentas = {};
-    TURNOS.forEach(t => cuentas[t.codigo] = 0);
-    for (let d = 1; d <= totalDias; d++) cuentas[getTurno(empSelec, d)] = (cuentas[getTurno(empSelec, d)] || 0) + 1;
-    const horasTrab = ((cuentas.manana||0) + (cuentas.tarde||0) + (cuentas.noche||0) + (cuentas.partido||0)) * 8;
-    cont.innerHTML = `
-        <div class="res-card"><div class="res-num">${totalDias}</div><div class="res-label">Días del mes</div></div>
-        <div class="res-card"><div class="res-num">${cuentas.manana||0}</div><div class="res-label">Mañanas</div></div>
-        <div class="res-card"><div class="res-num">${cuentas.tarde||0}</div><div class="res-label">Tardes</div></div>
-        <div class="res-card"><div class="res-num">${cuentas.noche||0}</div><div class="res-label">Noches</div></div>
-        <div class="res-card"><div class="res-num">${cuentas.libre||0}</div><div class="res-label">Libres</div></div>
-        <div class="res-card"><div class="res-num">${horasTrab}h</div><div class="res-label">Horas est.</div></div>
-    `;
-}
-
-function buildCalendarioAdmin() {
-    const grid = document.getElementById('cal-grid');
-    grid.innerHTML = '';
-    ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].forEach(d => {
-        const el = document.createElement('div'); el.className = 'cal-dia-nombre'; el.textContent = d;
-        grid.appendChild(el);
-    });
-
-    const primer = new Date(añoActual, mesActual - 1, 1);
-    let diaInicio = primer.getDay() === 0 ? 6 : primer.getDay() - 1;
-    const totalDias = new Date(añoActual, mesActual, 0).getDate();
-
-    for (let i = 0; i < diaInicio; i++) {
-        grid.appendChild(Object.assign(document.createElement('div'), {className: 'cal-celda vacio'}));
-    }
-
-    const TURNO_LABELS = {};
-    TURNOS.forEach(t => TURNO_LABELS[t.codigo] = `${t.emoji} ${t.nombre}`);
-
+  const totalDias = new Date(añoActual, mesActual, 0).getDate();
+  const emps = empSelec === null ? EMPLEADOS : EMPLEADOS.filter(e => e.id === empSelec);
+  let cuentas = {};
+  TURNOS.forEach(t => cuentas[t.codigo] = 0);
+  emps.forEach(e => {
     for (let d = 1; d <= totalDias; d++) {
-        const cel = document.createElement('div');
-        cel.className = 'cal-celda editable-cell';
-        const t = getTurno(empSelec, d);
-        cel.innerHTML = `
-            <div class="num-dia">${d}</div>
-            <div class="turno-chip turno-${t}">${TURNO_LABELS[t] || t}</div>
-            <div style="font-size:.6rem;color:gray;margin-top:5px;">✏ Editar</div>
-        `;
-        cel.onclick = () => abrirAdminModal(d);
-        grid.appendChild(cel);
+      const t = getTurno(e.id, d);
+      cuentas[t] = (cuentas[t] || 0) + 1;
     }
+  });
+  const horas = ((cuentas.manana||0)+(cuentas.tarde||0)+(cuentas.noche||0)+(cuentas.partido||0))*8;
+  document.getElementById('resumen-admin').innerHTML = `
+    <div class="res-card"><div class="res-num">${totalDias}</div><div class="res-label">Días del mes</div></div>
+    <div class="res-card"><div class="res-num">${cuentas.manana||0}</div><div class="res-label">Mañanas</div></div>
+    <div class="res-card"><div class="res-num">${cuentas.tarde||0}</div><div class="res-label">Tardes</div></div>
+    <div class="res-card"><div class="res-num">${cuentas.noche||0}</div><div class="res-label">Noches</div></div>
+    <div class="res-card"><div class="res-num">${cuentas.libre||0}</div><div class="res-label">Libres</div></div>
+    <div class="res-card"><div class="res-num">${horas}h</div><div class="res-label">Horas est.</div></div>`;
 }
 
-function abrirAdminModal(d) {
-    diaEditando = d;
-    const emp = EMPLEADOS.find(e => e.id === empSelec);
-    document.getElementById('edit-emp-nombre').value = emp ? emp.nombre : '';
-    document.getElementById('admin-modal-titulo').textContent = `Día ${d} — ${MESES[mesActual-1]} ${añoActual}`;
-    document.getElementById('edit-turno-select').value = getTurno(empSelec, d);
-    document.getElementById('modal-admin').classList.add('open');
+function buildCalendario() {
+  const hoy = new Date();
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+  DIAS_SEMANA.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dia-nombre'; el.textContent = d;
+    grid.appendChild(el);
+  });
+  const primer = new Date(añoActual, mesActual - 1, 1);
+  let diaInicio = primer.getDay() === 0 ? 6 : primer.getDay() - 1;
+  const totalDias = new Date(añoActual, mesActual, 0).getDate();
+
+  for (let i = 0; i < diaInicio; i++)
+    grid.appendChild(Object.assign(document.createElement('div'), {className:'cal-celda vacio'}));
+
+  const TURNO_LABELS = {};
+  TURNOS.forEach(t => TURNO_LABELS[t.codigo] = `${t.emoji||''} ${t.nombre}`);
+
+  // Mostrar todos los empleados si "Todos", o solo el seleccionado
+  const empsAMostrar = empSelec === null ? EMPLEADOS : EMPLEADOS.filter(e => e.id === empSelec);
+
+  for (let d = 1; d <= totalDias; d++) {
+    const esHoy = d === hoy.getDate() && mesActual === (hoy.getMonth()+1) && añoActual === hoy.getFullYear();
+    const dow   = new Date(añoActual, mesActual - 1, d).getDay();
+    const fds   = dow === 0 || dow === 6;
+    const cel   = document.createElement('div');
+    cel.className = 'cal-celda clickable' + (esHoy ? ' hoy' : '');
+    cel.onclick = () => abrirModalTurno(d);
+
+    let html = `<div class="num-dia">${d}${fds ? `<span style="font-size:0.55rem;color:rgba(245,232,211,0.3);margin-left:3px;">FDS</span>` : ''}${esHoy ? `<span class="hoy-label">HOY</span>` : ''}</div>`;
+
+    // Mostrar TODOS los empleados sin límite
+    empsAMostrar.forEach(e => {
+      const t = getTurno(e.id, d);
+      html += `<div class="turno-chip turno-${t}" style="margin-bottom:2px;">
+        <span style="color:${e.color||'#d17a22'};font-weight:900;font-size:0.58rem;margin-right:2px;">${(e.iniciales||(e.nombre[0]||'?')).substring(0,1).toUpperCase()}</span>
+        ${TURNO_LABELS[t] || t}
+      </div>`;
+    });
+    html += `<div style="font-size:0.58rem;color:rgba(245,232,211,0.18);margin-top:2px;">→ Editar</div>`;
+    cel.innerHTML = html;
+    grid.appendChild(cel);
+  }
+}
+
+function abrirModalTurno(d) {
+  diaEditando = d;
+  document.getElementById('modal-turno-titulo').textContent = `Día ${d} — ${MESES[mesActual-1]} ${añoActual}`;
+  document.getElementById('modal-turno-sub').textContent = 'Selecciona empleado y turno';
+
+  const empSel = document.getElementById('modal-emp-select');
+  empSel.innerHTML = EMPLEADOS.map(e => `<option value="${e.id}">${e.nombre}</option>`).join('');
+  if (empSelec !== null) empSel.value = empSelec;
+
+  const turnoSel = document.getElementById('modal-turno-select');
+  turnoSel.innerHTML = TURNOS.map(t => `<option value="${t.codigo}">${t.emoji||''} ${t.nombre}</option>`).join('');
+  turnoSel.value = getTurno(parseInt(empSel.value), d);
+
+  abrirModal('modal-turno');
+}
+
+function actualizarTurnoSeleccionado() {
+  const empId = parseInt(document.getElementById('modal-emp-select').value);
+  document.getElementById('modal-turno-select').value = getTurno(empId, diaEditando);
 }
 
 async function aplicarCambioTurno() {
-    const turno = document.getElementById('edit-turno-select').value;
-    const body = { empleadoId: empSelec, anyo: añoActual, mes: mesActual, dia: diaEditando, turnoCod: turno };
-    await fetch('/api/horarios', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
-    HORARIOS[`${empSelec}-${diaEditando}`] = turno;
-    cerrarAdminModal();
-    render();
+  const empId = parseInt(document.getElementById('modal-emp-select').value);
+  const turno = document.getElementById('modal-turno-select').value;
+
+  // FIX SNAKE_CASE: Jackson espera empleado_id y turno_cod (no camelCase)
+  const body = {
+    empleado_id: empId,
+    anyo: añoActual,
+    mes: mesActual,
+    dia: diaEditando,
+    turno_cod: turno
+  };
+
+  try {
+    const res = await fetch('/api/horarios', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      alert('Error al guardar: ' + err);
+      return;
+    }
+    cerrarModal('modal-turno');
+    // Recargar desde DB para confirmar que se guardó
+    await loadAll();
+  } catch(err) {
+    alert('Error de conexión: ' + err.message);
+  }
 }
 
-function cerrarAdminModal() { document.getElementById('modal-admin').classList.remove('open'); }
+function abrirModalEditarEmpleado() {
+  if (empSelec === null) return;
+  const emp = EMPLEADOS.find(e => e.id === empSelec);
+  if (!emp) return;
+  document.getElementById('edit-nombre').value = emp.nombre;
+  document.getElementById('edit-color').value = emp.color || '#d17a22';
+  abrirModal('modal-editar-emp');
+}
+
+async function guardarNuevoEmpleado() {
+  const nombre = document.getElementById('new-nombre').value.trim();
+  if (!nombre) { alert('El nombre es obligatorio'); return; }
+  const color    = document.getElementById('new-color').value;
+  const iniciales = nombre.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
+  try {
+    const res = await fetch('/api/empleados', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({nombre, iniciales, color, activo: true})
+    });
+    if (!res.ok) { alert('Error al guardar empleado'); return; }
+    cerrarModal('modal-nuevo-emp');
+    await loadAll();
+  } catch(err) { alert('Error de conexión'); }
+}
+
+async function confirmarBorrarEmpleado() {
+  if (empSelec === null) return;
+  const emp = EMPLEADOS.find(e => e.id === empSelec);
+  if (!emp) return;
+  if (!confirm(`¿Borrar a ${emp.nombre}? Se eliminarán TODOS sus horarios y fichajes. Esta acción no se puede deshacer.`)) return;
+  try {
+    const res = await fetch(`/api/empleados/${empSelec}`, { method: 'DELETE' });
+    if (!res.ok) { alert('Error al borrar empleado'); return; }
+    empSelec = null;
+    actualizarBotonesEmp();
+    await loadAll();
+  } catch(err) { alert('Error de conexión'); }
+}
 
 function cambiarMes(delta) {
-    mesActual += delta;
-    if (mesActual < 1) { mesActual = 12; añoActual--; }
-    if (mesActual > 12) { mesActual = 1; añoActual++; }
-    loadAll();
+  mesActual += delta;
+  if (mesActual < 1)  { mesActual = 12; añoActual--; }
+  if (mesActual > 12) { mesActual = 1;  añoActual++; }
+  loadAll();
 }
 
-async function agregarEmpleado() {
-    const nombre = prompt('Nombre del nuevo empleado:');
-    if (!nombre) return;
-    const colores = ['#ffc107','#64b5f6','#bb8fce','#4caf50','#ff9800','#e74c3c','#26c6da','#ab47bc'];
-    const color = colores[Math.floor(Math.random() * colores.length)];
-    const iniciales = nombre.split(' ').map(p => p[0]).join('').substring(0,2).toUpperCase();
-    await fetch('/api/empleados', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({nombre, iniciales, color, activo:true}) });
-    loadAll();
-}
+function abrirModal(id)  { document.getElementById(id).classList.add('open'); }
+function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
 
 loadAll();
 </script>

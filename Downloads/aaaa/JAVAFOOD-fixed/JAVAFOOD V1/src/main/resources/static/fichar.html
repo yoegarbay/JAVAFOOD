@@ -1,165 +1,256 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JavaFood — Fichaje</title>
-    <link rel="stylesheet" href="JAVAFOOD.css">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        .top-bar { width:95%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:14px; }
-        .clock-time { font-size:2.6rem;font-weight:900;color:var(--primary-orange);text-shadow:0 0 18px var(--primary-orange); }
-        .nav-top { display:flex;gap:8px;flex-wrap:wrap; }
-        .nav-top a { padding:8px 16px;border-radius:10px;text-decoration:none;font-size:0.82rem;font-weight:bold;border:1px solid rgba(245,232,211,0.15);color:var(--cream);transition:0.2s; }
-        .nav-top a:hover { background:var(--primary-orange);color:var(--coffee-dark);border-color:var(--primary-orange); }
-        .nav-top a.admin-link { border-color:rgba(231,76,60,0.3);color:#ff8a80; }
-        .nav-top a.admin-link:hover { background:#e74c3c;color:white;border-color:#e74c3c; }
-        .main-layout { width:95%;max-width:1100px;display:flex;gap:20px;flex-wrap:wrap; }
-        .panel-fichar { width:310px;background:var(--glass-bg);border:2px solid var(--primary-orange);border-radius:28px;padding:28px;box-shadow:0 0 40px rgba(209,122,34,0.2); }
-        .panel-historial { flex:1;background:var(--glass-bg);border:1px solid rgba(209,122,34,0.35);border-radius:28px;padding:26px;min-height:500px;display:flex;flex-direction:column; }
-        .section-label { font-size:0.68rem;text-transform:uppercase;letter-spacing:3px;color:var(--primary-orange);border-bottom:1px solid rgba(209,122,34,0.3);padding-bottom:7px;margin-bottom:16px; }
-        select { width:100%;padding:13px;background:rgba(0,0,0,0.45);border:1px solid var(--primary-orange);color:white;border-radius:12px;margin-bottom:15px;font-family:inherit;font-size:1rem;outline:none; }
-        .btn-group { display:flex;gap:12px; }
-        .btn-entrada { flex:1;padding:15px;background:linear-gradient(45deg,#1e6e1e,#4caf50);border:none;border-radius:12px;color:white;font-weight:900;cursor:pointer;font-family:inherit;font-size:1rem; }
-        .btn-salida  { flex:1;padding:15px;background:linear-gradient(45deg,#962020,#e74c3c);border:none;border-radius:12px;color:white;font-weight:900;cursor:pointer;font-family:inherit;font-size:1rem; }
-        .hist-fila { display:grid;grid-template-columns:1fr 80px 95px 80px;gap:10px;padding:10px;border-bottom:1px solid rgba(209,122,34,0.1);font-size:0.85rem;align-items:center; }
-        .badge { padding:3px 8px;border-radius:20px;font-size:0.7rem;font-weight:bold; }
-        .badge-entrada { color:#4caf50;border:1px solid #4caf50;background:rgba(76,175,80,0.1); }
-        .badge-salida  { color:#e74c3c;border:1px solid #e74c3c;background:rgba(231,76,60,0.1); }
-        .msg-flash { margin-top:15px;padding:12px;border-radius:10px;display:none;text-align:center;font-weight:bold; }
-        .turno-info { margin-top:18px;padding:12px;background:rgba(0,0,0,0.3);border-radius:12px;border:1px solid rgba(209,122,34,0.2);font-size:0.85rem; }
-        .turno-info .label { font-size:0.65rem;color:var(--primary-orange);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fichar — JavaFood</title>
+  <style>
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0d0d0d; color: #e0d0c0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+
+    header { display: flex; align-items: center; gap: 16px; padding: 0 28px; height: 62px; background: #111; border-bottom: 1px solid #2a1505; flex-shrink: 0; width: 100%; }
+    .brand { display: flex; flex-direction: column; }
+    .brand-title { font-size: 1.1rem; font-weight: bold; }
+    .brand-title span { color: #d17a22; }
+    .brand-sub { font-size: .7rem; color: #886655; }
+    nav { display: flex; gap: 8px; margin-left: 16px; }
+    nav a { padding: 5px 14px; border: 1px solid #444; border-radius: 6px; color: #bbb; text-decoration: none; font-size: .82rem; transition: all .2s; }
+    nav a:hover { background: #2a1505; border-color: #d17a22; color: #d17a22; }
+    .clock { margin-left: auto; font-size: 1.9rem; font-weight: bold; color: #d17a22; font-variant-numeric: tabular-nums; letter-spacing: 2px; }
+
+    /* centrado bajo cabecera */
+    .main { flex: 1; display: flex; justify-content: center; align-items: flex-start; gap: 24px; padding: 32px 28px; }
+
+    .card { background: #1a0d04; border: 1px solid #d17a22; border-radius: 12px; padding: 24px 20px; }
+    .card-fichaje   { width: 320px; flex-shrink: 0; }
+    .card-historial { width: 520px; }
+    .card-title { font-size: .65rem; letter-spacing: 3px; color: #886655; text-transform: uppercase; margin-bottom: 16px; }
+
+    select, input[type=password] { width: 100%; padding: 10px 12px; background: #0d0700; border: 1px solid #3a1e08; border-radius: 8px; color: #e0d0c0; font-size: .9rem; outline: none; transition: border .2s; }
+    select:focus, input[type=password]:focus { border-color: #d17a22; }
+
+    .turno-box { margin-top: 14px; background: #0d0700; border: 1px solid #2a1205; border-radius: 8px; padding: 10px 14px; font-size: .85rem; display: none; }
+    .small-label { font-size: .65rem; color: #886655; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+    .pin-section { margin-top: 14px; display: none; }
+    .pin-error { color: #e05555; font-size: .8rem; margin-top: 6px; display: none; }
+
+    .btn-row { display: flex; gap: 12px; margin-top: 16px; }
+    .btn-fichar { flex: 1; padding: 13px; border: none; border-radius: 8px; font-weight: bold; font-size: .9rem; cursor: pointer; transition: filter .2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-fichar:hover { filter: brightness(1.25); }
+    .btn-entrada { background: #1e6b1e; color: #c8f0c8; }
+    .btn-salida  { background: #7a1c1c; color: #f0c8c8; }
+
+    table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+    thead th { text-align: left; padding: 6px 10px; font-size: .65rem; letter-spacing: 2px; color: #886655; text-transform: uppercase; border-bottom: 1px solid #2a1205; }
+    tbody tr:hover { background: #200d04; }
+    td { padding: 9px 10px; border-bottom: 1px solid #160802; }
+    .hora-val { color: #d17a22; font-weight: bold; }
+    .badge { padding: 3px 10px; border-radius: 20px; font-size: .7rem; font-weight: bold; text-transform: uppercase; }
+    .badge-entrada { background: #0d3d0d; color: #4dbb4d; border: 1px solid #1a5c1a; }
+    .badge-salida  { background: #3d0d0d; color: #e05555; border: 1px solid #5c1a1a; }
+    .horas-val  { color: #d17a22; }
+    .horas-null { color: #554433; }
+    .empty-msg { color: #554433; font-size: .85rem; text-align: center; padding: 20px 0; }
+  </style>
 </head>
 <body>
-<div class="code-overlay"></div>
 
-<div class="top-bar">
-    <div>
-        <h1 style="color:white;font-size:1.6rem;">Java<span style="color:var(--primary-orange)">Food</span></h1>
-        <p style="font-size:0.8rem;color:rgba(245,232,211,0.5);">Control de Presencia</p>
-    </div>
-    <nav class="nav-top">
-        <a href="horarios.html">📅 Horarios</a>
-        <a href="AdminFichar.html" class="admin-link">🔐 Admin Fichajes</a>
-        <a href="AdminHorario.html" class="admin-link">⚙️ Admin Horarios</a>
-    </nav>
-    <div class="clock-time" id="clock">00:00:00</div>
-</div>
+<header>
+  <div class="brand">
+    <div class="brand-title">Java<span>Food</span></div>
+    <div class="brand-sub">Control de Presencia</div>
+  </div>
+  <nav>
+    <a href="/horarios.html">📅 Horarios</a>
+    <a href="/AdminFichar.html">🔒 Admin Fichajes</a>
+    <a href="/AdminHorario.html">⚙️ Admin Horarios</a>
+  </nav>
+  <div class="clock" id="clock">00:00:00</div>
+</header>
 
-<div class="main-layout">
-    <div class="panel-fichar">
-        <div class="section-label">Tu Fichaje</div>
-        <select id="sel-empleado" onchange="onEmpleadoChange()">
-            <option value="">— Selecciona tu nombre —</option>
-        </select>
-        <div id="turno-hoy" class="turno-info" style="display:none;">
-            <div class="label">Tu turno hoy</div>
-            <div id="turno-hoy-texto">—</div>
-        </div>
-        <div style="height:14px;"></div>
-        <div class="btn-group">
-            <button class="btn-entrada" onclick="fichar('entrada')">▶ Entrada</button>
-            <button class="btn-salida"  onclick="fichar('salida')">■ Salida</button>
-        </div>
-        <div id="msg-flash" class="msg-flash"></div>
+<div class="main">
+
+  <div class="card card-fichaje">
+    <div class="card-title">Tu fichaje</div>
+
+    <select id="sel-empleado" onchange="onSelectEmpleado()">
+      <option value="">— Selecciona tu nombre —</option>
+    </select>
+
+    <div class="turno-box" id="turno-box">
+      <div class="small-label">Tu turno hoy</div>
+      <div id="turno-val">—</div>
     </div>
 
-    <div class="panel-historial">
-        <div class="section-label">Mis fichajes recientes</div>
-        <div style="display:grid;grid-template-columns:1fr 80px 95px 80px;gap:10px;padding:7px 10px;font-size:0.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--primary-orange);border-bottom:1px solid rgba(209,122,34,0.25);margin-bottom:6px;">
-            <span>Fecha</span><span>Hora</span><span>Tipo</span><span>Horas</span>
-        </div>
-        <div id="hist-lista" style="overflow-y:auto;flex:1;">
-            <p style="opacity:0.5;text-align:center;margin-top:20px;">Selecciona tu nombre para ver tu historial.</p>
-        </div>
+    <div class="pin-section" id="pin-section">
+      <div class="small-label">Introduce tu PIN</div>
+      <input type="password" id="inp-pin" maxlength="6"
+             placeholder="• • • • • •" inputmode="numeric"
+             oninput="clearPinError()">
+      <div class="pin-error" id="pin-error">❌ PIN incorrecto</div>
     </div>
+
+    <div class="btn-row">
+      <button class="btn-fichar btn-entrada" onclick="fichar('entrada')">▶ Entrada</button>
+      <button class="btn-fichar btn-salida"  onclick="fichar('salida')">■ Salida</button>
+    </div>
+  </div>
+
+  <div class="card card-historial">
+    <div class="card-title">Mis fichajes recientes</div>
+    <table>
+      <thead>
+        <tr><th>Fecha</th><th>Hora</th><th>Tipo</th><th>Horas</th></tr>
+      </thead>
+      <tbody id="hist-tbody">
+        <tr><td colspan="4" class="empty-msg">Selecciona tu nombre para ver tu historial.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
 </div>
 
 <script>
-const TURNOS_LABEL = { manana:'🌅 Mañana', tarde:'🌆 Tarde', noche:'🌙 Noche', partido:'⚡ Partido', libre:'✓ Libre', baja:'🏥 Baja' };
-const TURNOS_HORAS = { manana:'07:00–15:00', tarde:'15:00–23:00', noche:'23:00–07:00', partido:'10:00–14:00 / 18:00–22:00', libre:'—', baja:'—' };
-let EMPLEADOS = [];
+/* ── Mapa de turnos (hardcoded para no hacer petición extra) ── */
+const TURNOS = {
+  manana:  { emoji: '🌅', nombre: 'Mañana',  horas: '07:00–15:00' },
+  tarde:   { emoji: '🌆', nombre: 'Tarde',   horas: '15:00–23:00' },
+  noche:   { emoji: '🌙', nombre: 'Noche',   horas: '23:00–07:00' },
+  partido: { emoji: '⚡', nombre: 'Partido', horas: '10:00–14:00 / 18:00–22:00' },
+  libre:   { emoji: '✓',  nombre: 'Libre',   horas: '—' },
+  baja:    { emoji: '🏥', nombre: 'Baja',    horas: '—' }
+};
 
-function tick() { document.getElementById('clock').textContent = new Date().toLocaleTimeString(); }
+/* Reloj */
+function tick() {
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    String(n.getHours()).padStart(2,'0') + ':' +
+    String(n.getMinutes()).padStart(2,'0') + ':' +
+    String(n.getSeconds()).padStart(2,'0');
+}
 setInterval(tick, 1000); tick();
 
-async function cargarEmpleados() {
-    const res = await fetch('/api/empleados');
-    EMPLEADOS = await res.json();
-    const sel = document.getElementById('sel-empleado');
-    sel.innerHTML = '<option value="">— Selecciona tu nombre —</option>' +
-        EMPLEADOS.map(e => `<option value="${e.id}">${e.nombre} ${e.apellidos || ''}</option>`).join('');
+let empleados = [];
+let empleadoActual = null;
+
+async function init() {
+  const res = await fetch('/api/empleados');
+  empleados = await res.json();
+  const sel = document.getElementById('sel-empleado');
+  empleados.forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = e.id; opt.textContent = e.nombre;
+    sel.appendChild(opt);
+  });
 }
 
-async function onEmpleadoChange() {
-    const idCliente = document.getElementById('sel-empleado').value;
-    if (!idCliente) {
-        document.getElementById('turno-hoy').style.display = 'none';
-        document.getElementById('hist-lista').innerHTML = '';
-        return;
-    }
-    // Mostrar turno de hoy
-    const hoy  = new Date();
-    const anyo = hoy.getFullYear();
-    const mes  = hoy.getMonth() + 1;
-    const res  = await fetch(`/api/horarios/empleado/${idCliente}?anyo=${anyo}&mes=${mes}`);
-    const horarios = await res.json();
-    const diaHoy = hoy.getDate();
-    const horHoy = horarios.find(h => h.anyo === anyo && h.mes === mes && h.dia === diaHoy);
-    const turno  = horHoy ? horHoy.turnoCod : 'libre';
-    document.getElementById('turno-hoy-texto').innerHTML =
-        `<span style="font-weight:bold;color:var(--primary-orange)">${TURNOS_LABEL[turno]}</span>
-         <span style="opacity:0.5;font-size:0.8rem;margin-left:8px;">${TURNOS_HORAS[turno]}</span>`;
-    document.getElementById('turno-hoy').style.display = 'block';
+async function onSelectEmpleado() {
+  const id = document.getElementById('sel-empleado').value;
+  document.getElementById('inp-pin').value = '';
+  clearPinError();
 
-    await renderHistorial(idCliente);
+  if (!id) {
+    empleadoActual = null;
+    document.getElementById('turno-box').style.display   = 'none';
+    document.getElementById('pin-section').style.display = 'none';
+    document.getElementById('hist-tbody').innerHTML =
+      '<tr><td colspan="4" class="empty-msg">Selecciona tu nombre para ver tu historial.</td></tr>';
+    return;
+  }
+
+  empleadoActual = empleados.find(e => e.id == id);
+  document.getElementById('pin-section').style.display = 'block';
+
+  await Promise.all([loadTurnoHoy(id), loadHistorial(id)]);
+}
+
+async function loadTurnoHoy(id) {
+  const now = new Date();
+  const turnoBox = document.getElementById('turno-box');
+  const turnoVal = document.getElementById('turno-val');
+  try {
+    const res = await fetch(`/api/horarios/empleado/${id}?anyo=${now.getFullYear()}&mes=${now.getMonth()+1}`);
+    const horarios = await res.json();
+
+    // Con SNAKE_CASE Jackson devuelve turno_cod (no turnoCod)
+    const hoy = horarios.find(h => h.dia === now.getDate());
+
+    turnoBox.style.display = 'block';
+    if (hoy && hoy.turno_cod) {
+      const t = TURNOS[hoy.turno_cod] || { emoji: '📋', nombre: hoy.turno_cod, horas: '' };
+      turnoVal.textContent = `${t.emoji} ${t.nombre}  ${t.horas}`;
+    } else {
+      turnoVal.textContent = '✓ Libre  —';
+    }
+  } catch {
+    turnoBox.style.display = 'none';
+  }
+}
+
+async function loadHistorial(id) {
+  const res     = await fetch('/api/fichajes/empleado/' + id);
+  const fichajes = await res.json();
+  const tbody   = document.getElementById('hist-tbody');
+  if (!fichajes.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">No tienes fichajes aún.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = '';
+  fichajes.slice(0, 30).forEach(f => {
+    // Con SNAKE_CASE Jackson devuelve horas_calc (no horasCalc)
+    const hc   = f.horas_calc;
+    const hStr = hc != null ? hc + 'h' : '—';
+    const hCls = hc != null ? 'horas-val' : 'horas-null';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${f.fecha}</td>
+      <td class="hora-val">${f.hora ? f.hora.slice(0,8) : '—'}</td>
+      <td><span class="badge badge-${f.tipo}">${f.tipo.toUpperCase()}</span></td>
+      <td class="${hCls}">${hStr}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
 async function fichar(tipo) {
-    const idCliente = document.getElementById('sel-empleado').value;
-    if (!idCliente) { alert('Selecciona tu nombre primero'); return; }
+  if (!empleadoActual) { alert('Selecciona tu nombre primero'); return; }
 
-    const ahora = new Date();
-    const fecha = ahora.toISOString().split('T')[0];
-    const hora  = ahora.toTimeString().substring(0, 8); // HH:MM:SS
+  const pinIntroducido = document.getElementById('inp-pin').value.trim();
+  if (empleadoActual.pin) {
+    if (pinIntroducido !== empleadoActual.pin) { mostrarPinError(); return; }
+  }
 
-    const res = await fetch('/api/fichajes', {
-        method:  'POST',
-        headers: {'Content-Type':'application/json'},
-        body:    JSON.stringify({ empleadoId: parseInt(idCliente), tipo, fecha, hora })
-    });
-    const data = await res.json();
-    if (data && data.id != null) {
-        flash(tipo === 'entrada' ? '✅ Entrada registrada' : '🔴 Salida registrada', tipo);
-        await renderHistorial(idCliente);
-    }
+  const now   = new Date();
+  const fecha = now.toISOString().slice(0, 10);
+  const hora  = now.toTimeString().slice(0, 8);
+
+  // SNAKE_CASE: mandar empleado_id (no empleadoId)
+  const res = await fetch('/api/fichajes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ empleado_id: empleadoActual.id, tipo, fecha, hora })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    alert('Error al fichar: ' + (err.detalle || err.mensaje || res.status));
+    return;
+  }
+
+  document.getElementById('inp-pin').value = '';
+  await loadHistorial(empleadoActual.id);
 }
 
-async function renderHistorial(idCliente) {
-    const res      = await fetch(`/api/fichajes/empleado/${idCliente}`);
-    const fichajes = await res.json();
-    document.getElementById('hist-lista').innerHTML = fichajes.length
-        ? fichajes.map(f => `
-            <div class="hist-fila">
-                <span style="color:rgba(245,232,211,0.7)">${f.fecha}</span>
-                <span style="color:var(--primary-orange);font-weight:bold">${f.hora}</span>
-                <span><span class="badge badge-${f.tipo}">${f.tipo.toUpperCase()}</span></span>
-                <span style="opacity:0.6">${f.horasCalc != null ? f.horasCalc + 'h' : '—'}</span>
-            </div>`).join('')
-        : '<p style="opacity:0.5;padding:10px;text-align:center;">No tienes fichajes aún.</p>';
+function mostrarPinError() {
+  document.getElementById('pin-error').style.display = 'block';
+  document.getElementById('inp-pin').value = '';
+}
+function clearPinError() {
+  document.getElementById('pin-error').style.display = 'none';
 }
 
-function flash(m, tipo) {
-    const el = document.getElementById('msg-flash');
-    el.textContent   = m;
-    el.style.display = 'block';
-    el.style.background = tipo === 'entrada' ? 'rgba(76,175,80,0.2)' : 'rgba(231,76,60,0.2)';
-    el.style.color      = tipo === 'entrada' ? '#4caf50' : '#e74c3c';
-    setTimeout(() => el.style.display = 'none', 3500);
-}
-
-cargarEmpleados();
+init();
 </script>
 </body>
 </html>

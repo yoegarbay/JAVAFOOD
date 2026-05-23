@@ -1,145 +1,282 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JavaFood — Admin Fichajes</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
-<style>
-:root { --primary-orange:#d17a22; --coffee-dark:#2b1b12; --cream:#f5e8d3; --gold-glow:rgba(209,122,34,0.4); --glass-bg:rgba(43,27,18,0.85); }
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Space Grotesk',sans-serif; }
-body { background:#000; color:var(--cream); min-height:100vh; display:flex; flex-direction:column; align-items:center; overflow-x:hidden; padding:24px 16px 40px; position:relative; }
-.code-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(rgba(0,0,0,0.82),rgba(0,0,0,0.82)),url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); opacity:0.3; z-index:-1; }
-.top-bar { width:95%; max-width:1100px; display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:14px; }
-.logo-area { display:flex; align-items:center; gap:12px; }
-.logo-area svg { width:44px; filter:drop-shadow(0 0 8px var(--primary-orange)); }
-.logo-area h1 { font-size:1.4rem; color:white; } .logo-area h1 span { color:var(--primary-orange); }
-.nav-links { display:flex; gap:10px; }
-.nav-btn { padding:9px 16px; border-radius:10px; border:1px solid rgba(245,232,211,0.15); background:transparent; color:var(--cream); cursor:pointer; font-family:inherit; font-size:.82rem; text-decoration:none; display:inline-block; transition:.2s; }
-.nav-btn:hover { background:var(--primary-orange); color:var(--coffee-dark); font-weight:bold; border-color:var(--primary-orange); }
-.clock-wrap { text-align:right; }
-.clock-time { font-size:2.6rem; font-weight:900; color:var(--primary-orange); letter-spacing:3px; text-shadow:0 0 18px var(--primary-orange); line-height:1; }
-.main-layout { width:95%; max-width:1100px; display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; }
-.panel-fichar { width:310px; flex-shrink:0; background:var(--glass-bg); border:2px solid var(--primary-orange); border-radius:28px; padding:28px 24px; box-shadow:0 0 40px var(--gold-glow); backdrop-filter:blur(12px); }
-.section-label { font-size:.68rem; text-transform:uppercase; letter-spacing:3px; color:var(--primary-orange); border-bottom:1px solid rgba(209,122,34,0.3); padding-bottom:7px; margin-bottom:16px; }
-.form-group { margin-bottom:14px; }
-.form-group label { display:block; font-size:.75rem; font-weight:bold; color:var(--primary-orange); margin-bottom:7px; text-transform:uppercase; letter-spacing:1px; }
-.form-group input { width:100%; padding:13px 16px; background:rgba(0,0,0,.45); border:1px solid var(--primary-orange); color:white; border-radius:12px; outline:none; font-family:inherit; font-size:1rem; }
-.btn-add { width:100%; padding:15px; background:linear-gradient(45deg,#1e6e1e,#4caf50); border:none; border-radius:12px; color:white; font-weight:900; font-size:1rem; cursor:pointer; text-transform:uppercase; letter-spacing:1px; margin-bottom:20px; font-family:inherit; }
-.panel-historial { flex:1; min-width:0; background:var(--glass-bg); border:1px solid rgba(209,122,34,0.35); border-radius:28px; padding:26px 22px; backdrop-filter:blur(12px); display:flex; flex-direction:column; min-height:560px; }
-.hist-head { display:grid; grid-template-columns:1.4fr 90px 70px 90px 65px 30px; gap:6px; padding:7px 10px; font-size:.62rem; text-transform:uppercase; letter-spacing:2px; color:var(--primary-orange); border-bottom:1px solid rgba(209,122,34,0.25); margin-bottom:6px; }
-.hist-fila { display:grid; grid-template-columns:1.4fr 90px 70px 90px 65px 30px; gap:6px; align-items:center; padding:9px 10px; border-radius:10px; border:1px solid rgba(209,122,34,0.1); background:rgba(0,0,0,.2); margin-bottom:5px; font-size:.83rem; }
-.badge { display:inline-block; font-size:.66rem; padding:3px 8px; border-radius:20px; font-weight:bold; }
-.badge-entrada { background:rgba(76,175,80,.18); color:#4caf50; border:1px solid #4caf50; }
-.badge-salida  { background:rgba(231,76,60,.18); color:#e74c3c; border:1px solid #e74c3c; }
-.btn-del { background:transparent; border:1px solid rgba(255,68,68,.28); color:rgba(255,100,100,.55); border-radius:6px; width:24px; height:24px; cursor:pointer; font-family:inherit; }
-.emp-row { display:flex; justify-content:space-between; align-items:center; padding:10px; background:rgba(0,0,0,.3); border-radius:10px; margin-bottom:5px; border:1px solid rgba(209,122,34,0.1); }
-.dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Fichajes — JavaFood</title>
+  <style>
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0d0d0d; color: #e0d0c0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+
+    header { display: flex; align-items: center; gap: 16px; padding: 0 28px; height: 62px; background: #111; border-bottom: 1px solid #2a1505; flex-shrink: 0; }
+    .logo { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; font-weight: bold; }
+    .logo-circle { width: 34px; height: 34px; border: 2px solid #d17a22; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #d17a22; }
+    nav { display: flex; gap: 8px; margin-left: 12px; }
+    nav a { padding: 5px 14px; border: 1px solid #444; border-radius: 6px; color: #bbb; text-decoration: none; font-size: .82rem; transition: all .2s; }
+    nav a:hover, nav a.active { background: #2a1505; border-color: #d17a22; color: #d17a22; }
+    .clock { margin-left: auto; font-size: 1.9rem; font-weight: bold; color: #d17a22; font-variant-numeric: tabular-nums; letter-spacing: 2px; }
+
+    .main { display: flex; gap: 20px; padding: 20px 28px; flex: 1; overflow: hidden; }
+
+    .panel-left { width: 270px; flex-shrink: 0; background: #1a0d04; border: 1px solid #3a1e08; border-radius: 10px; padding: 18px 16px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+    .panel-title { font-size: .65rem; letter-spacing: 3px; color: #886655; text-transform: uppercase; margin-bottom: 2px; }
+    label { font-size: .7rem; color: #998877; letter-spacing: 1px; text-transform: uppercase; }
+    input[type=text], input[type=color], select { width: 100%; padding: 9px 11px; background: #0d0700; border: 1px solid #3a1e08; border-radius: 7px; color: #e0d0c0; font-size: .88rem; outline: none; transition: border .2s; }
+    input[type=color] { height: 38px; padding: 3px 7px; cursor: pointer; }
+    input:focus, select:focus { border-color: #d17a22; }
+    .btn { width: 100%; padding: 11px; border: none; border-radius: 7px; font-weight: bold; font-size: .88rem; cursor: pointer; transition: filter .2s; }
+    .btn:hover { filter: brightness(1.2); }
+    .btn-green { background: #1e6b1e; color: #c8f0c8; }
+    .btn-red   { background: #7a1c1c; color: #f0c8c8; }
+    hr { border: none; border-top: 1px solid #2a1205; margin: 2px 0; }
+
+    .emp-list { display: flex; flex-direction: column; gap: 5px; }
+    .emp-item { display: flex; align-items: center; gap: 8px; padding: 7px 9px; background: #0d0700; border-radius: 7px; font-size: .85rem; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .emp-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tag-baja { font-size: .65rem; color: #665544; background: #1a0d04; padding: 1px 5px; border-radius: 4px; }
+    .btn-sm { font-size: .72rem; padding: 3px 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    .btn-sm-edit { background: #1e3d6b; color: #a0c8f0; }
+    .btn-sm-baja { background: #4a1010; color: #f0c8c8; }
+    .btn-sm:hover { filter: brightness(1.3); }
+
+    .panel-right { flex: 1; background: #1a0d04; border: 1px solid #3a1e08; border-radius: 10px; padding: 18px 16px; display: flex; flex-direction: column; overflow: hidden; }
+    .table-wrap { overflow-y: auto; flex: 1; margin-top: 10px; }
+    table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+    thead th { text-align: left; padding: 6px 10px; font-size: .65rem; letter-spacing: 2px; color: #886655; text-transform: uppercase; border-bottom: 1px solid #2a1205; }
+    tbody tr:hover { background: #200d04; }
+    td { padding: 9px 10px; border-bottom: 1px solid #160802; vertical-align: middle; }
+    .emp-cell { display: flex; align-items: center; gap: 8px; }
+    .badge { padding: 3px 11px; border-radius: 20px; font-size: .72rem; font-weight: bold; text-transform: uppercase; }
+    .badge-entrada { background: #0d3d0d; color: #4dbb4d; border: 1px solid #1a5c1a; }
+    .badge-salida  { background: #3d0d0d; color: #e05555; border: 1px solid #5c1a1a; }
+    .horas-val  { color: #d17a22; font-weight: bold; }
+    .horas-null { color: #554433; }
+    .btn-del { background: #3a0000; border: 1px solid #7a2020; color: #e05555; border-radius: 5px; width: 24px; height: 24px; cursor: pointer; font-size: .9rem; display: flex; align-items: center; justify-content: center; }
+    .btn-del:hover { background: #5a0000; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); display: none; align-items: center; justify-content: center; z-index: 200; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #1a0d04; border: 1px solid #d17a22; border-radius: 12px; padding: 28px 24px; width: 340px; display: flex; flex-direction: column; gap: 12px; }
+    .modal h3 { font-size: 1rem; color: #d17a22; }
+    .modal input[type=text], .modal input[type=password], .modal input[type=color] { width: 100%; padding: 9px 11px; background: #0d0700; border: 1px solid #3a1e08; border-radius: 7px; color: #e0d0c0; font-size: .88rem; outline: none; }
+    .modal input:focus { border-color: #d17a22; }
+    .pin-hint { font-size: .75rem; color: #886655; margin-top: -6px; }
+    .modal-btns { display: flex; gap: 10px; margin-top: 4px; }
+    .modal-btns .btn { flex: 1; }
+    .btn-cancel-modal { background: #2a1205; color: #998877; }
+  </style>
 </head>
 <body>
-<div class="code-overlay"></div>
-<div class="top-bar">
-    <div class="logo-area">
-        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="32" cy="32" r="30" stroke="#d17a22" stroke-width="3"/>
-            <path d="M20 44 C20 44 24 20 32 20 C40 20 44 44 44 44" stroke="#d17a22" stroke-width="3" stroke-linecap="round"/>
-            <ellipse cx="32" cy="46" rx="10" ry="3" fill="#d17a22" opacity="0.5"/>
-        </svg>
-        <div>
-            <h1>Java<span>Food</span> — Admin Fichajes</h1>
-        </div>
+
+<header>
+  <div class="logo">
+    <div class="logo-circle">⚡</div>
+    <span>JavaFood — Admin Fichajes</span>
+  </div>
+  <nav>
+    <a href="/index.html">🏠 Inicio</a>
+    <a href="/fichar.html">● Fichar</a>
+    <a href="/AdminHorarios.html" class="active">📅 Admin Horarios</a>
+  </nav>
+  <div class="clock" id="clock">00:00:00</div>
+</header>
+
+<div class="main">
+
+  <div class="panel-left">
+    <div class="panel-title">Gestión de equipo</div>
+
+    <label>Nombre</label>
+    <input type="text" id="inp-nombre" placeholder="Nombre completo...">
+
+    <label>Color</label>
+    <input type="color" id="inp-color" value="#d17a22">
+
+    <button class="btn btn-green" onclick="addEmpleado()">+ Añadir empleado</button>
+
+    <hr>
+
+    <label>Borrar empleado</label>
+    <select id="sel-borrar">
+      <option value="">— Selecciona empleado —</option>
+    </select>
+    <button class="btn btn-red" onclick="borrarEmpleado()">− Borrar empleado</button>
+
+    <hr>
+
+    <div class="emp-list" id="emp-list">
+      <div style="color:#554433;font-size:.8rem">Cargando...</div>
     </div>
-    <div style="display:flex;align-items:center;gap:16px;">
-        <div class="nav-links">
-            <a href="/" class="nav-btn">🏠 Inicio</a>
-            <a href="/fichar" class="nav-btn">🕐 Fichar</a>
-            <a href="/admin/horarios" class="nav-btn">📅 Admin Horarios</a>
-        </div>
-        <div class="clock-wrap"><div class="clock-time" id="clock">00:00:00</div></div>
+  </div>
+
+  <div class="panel-right">
+    <div class="panel-title">Control de presencia total</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Empleado</th><th>Fecha</th><th>Hora</th><th>Tipo</th><th>Horas</th><th></th></tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="6" style="color:#554433;text-align:center;padding:20px">Cargando...</td></tr>
+        </tbody>
+      </table>
     </div>
+  </div>
 </div>
 
-<div class="main-layout">
-    <div class="panel-fichar">
-        <div class="section-label">Gestión de Equipo</div>
-        <div class="form-group"><label>Nombre</label><input type="text" id="new-emp-nombre" placeholder="Nombre completo..."></div>
-        <div class="form-group"><label>Color</label><input type="color" id="new-emp-color" value="#d17a22"></div>
-        <button class="btn-add" onclick="addEmp()">+ Añadir Empleado</button>
-        <div id="emp-list"></div>
+<!-- Modal editar empleado: nombre + color + PIN -->
+<div class="modal-overlay" id="modal-overlay" onclick="cerrarModalClick(event)">
+  <div class="modal">
+    <h3>✏️ Editar empleado</h3>
+    <input type="hidden" id="modal-id">
+    <label>Nombre</label>
+    <input type="text" id="modal-nombre" placeholder="Nombre completo...">
+    <label>Color</label>
+    <input type="color" id="modal-color">
+    <label>Asignar / cambiar PIN</label>
+    <input type="password" id="modal-pin" maxlength="6" placeholder="••••••" inputmode="numeric">
+    <p class="pin-hint">Dejar vacío para no modificar el PIN actual</p>
+    <div class="modal-btns">
+      <button class="btn btn-green" onclick="guardarEdicion()">💾 Guardar</button>
+      <button class="btn btn-cancel-modal" onclick="cerrarModal()">Cancelar</button>
     </div>
-
-    <div class="panel-historial">
-        <div class="section-label">Control de Presencia Total</div>
-        <div class="hist-head">
-            <span>Empleado</span><span>Fecha</span><span>Hora</span><span>Tipo</span><span>Horas</span><span></span>
-        </div>
-        <div id="admin-lista"></div>
-    </div>
+  </div>
 </div>
 
 <script>
-let EMPLEADOS = [];
-
-function tick() { document.getElementById('clock').textContent = new Date().toLocaleTimeString(); }
+/* Reloj */
+function tick() {
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0') + ':' + String(n.getSeconds()).padStart(2,'0');
+}
 setInterval(tick, 1000); tick();
 
-async function loadAll() {
-    const [emps, fichajes] = await Promise.all([
-        fetch('/api/empleados/todos').then(r => r.json()),
-        fetch('/api/fichajes').then(r => r.json())
-    ]);
-    EMPLEADOS = emps;
-    renderEmpleados(emps);
-    renderFichajes(fichajes);
+let empleadosCache = [];
+
+async function loadEmpleados() {
+  const res = await fetch('/api/empleados/todos');
+  empleadosCache = await res.json();
+  const list = document.getElementById('emp-list');
+  const sel  = document.getElementById('sel-borrar');
+  list.innerHTML = '';
+  sel.innerHTML  = '<option value="">— Selecciona empleado —</option>';
+
+  empleadosCache.forEach(e => {
+    const div = document.createElement('div');
+    div.className = 'emp-item';
+    div.innerHTML = `
+      <span class="dot" style="background:${e.color}"></span>
+      <span class="emp-name">${e.nombre}${!e.activo ? ' <span class="tag-baja">(baja)</span>' : ''}</span>
+      ${e.activo ? `
+        <button class="btn-sm btn-sm-edit" onclick="abrirModal(${e.id})">Editar</button>
+        <button class="btn-sm btn-sm-baja" onclick="darBaja(${e.id})">Baja</button>
+      ` : ''}
+    `;
+    list.appendChild(div);
+    if (e.activo) {
+      const opt = document.createElement('option');
+      opt.value = e.id; opt.textContent = e.nombre;
+      sel.appendChild(opt);
+    }
+  });
 }
 
-function renderEmpleados(emps) {
-    document.getElementById('emp-list').innerHTML = emps.map(e => `
-        <div class="emp-row">
-            <span><span class="dot" style="background:${e.color}"></span>${e.nombre} ${!e.activo?'<span style="color:#e74c3c;font-size:.7rem;">(baja)</span>':''}</span>
-            <button onclick="darBaja(${e.id})" style="color:#e74c3c;background:none;border:none;cursor:pointer;font-family:inherit;">Baja</button>
-        </div>
-    `).join('');
-}
-
-function renderFichajes(fichajes) {
-    document.getElementById('admin-lista').innerHTML = fichajes.map(f => `
-        <div class="hist-fila">
-            <span><span class="dot" style="background:${f.color}"></span>${f.nombre}</span>
-            <span>${f.fecha}</span>
-            <span>${(f.hora||'').substring(0,5)}</span>
-            <span><span class="badge badge-${f.tipo}">${f.tipo}</span></span>
-            <span>${f.horasCalc != null ? f.horasCalc+'h' : '--'}</span>
-            <button class="btn-del" onclick="delFichaje(${f.id})">×</button>
-        </div>
-    `).join('') || '<p style="opacity:.5;text-align:center;margin-top:20px;">No hay fichajes registrados.</p>';
-}
-
-async function addEmp() {
-    const nombre = document.getElementById('new-emp-nombre').value.trim();
-    const color  = document.getElementById('new-emp-color').value;
-    if (!nombre) return alert('Introduce el nombre del empleado');
-    const iniciales = nombre.split(' ').map(p => p[0]).join('').substring(0,2).toUpperCase();
-    const body = { nombre, iniciales, color, activo: true };
-    await fetch('/api/empleados', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
-    document.getElementById('new-emp-nombre').value = '';
-    loadAll();
+async function addEmpleado() {
+  const nombre = document.getElementById('inp-nombre').value.trim();
+  const color  = document.getElementById('inp-color').value;
+  if (!nombre) { alert('Introduce un nombre'); return; }
+  const iniciales = nombre.split(' ').filter(Boolean).map(p => p[0].toUpperCase()).join('').slice(0,4);
+  await fetch('/api/empleados', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nombre, iniciales, color, activo: true, pin: null })
+  });
+  document.getElementById('inp-nombre').value = '';
+  loadEmpleados();
 }
 
 async function darBaja(id) {
-    if (!confirm('¿Dar de baja a este empleado?')) return;
-    await fetch(`/api/empleados/${id}`, { method:'DELETE' });
-    loadAll();
+  if (!confirm('¿Dar de baja a este empleado?')) return;
+  await fetch('/api/empleados/' + id, { method: 'DELETE' });
+  loadEmpleados(); loadFichajes();
 }
 
-async function delFichaje(id) {
-    if (!confirm('¿Eliminar este fichaje?')) return;
-    await fetch(`/api/fichajes/${id}`, { method:'DELETE' });
-    loadAll();
+async function borrarEmpleado() {
+  const id = document.getElementById('sel-borrar').value;
+  if (!id) { alert('Selecciona un empleado'); return; }
+  if (!confirm('¿Borrar definitivamente este empleado y todos sus fichajes?')) return;
+  await fetch('/api/empleados/' + id, { method: 'DELETE' });
+  loadEmpleados(); loadFichajes();
 }
 
-loadAll();
+/* Modal */
+function abrirModal(id) {
+  const e = empleadosCache.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('modal-id').value     = id;
+  document.getElementById('modal-nombre').value = e.nombre;
+  document.getElementById('modal-color').value  = e.color;
+  document.getElementById('modal-pin').value    = '';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function cerrarModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+function cerrarModalClick(ev) { if (ev.target === document.getElementById('modal-overlay')) cerrarModal(); }
+
+async function guardarEdicion() {
+  const id     = parseInt(document.getElementById('modal-id').value);
+  const nombre = document.getElementById('modal-nombre').value.trim();
+  const color  = document.getElementById('modal-color').value;
+  const pin    = document.getElementById('modal-pin').value.trim();
+  if (!nombre) { alert('El nombre no puede estar vacío'); return; }
+  const e = empleadosCache.find(x => x.id === id);
+  const iniciales = nombre.split(' ').filter(Boolean).map(p => p[0].toUpperCase()).join('').slice(0,4);
+  const pinFinal  = pin || (e ? e.pin : null);
+  await fetch('/api/empleados/' + id, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nombre, iniciales, color, activo: true, pin: pinFinal || null })
+  });
+  cerrarModal();
+  loadEmpleados();
+}
+
+/* Fichajes */
+async function loadFichajes() {
+  const res     = await fetch('/api/fichajes');
+  const fichajes = await res.json();
+  const tbody   = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  if (!fichajes.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="color:#554433;text-align:center;padding:20px">Sin fichajes</td></tr>';
+    return;
+  }
+  fichajes.forEach(f => {
+    // SNAKE_CASE: Jackson devuelve horas_calc (no horasCalc)
+    const hc   = f.horas_calc;
+    const hStr = hc != null ? hc + ' h' : '—';
+    const hCls = hc != null ? 'horas-val' : 'horas-null';
+    const tr   = document.createElement('tr');
+    tr.innerHTML = `
+      <td><div class="emp-cell"><span class="dot" style="background:${f.color}"></span>${f.nombre}</div></td>
+      <td>${f.fecha}</td>
+      <td>${f.hora ? f.hora.slice(0,5) : '—'}</td>
+      <td><span class="badge badge-${f.tipo}">${f.tipo}</span></td>
+      <td class="${hCls}">${hStr}</td>
+      <td><button class="btn-del" onclick="deleteFichaje(${f.id})">×</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function deleteFichaje(id) {
+  await fetch('/api/fichajes/' + id, { method: 'DELETE' });
+  loadFichajes();
+}
+
+loadEmpleados();
+loadFichajes();
+setInterval(loadFichajes, 30000);
 </script>
 </body>
 </html>

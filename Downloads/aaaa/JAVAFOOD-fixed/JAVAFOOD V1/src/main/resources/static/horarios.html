@@ -98,8 +98,10 @@ async function cargarHorarios() {
         HORARIOS = {};
         // servidor devuelve: empleadoId, anyo, mes, dia, turnoCod
         lista.forEach(h => {
+            const empId = h.empleado_id ?? h.empleadoId;
+            const cod   = h.turno_cod   ?? h.turnoCod;
             const f = h.anyo+'-'+String(h.mes).padStart(2,'0')+'-'+String(h.dia).padStart(2,'0');
-            HORARIOS[h.empleadoId+'-'+f] = h.turnoCod;
+            HORARIOS[empId+'-'+f] = cod;
         });
     } catch(err) {
         console.error('Error cargando horarios:', err);

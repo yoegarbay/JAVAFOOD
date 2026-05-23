@@ -1,93 +1,81 @@
 /* admin/resenas/js/edit.js */
 
-const id = new URLSearchParams(location.search).get('id');
-let puntuacionSeleccionada = 0;
-
-const LABELS = ['', 'Muy malo 😞', 'Malo 😐', 'Normal 🙂', 'Bueno 😊', 'Excelente 🤩'];
+var id = new URLSearchParams(location.search).get('id');
+var puntuacionActual = 0;
 
 async function cargar() {
     if (!id) {
-        document.getElementById('loading').innerHTML =
-            "<p style='color:#e05555;text-align:center'>❌ No se indicó id de reseña.</p>";
+        document.getElementById('loading').innerHTML = "<p style='color:#e05555;text-align:center'>No se indico id.</p>";
         return;
     }
     try {
-        const res = await fetch(`/api/admin/resenas/${id}`);
+        var res = await fetch('/api/admin/resenas/' + id);
         if (!res.ok) throw new Error('HTTP ' + res.status);
-        const r = await res.json();
+        var r = await res.json();
 
         document.getElementById('titulo-id').textContent    = '#' + r.id_resena;
-        document.getElementById('info-producto').textContent = r.nombre_producto;
-        document.getElementById('info-cliente').textContent  = r.nombre_cliente;
-        document.getElementById('inp-comentario').value      = r.comentario || '';
+        document.getElementById('info-producto').textContent = r.nombre_producto || '—';
+        document.getElementById('info-cliente').textContent  = r.nombre_cliente  || '—';
+        document.getElementById('inp-comentario').value     = r.comentario || '';
 
-        seleccionarEstrella(r.puntuacion);
+        setEstrellas(r.puntuacion);
 
         document.getElementById('loading').style.display   = 'none';
         document.getElementById('contenido').style.display = 'block';
     } catch (err) {
         document.getElementById('loading').innerHTML =
-            `<p style="color:#e05555;text-align:center">❌ ${err.message}</p>`;
+            '<p style="color:#e05555;text-align:center">' + err.message + '</p>';
     }
 }
 
-function seleccionarEstrella(n) {
-    puntuacionSeleccionada = n;
-    resaltarEstrellas(n);
-    document.getElementById('star-label').textContent = LABELS[n] || '';
-}
-
-function resaltarEstrellas(n) {
-    document.querySelectorAll('#star-picker .s').forEach(s => {
-        s.classList.toggle('on', parseInt(s.dataset.v) <= n);
+function setEstrellas(n) {
+    puntuacionActual = n;
+    document.querySelectorAll('#star-picker .s').forEach(function(el) {
+        el.classList.toggle('on', parseInt(el.dataset.v) <= n);
     });
+    var labels = ['', 'Muy mala', 'Mala', 'Regular', 'Buena', 'Excelente'];
+    document.getElementById('star-label').textContent = labels[n] || 'Selecciona una puntuacion';
 }
 
-document.querySelectorAll('#star-picker .s').forEach(s => {
-    s.addEventListener('click', () => seleccionarEstrella(parseInt(s.dataset.v)));
-    s.addEventListener('mouseenter', () => resaltarEstrellas(parseInt(s.dataset.v)));
-    s.addEventListener('mouseleave', () => resaltarEstrellas(puntuacionSeleccionada));
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('#star-picker .s').forEach(function(el) {
+        el.addEventListener('click',     function() { setEstrellas(parseInt(el.dataset.v)); });
+        el.addEventListener('mouseover', function() {
+            var v = parseInt(el.dataset.v);
+            document.querySelectorAll('#star-picker .s').forEach(function(s) {
+                s.classList.toggle('on', parseInt(s.dataset.v) <= v);
+            });
+        });
+        el.addEventListener('mouseout', function() { setEstrellas(puntuacionActual); });
+    });
 });
 
 async function guardar() {
-    if (puntuacionSeleccionada < 1) {
-        mostrarMsg('err', 'Selecciona una puntuación (1-5 estrellas)');
-        return;
-    }
-    const btn = document.getElementById('btn-save');
-    btn.disabled = true;
-    btn.textContent = 'Guardando…';
-    limpiarMsg();
+    if (!puntuacionActual) { mostrarMsg('err', 'Selecciona una puntuacion.'); return; }
+    var comentario = document.getElementById('inp-comentario').value.trim();
+    var btn = document.getElementById('btn-save');
+    btn.disabled = true; btn.textContent = 'Guardando...';
 
     try {
-        const res = await fetch(`/api/admin/resenas/${id}`, {
+        var res = await fetch('/api/admin/resenas/' + id, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                puntuacion: puntuacionSeleccionada,
-                comentario: document.getElementById('inp-comentario').value.trim() || null
-            })
+            body: JSON.stringify({ puntuacion: puntuacionActual, comentario: comentario || null })
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detalle || data.message || 'Error del servidor');
-        mostrarMsg('ok', '✅ Reseña actualizada correctamente');
-        setTimeout(() => location.href = `show.html?id=${id}`, 900);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        mostrarMsg('ok', 'Resena actualizada correctamente');
+        setTimeout(function() { location.href = 'index.html'; }, 1500);
     } catch (err) {
-        mostrarMsg('err', '❌ ' + err.message);
-        btn.disabled = false;
-        btn.textContent = '💾 Guardar cambios';
+        mostrarMsg('err', err.message);
+        btn.disabled = false; btn.textContent = 'Guardar cambios';
     }
 }
 
 function mostrarMsg(tipo, texto) {
-    const el = document.getElementById('msg');
-    el.className = 'msg ' + tipo;
-    el.textContent = texto;
-    el.style.display = 'block';
-}
-function limpiarMsg() {
-    const el = document.getElementById('msg');
-    el.style.display = 'none';
+    var msg = document.getElementById('msg');
+    msg.className = 'msg ' + tipo;
+    msg.textContent = texto;
+    msg.style.display = 'block';
 }
 
 cargar();

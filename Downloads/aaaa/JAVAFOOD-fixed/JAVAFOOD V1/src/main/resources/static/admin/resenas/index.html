@@ -1,130 +1,125 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JAVAFOOD · Admin Reseñas</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --orange:#d17a22; --orange2:#f0932b;
-    --dark:#0d0804; --card:rgba(28,16,8,0.98);
-    --cream:#f5e8d3; --muted:rgba(245,232,211,0.42);
-    --border:rgba(209,122,34,0.20); --glow:rgba(209,122,34,0.28);
-    --green:#4caf50; --red:#e05555;
-  }
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'Space Grotesk',sans-serif;background:var(--dark);color:var(--cream);min-height:100vh;}
+/* admin/resenas/js/index.js */
 
-  nav{background:rgba(18,10,4,.98);border-bottom:2px solid var(--orange);
-      box-shadow:0 0 28px var(--glow);padding:13px 32px;
-      display:flex;align-items:center;justify-content:space-between;
-      position:sticky;top:0;z-index:100;}
-  .brand{font-size:1.4rem;font-weight:900;color:#fff;text-decoration:none;}
-  .brand span{color:var(--orange);}
-  .brand small{font-size:.65rem;background:rgba(209,122,34,.18);color:var(--orange);
-    border-radius:4px;padding:2px 7px;margin-left:8px;font-weight:700;
-    letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;}
-  .nav-links a{color:var(--cream);text-decoration:none;margin-left:18px;
-    font-weight:600;opacity:.5;transition:.2s;font-size:.85rem;}
-  .nav-links a:hover,.nav-links a.active{color:var(--orange);opacity:1;}
+let resenasGlobal = [];
 
-  .stats-bar{background:linear-gradient(135deg,#1a0d06,#0d0804);
-    border-bottom:1px solid var(--border);
-    display:grid;grid-template-columns:repeat(3,1fr);}
-  .stat-item{padding:20px 24px;border-right:1px solid var(--border);display:flex;flex-direction:column;}
-  .stat-item:last-child{border-right:none;}
-  .stat-item .n{font-size:1.9rem;font-weight:900;color:var(--orange);line-height:1;}
-  .stat-item .l{font-size:.65rem;text-transform:uppercase;letter-spacing:.09em;opacity:.35;margin-top:5px;}
+async function cargarResenas() {
+    mostrarSpinner(true);
+    try {
+        const res = await fetch('/api/admin/resenas');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        resenasGlobal = await res.json();
+    } catch (err) {
+        console.error('Error al cargar resenas:', err);
+        resenasGlobal = [];
+    }
+    actualizarStats(resenasGlobal);
+    renderizarTabla(resenasGlobal);
+    mostrarSpinner(false);
+}
 
-  .toolbar{padding:20px 32px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
-    border-bottom:1px solid var(--border);}
-  .search-wrap{position:relative;flex:1;min-width:220px;}
-  .search-wrap input{width:100%;padding:10px 14px 10px 38px;background:rgba(0,0,0,.45);
-    border:1px solid var(--border);border-radius:10px;color:var(--cream);
-    font-family:inherit;font-size:.9rem;outline:none;transition:.2s;}
-  .search-wrap input:focus{border-color:var(--orange);}
-  .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.4;font-size:.95rem;}
-  .btn-new{padding:10px 22px;background:linear-gradient(45deg,var(--orange),var(--orange2));
-    color:#1a0a02;font-weight:700;border:none;border-radius:10px;cursor:pointer;
-    font-family:inherit;font-size:.9rem;text-decoration:none;transition:.2s;white-space:nowrap;}
-  .btn-new:hover{transform:translateY(-1px);box-shadow:0 0 18px var(--glow);}
+function renderizarTabla(resenas) {
+    const tbody = document.getElementById('tbody');
+    const empty = document.getElementById('empty');
+    const tabla = document.getElementById('tabla');
+    tbody.innerHTML = '';
 
-  .table-wrap{padding:24px 32px;}
-  table{width:100%;border-collapse:collapse;}
-  thead th{padding:10px 14px;text-align:left;font-size:.65rem;text-transform:uppercase;
-    letter-spacing:.09em;opacity:.38;border-bottom:1px solid var(--border);}
-  tbody tr{border-bottom:1px solid rgba(209,122,34,.07);transition:.15s;}
-  tbody tr:hover{background:rgba(209,122,34,.04);}
-  tbody td{padding:12px 14px;font-size:.88rem;vertical-align:middle;}
-  .stars{color:#f5a623;letter-spacing:2px;font-size:1rem;}
-  .stars-empty{color:#333;}
-  .td-comment{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.65;}
-  .td-fecha{opacity:.45;font-size:.8rem;white-space:nowrap;}
-  .actions{display:flex;gap:6px;flex-wrap:wrap;}
-  .btn-ver{padding:5px 12px;background:rgba(209,122,34,.12);border:1px solid rgba(209,122,34,.3);
-    color:var(--orange);border-radius:7px;text-decoration:none;font-size:.8rem;
-    font-weight:600;transition:.15s;white-space:nowrap;}
-  .btn-ver:hover{background:rgba(209,122,34,.22);}
-  .btn-edit{padding:5px 12px;background:rgba(76,175,80,.12);border:1px solid rgba(76,175,80,.3);
-    color:var(--green);border-radius:7px;text-decoration:none;font-size:.8rem;
-    font-weight:600;transition:.15s;white-space:nowrap;}
-  .btn-edit:hover{background:rgba(76,175,80,.22);}
-  .btn-del{padding:5px 12px;background:rgba(224,85,85,.12);border:1px solid rgba(224,85,85,.3);
-    color:var(--red);border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;
-    font-family:inherit;transition:.15s;white-space:nowrap;}
-  .btn-del:hover{background:rgba(224,85,85,.22);}
-  .btn-del:disabled{opacity:.4;cursor:not-allowed;}
+    if (resenas.length === 0) {
+        empty.style.display = 'block';
+        tabla.style.display = 'none';
+        return;
+    }
+    empty.style.display = 'none';
+    tabla.style.display = '';
 
-  #empty{display:none;text-align:center;padding:60px 20px;opacity:.35;}
-  #loading{text-align:center;padding:60px 20px;opacity:.5;}
-</style>
-</head>
-<body>
+    resenas.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+            '<td><strong>#' + r.id_resena + '</strong></td>' +
+            '<td>' + (r.nombre_producto || '—') + '</td>' +
+            '<td>' + (r.nombre_cliente  || '—') + '</td>' +
+            '<td>' + renderEstrellas(r.puntuacion) + '</td>' +
+            '<td class="td-comment">' + (r.comentario ? escHtml(r.comentario) : '<span style="opacity:.3">—</span>') + '</td>' +
+            '<td class="td-fecha">' + formatFecha(r.fecha) + '</td>' +
+            '<td><div class="actions">' +
+              '<a href="edit.html?id=' + r.id_resena + '" class="btn-edit">Editar</a>' +
+              '<button class="btn-del" onclick="eliminar(' + r.id_resena + ', this)">Borrar</button>' +
+            '</div></td>';
+        tbody.appendChild(tr);
+    });
+}
 
-<nav>
-  <a href="/index.html" class="brand">JAVA<span>FOOD</span><small>Admin</small></a>
-  <div class="nav-links">
-    <a href="/admin/peliculas/index.html">Productos</a>
-    <a href="/admin/pagos/index.html">Pedidos</a>
-    <a href="/admin/resenas/index.html" class="active">Reseñas</a>
-  </div>
-</nav>
+function renderEstrellas(n) {
+    var html = '';
+    for (var i = 1; i <= 5; i++) {
+        if (i <= n) {
+            html += '<span style="color:#f5a623;font-size:1rem">★</span>';
+        } else {
+            html += '<span style="color:#333;font-size:1rem">★</span>';
+        }
+    }
+    return html;
+}
 
-<div class="stats-bar">
-  <div class="stat-item"><span class="n" id="stat-total">—</span><span class="l">Total reseñas</span></div>
-  <div class="stat-item"><span class="n" id="stat-promedio">—</span><span class="l">Puntuación media</span></div>
-  <div class="stat-item"><span class="n" id="stat-hoy">—</span><span class="l">Hoy</span></div>
-</div>
+function filtrar() {
+    var q = document.getElementById('input-buscar').value.trim().toLowerCase();
+    if (!q) { renderizarTabla(resenasGlobal); return; }
+    var f = resenasGlobal.filter(function(r) {
+        return (r.nombre_producto || '').toLowerCase().includes(q) ||
+               (r.nombre_cliente  || '').toLowerCase().includes(q) ||
+               String(r.puntuacion).includes(q) ||
+               (r.comentario || '').toLowerCase().includes(q);
+    });
+    renderizarTabla(f);
+}
 
-<div class="toolbar">
-  <div class="search-wrap">
-    <span class="search-icon">🔍</span>
-    <input id="input-buscar" placeholder="Buscar por producto, cliente, puntuación…"
-           oninput="filtrar()" onkeydown="if(event.key==='Escape')limpiarFiltro()">
-  </div>
-  <a href="create.html" class="btn-new">+ Nueva reseña</a>
-</div>
+function limpiarFiltro() {
+    document.getElementById('input-buscar').value = '';
+    renderizarTabla(resenasGlobal);
+}
 
-<div class="table-wrap">
-  <div id="loading">Cargando reseñas…</div>
-  <div id="empty">No hay reseñas registradas todavía.</div>
-  <table id="tabla" style="display:none">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Producto</th>
-        <th>Cliente</th>
-        <th>Puntuación</th>
-        <th>Comentario</th>
-        <th>Fecha</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody id="tbody"></tbody>
-  </table>
-</div>
+async function eliminar(id, boton) {
+    if (!confirm('Eliminar la resena #' + id + '?')) return;
+    boton.disabled = true;
+    boton.textContent = '...';
+    try {
+        var res = await fetch('/api/admin/resenas/' + id, { method: 'DELETE' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        resenasGlobal = resenasGlobal.filter(function(r) { return r.id_resena !== id; });
+        actualizarStats(resenasGlobal);
+        renderizarTabla(resenasGlobal);
+    } catch (err) {
+        alert('No se pudo eliminar la resena #' + id);
+        boton.disabled = false;
+        boton.textContent = 'Borrar';
+    }
+}
 
-<script src="js/index.js"></script>
-</body>
-</html>
+function actualizarStats(resenas) {
+    document.getElementById('stat-total').textContent = resenas.length;
+    var media = resenas.length
+        ? (resenas.reduce(function(a,r) { return a + r.puntuacion; }, 0) / resenas.length).toFixed(1)
+        : '—';
+    document.getElementById('stat-promedio').textContent = media;
+    var hoy = new Date().toISOString().slice(0, 10);
+    document.getElementById('stat-hoy').textContent =
+        resenas.filter(function(r) { return r.fecha && r.fecha.startsWith(hoy); }).length;
+}
+
+function formatFecha(f) {
+    if (!f) return '—';
+    try {
+        var d = new Date(f.replace(' ', 'T'));
+        return d.toLocaleDateString('es-ES') + ' ' +
+               d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    } catch(e) { return f; }
+}
+
+function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function mostrarSpinner(v) {
+    document.getElementById('loading').style.display = v ? 'block' : 'none';
+}
+
+cargarResenas();
