@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAVAFOOD · Acceso</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--orange:#d17a22;--dark:#2b1b12;--bg:#0d0804;--cream:#f5e8d3;
+        --glass:rgba(43,27,18,0.92);--glow:rgba(209,122,34,0.35);--border:rgba(209,122,34,0.25);--red:#e05555;}
+  *{font-family:'Space Grotesk',sans-serif;box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--cream);min-height:100vh;display:flex;
+       flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+  .brand{font-size:1.8rem;font-weight:900;color:#fff;margin-bottom:36px;
+         text-decoration:none;display:flex;align-items:center;gap:12px;}
+  .brand img{width:48px;height:48px;border-radius:50%;border:2px solid var(--orange);}
+  .brand span{color:var(--orange);}
+  .card{background:var(--glass);border:1px solid var(--border);border-radius:24px;
+        overflow:hidden;width:100%;max-width:420px;box-shadow:0 0 60px rgba(0,0,0,.7);}
+  .tabs{display:flex;border-bottom:1px solid var(--border);}
+  .tab{flex:1;padding:16px;text-align:center;font-weight:700;font-size:.9rem;cursor:pointer;
+       opacity:.45;transition:.2s;letter-spacing:.5px;border:none;background:transparent;
+       color:var(--cream);font-family:inherit;text-decoration:none;display:flex;
+       align-items:center;justify-content:center;}
+  .tab.active,.tab:hover{opacity:1;color:var(--orange);}
+  .tab.active{border-bottom:2px solid var(--orange);}
+  /* Registrarse tab is a link → orange background hint */
+  .tab-register{background:rgba(209,122,34,0.08);}
+  .tab-register:hover{background:rgba(209,122,34,0.18);}
+  .panel{padding:30px;display:none;}
+  .panel.active{display:block;}
+  .field{margin-bottom:18px;}
+  .field label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:1px;
+               color:var(--orange);font-weight:700;margin-bottom:7px;}
+  .field input{width:100%;padding:12px 16px;background:rgba(0,0,0,.5);
+               border:1px solid rgba(209,122,34,.4);color:#fff;border-radius:10px;
+               font-family:inherit;font-size:.95rem;outline:none;transition:.2s;}
+  .field input:focus{border-color:var(--orange);box-shadow:0 0 10px var(--glow);}
+  .field input::placeholder{opacity:.4;}
+  .btn-submit{width:100%;padding:14px;background:linear-gradient(45deg,#d17a22,#f5e8d3);
+    color:var(--dark);font-weight:900;border:none;border-radius:12px;cursor:pointer;
+    font-size:.95rem;font-family:inherit;transition:.2s;margin-top:6px;}
+  .btn-submit:hover{transform:translateY(-2px);box-shadow:0 0 18px var(--glow);}
+  .btn-submit:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+  .msg{padding:12px 14px;border-radius:10px;margin-top:14px;font-size:.85rem;
+       font-weight:600;text-align:center;display:none;}
+  .msg.ok {background:rgba(76,175,80,.15);border:1px solid rgba(76,175,80,.3);color:#4caf50;}
+  .msg.err{background:rgba(224,85,85,.15);border:1px solid rgba(224,85,85,.3);color:var(--red);}
+  .volver{display:block;text-align:center;margin-top:20px;color:var(--cream);
+          opacity:.4;font-size:.85rem;text-decoration:none;transition:.2s;}
+  .volver:hover{opacity:.8;color:var(--orange);}
+</style>
+</head>
+<body>
+<a href="index.html" class="brand">
+  <img src="Javafoodlogo.png" alt="Logo" onerror="this.style.display='none'">
+  JAVA<span>FOOD</span>
+</a>
+
+<div class="card">
+  <div class="tabs">
+    <button class="tab active" onclick="mostrarLogin()">Iniciar sesión</button>
+    <a href="register.html" class="tab tab-register">🆕 Registrarse</a>
+  </div>
+
+  <div class="panel active" id="panel-login">
+    <div class="field"><label>Email</label>
+      <input id="l-email" type="email" placeholder="tu@email.com"></div>
+    <div class="field"><label>Contraseña</label>
+      <input id="l-pass" type="password" placeholder="••••••••"
+             onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn-submit" id="btn-login" onclick="doLogin()">Entrar →</button>
+    <div class="msg" id="msg-login"></div>
+  </div>
+</div>
+
+<a href="index.html" class="volver">← Volver sin iniciar sesión</a>
+
+<script>
+// Si ya está logueado, redirigir directamente
+if (sessionStorage.getItem('javafoodUser')) {
+    location.replace(new URLSearchParams(location.search).get('next') || 'index.html');
+}
+const redirect = new URLSearchParams(location.search).get("next") || "index.html";
+
+function mostrarLogin() {
+    document.getElementById("panel-login").classList.add("active");
+}
+
+async function doLogin() {
+    const email = document.getElementById("l-email").value.trim();
+    const pass  = document.getElementById("l-pass").value;
+    const btn   = document.getElementById("btn-login");
+    const msg   = document.getElementById("msg-login");
+    if (!email || !pass) { showMsg(msg,"err","❌ Rellena todos los campos"); return; }
+    btn.disabled = true; btn.textContent = "Entrando…";
+    try {
+        const res = await fetch("/api/clientes/login", {
+            method:"POST", headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({ email, password: pass })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detalle || data.mensaje || "Email o contraseña incorrectos");
+        sessionStorage.setItem("javafoodUser", JSON.stringify(data));
+        showMsg(msg,"ok","✅ ¡Bienvenido, " + (data.nom || data.nombre || "usuario") + "!");
+        setTimeout(() => location.href = redirect, 800);
+    } catch(e) {
+        showMsg(msg,"err","❌ " + e.message);
+        btn.disabled = false; btn.textContent = "Entrar →";
+    }
+}
+
+function showMsg(el, tipo, txt) {
+    el.className = "msg " + tipo; el.textContent = txt; el.style.display = "block";
+}
+</script>
+</body>
+</html>

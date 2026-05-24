@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAVAFOOD · Admin Reseñas</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--orange:#d17a22;--dark:#0d0804;--card:rgba(28,16,8,0.98);
+    --cream:#f5e8d3;--muted:rgba(245,232,211,0.42);
+    --border:rgba(209,122,34,0.20);--glow:rgba(209,122,34,0.28);
+    --green:#4caf50;--red:#e05555;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Space Grotesk',sans-serif;background:var(--dark);color:var(--cream);min-height:100vh;}
+
+  nav{background:rgba(18,10,4,.98);border-bottom:2px solid var(--orange);
+      box-shadow:0 0 28px var(--glow);padding:13px 32px;
+      display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:100;}
+  .brand{font-size:1.4rem;font-weight:900;color:#fff;text-decoration:none;}
+  .brand span{color:var(--orange);}
+  .brand small{font-size:.65rem;background:rgba(209,122,34,.18);color:var(--orange);
+    border-radius:4px;padding:2px 7px;margin-left:8px;font-weight:700;
+    text-transform:uppercase;vertical-align:middle;}
+  .nav-links{display:flex;gap:6px;align-items:center;}
+  .nav-links a{color:var(--cream);text-decoration:none;margin-left:14px;
+    font-weight:600;opacity:.5;transition:.2s;font-size:.85rem;}
+  .nav-links a:hover{color:var(--orange);opacity:1;}
+
+  .stats-bar{display:flex;gap:0;border-bottom:1px solid var(--border);
+    background:rgba(18,10,4,.6);}
+  .stat{flex:1;padding:18px 28px;border-right:1px solid var(--border);text-align:center;}
+  .stat:last-child{border-right:none;}
+  .stat .n{font-size:1.8rem;font-weight:900;color:var(--orange);line-height:1;}
+  .stat .l{font-size:.62rem;text-transform:uppercase;letter-spacing:.09em;opacity:.35;margin-top:4px;}
+
+  .toolbar{padding:18px 32px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+    border-bottom:1px solid var(--border);}
+  .search-wrap{position:relative;flex:1;min-width:220px;}
+  .search-wrap input{width:100%;padding:10px 14px 10px 38px;
+    background:rgba(0,0,0,.45);border:1px solid var(--border);
+    border-radius:10px;color:var(--cream);font-family:inherit;font-size:.9rem;
+    outline:none;transition:.2s;}
+  .search-wrap input:focus{border-color:var(--orange);}
+  .search-wrap input::placeholder{color:var(--muted);}
+  .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.4;}
+  .btn-clear{padding:9px 16px;background:transparent;border:1px solid var(--border);
+    color:var(--muted);border-radius:9px;font-family:inherit;font-size:.83rem;cursor:pointer;transition:.2s;}
+  .btn-clear:hover{border-color:rgba(245,232,211,.4);color:var(--cream);}
+
+  .content{padding:24px 32px;}
+  #loading{text-align:center;padding:50px;opacity:.4;}
+  #empty{display:none;text-align:center;padding:60px;opacity:.35;}
+
+  table{width:100%;border-collapse:collapse;display:none;}
+  thead{background:rgba(43,27,18,0.7);}
+  th{text-align:left;font-size:.63rem;text-transform:uppercase;letter-spacing:.09em;
+    opacity:.38;padding:11px 14px;font-weight:700;}
+  td{padding:13px 14px;border-bottom:1px solid rgba(255,255,255,.04);
+    font-size:.87rem;vertical-align:middle;}
+  tr:hover td{background:rgba(209,122,34,.04);}
+
+  .stars{color:#f5a623;}
+  .stars-empty{color:#333;}
+
+  .td-comment{max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .td-fecha{opacity:.55;font-size:.8rem;white-space:nowrap;}
+
+  .actions{display:flex;gap:8px;}
+  .btn-ver{padding:5px 12px;background:rgba(209,122,34,.12);border:1px solid rgba(209,122,34,.3);
+    color:var(--orange);border-radius:7px;text-decoration:none;font-size:.78rem;font-weight:600;
+    transition:.15s;white-space:nowrap;}
+  .btn-ver:hover{background:rgba(209,122,34,.25);}
+  .btn-del{padding:5px 12px;background:transparent;border:1px solid rgba(224,85,85,.3);
+    color:var(--red);border-radius:7px;font-family:inherit;font-size:.78rem;font-weight:600;
+    cursor:pointer;transition:.15s;}
+  .btn-del:hover{background:rgba(224,85,85,.1);border-color:var(--red);}
+</style>
+
+<script>
+// GUARD: solo admins pueden entrar
+(function() {
+    var raw  = sessionStorage.getItem('javafoodUser');
+    var user = raw ? JSON.parse(raw) : null;
+    var tipo = user ? (user.tipo || user.rol || '').toUpperCase() : '';
+    if (!user || tipo !== 'ADMIN') {
+        sessionStorage.setItem('adminRedirect', window.location.href);
+        window.location.replace('/login.html');
+    }
+})();
+</script>
+</head>
+<body>
+
+<nav>
+  <a href="/AdminComplementos.html" class="brand">JAVA<span>FOOD</span><small>Admin</small></a>
+  <div class="nav-links">
+    <a href="/AdminComplementos.html">← Volver</a>
+    <a href="/admin/pagos/index.html">Pedidos</a>
+    <a href="create.html" class="btn-new">✍️ Crear reseña</a>
+  </div>
+</nav>
+
+<div class="stats-bar">
+  <div class="stat"><div class="n" id="stat-total">—</div><div class="l">Total reseñas</div></div>
+  <div class="stat"><div class="n" id="stat-promedio">—</div><div class="l">Puntuación media</div></div>
+  <div class="stat"><div class="n" id="stat-hoy">—</div><div class="l">Hoy</div></div>
+</div>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="input-buscar" placeholder="Buscar por producto, cliente o comentario…" oninput="filtrar()">
+  </div>
+  <button class="btn-clear" onclick="limpiarFiltro()">✕ Limpiar</button>
+</div>
+
+<div class="content">
+  <div id="loading">⏳ Cargando reseñas…</div>
+  <div id="empty">No hay reseñas todavía.</div>
+  <table id="tabla">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Producto</th>
+        <th>Cliente</th>
+        <th>Puntuación</th>
+        <th>Comentario</th>
+        <th>Fecha</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+let resenasGlobal = [];
+
+async function cargarResenas() {
+    try {
+        const res = await fetch('/api/admin/resenas');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        resenasGlobal = await res.json();
+    } catch (err) {
+        document.getElementById('loading').innerHTML = '❌ Error: ' + err.message;
+        return;
+    }
+    actualizarStats(resenasGlobal);
+    renderizarTabla(resenasGlobal);
+    document.getElementById('loading').style.display = 'none';
+}
+
+function renderizarTabla(resenas) {
+    const tbody = document.getElementById('tbody');
+    const empty = document.getElementById('empty');
+    const tabla = document.getElementById('tabla');
+    tbody.innerHTML = '';
+
+    if (resenas.length === 0) {
+        empty.style.display = 'block';
+        tabla.style.display = 'none';
+        return;
+    }
+    empty.style.display = 'none';
+    tabla.style.display = 'table';
+
+    resenas.forEach(r => {
+        const estrellas = '★'.repeat(r.puntuacion) +
+            '<span class="stars-empty">' + '★'.repeat(5 - r.puntuacion) + '</span>';
+        const comentario = r.comentario
+            ? escHtml(r.comentario)
+            : '<em style="opacity:.35">Sin comentario</em>';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>#${r.id_resena}</strong></td>
+            <td>${escHtml(r.nombre_producto || '—')}</td>
+            <td>${escHtml(r.nombre_cliente  || '—')}</td>
+            <td><span class="stars">${estrellas}</span></td>
+            <td class="td-comment">${comentario}</td>
+            <td class="td-fecha">${formatearFecha(r.fecha)}</td>
+            <td>
+              <div class="actions">
+                <a href="show.html?id=${r.id_resena}" class="btn-ver">👁 Ver</a>
+                <button class="btn-del" onclick="eliminar(${r.id_resena}, this)">🗑 Borrar</button>
+              </div>
+            </td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+function filtrar() {
+    const q = document.getElementById('input-buscar').value.trim().toLowerCase();
+    if (!q) { renderizarTabla(resenasGlobal); return; }
+    renderizarTabla(resenasGlobal.filter(r =>
+        (r.nombre_producto || '').toLowerCase().includes(q) ||
+        (r.nombre_cliente  || '').toLowerCase().includes(q) ||
+        String(r.puntuacion).includes(q) ||
+        (r.comentario || '').toLowerCase().includes(q)
+    ));
+}
+
+function limpiarFiltro() {
+    document.getElementById('input-buscar').value = '';
+    renderizarTabla(resenasGlobal);
+}
+
+async function eliminar(id, boton) {
+    if (!confirm(`¿Eliminar la reseña #${id}? No se puede deshacer.`)) return;
+    boton.disabled = true; boton.textContent = '…';
+    try {
+        const res = await fetch(`/api/admin/resenas/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        resenasGlobal = resenasGlobal.filter(r => r.id_resena !== id);
+        actualizarStats(resenasGlobal);
+        renderizarTabla(resenasGlobal);
+    } catch (err) {
+        alert('No se pudo eliminar la reseña #' + id);
+        boton.disabled = false; boton.textContent = '🗑 Borrar';
+    }
+}
+
+function actualizarStats(resenas) {
+    document.getElementById('stat-total').textContent = resenas.length;
+    const promedio = resenas.length
+        ? (resenas.reduce((a, r) => a + r.puntuacion, 0) / resenas.length).toFixed(1) + ' ★'
+        : '—';
+    document.getElementById('stat-promedio').textContent = resenas.length ? promedio : '—';
+    const hoy = new Date().toISOString().slice(0, 10);
+    document.getElementById('stat-hoy').textContent =
+        resenas.filter(r => r.fecha && r.fecha.startsWith(hoy)).length;
+}
+
+function formatearFecha(f) {
+    if (!f) return '—';
+    try {
+        const d = new Date(f.replace(' ', 'T'));
+        return d.toLocaleDateString('es-ES') + ' ' +
+               d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    } catch { return f; }
+}
+
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+cargarResenas();
+</script>
+</body>
+</html>

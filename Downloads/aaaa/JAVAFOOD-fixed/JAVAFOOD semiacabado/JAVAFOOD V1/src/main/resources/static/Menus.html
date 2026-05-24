@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaFood | Menús</title>
+    <link rel="stylesheet" href="JAVAFOOD.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="code-overlay"></div>
+    <div class="kiosk-container">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <img src="Javafoodlogo.png" alt="Logo" class="main-logo">
+                <h1>Java<span>Food</span></h1>
+            </div>
+            <nav class="nav-links">
+                <button class="nav-btn active">🍱 MENÚS</button>
+                <button class="nav-btn" onclick="location.href='Principales.html'">🍔 PRINCIPALES</button>
+                <button class="nav-btn" onclick="location.href='Complementos.html'">🍟 COMPLEMENTOS</button>
+                <button class="nav-btn" onclick="location.href='Salsas.html'">🍯 SALSAS</button>
+                <button class="nav-btn" onclick="location.href='Bebidas.html'">🥤 BEBIDAS</button>
+                <button class="nav-btn" onclick="location.href='Postres.html'">🎂 POSTRES</button>
+				<button class="nav-btn" onclick="location.href='Promociones.html'">🎁 PROMOCIONES</button>
+            </nav>
+            <div class="cart-box">
+                <h3 class="cart-title">Tu Pedido</h3>
+                <div class="cart-items-list"></div>
+                <div class="total-row">
+                    <span>Total:</span>
+                    <span class="total-price">0.00€</span>
+                </div>
+                <button class="pay-btn">PAGAR AHORA</button>
+                <button class="clear-btn" onclick="carrito=[];guardarCarrito();">🗑️ Vaciar pedido</button>
+            </div>
+        </aside>
+        <main class="main-view">
+            <header class="top-info">
+                <span>Explorando: <strong>MENÚS</strong></span>
+                <span class="highlight">Próximamente disponible</span>
+          <div id="auth-area"></div>
+        </header>
+            <div class="promo-banner secondary">
+                <div class="promo-content">
+                    <h2>COMBOS <br><span>JAVA</span></h2>
+                    <p>Los mejores menús compilados para ti.</p>
+                </div>
+                <span style="font-size: 80px;">🍱</span>
+            </div>
+            <div style="text-align:center; padding: 60px 20px; color: rgba(245,232,211,0.4);">
+                <p style="font-size:1.2rem; margin-bottom:12px;">🚧 Sección en construcción</p>
+                <p style="font-size:0.9rem;">Los menús combinados estarán disponibles próximamente.</p>
+                <p style="font-size:0.85rem; margin-top:20px;">
+                    Mientras tanto, puedes construir tu propio menú desde
+                    <a href="Principales.html" style="color:var(--primary-orange);">Principales</a>,
+                    <a href="Complementos.html" style="color:var(--primary-orange);">Complementos</a> y
+                    <a href="Bebidas.html" style="color:var(--primary-orange);">Bebidas</a>.
+                </p>
+            </div>
+        </main>
+    </div>
+<script src="main.js"></script>
+<script src="auth-rol.js"></script>
+</body>
+</html>

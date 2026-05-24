@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaFood | Promociones Tech</title>
+    <link rel="stylesheet" href="JAVAFOOD.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="code-overlay"></div>
+
+<div class="kiosk-container">
+    <aside class="sidebar">
+        <div class="logo-area">
+            <img src="Javafoodlogo.png" alt="Logo" class="main-logo">
+            <h1>Java<span>Food</span></h1>
+        </div>
+        <nav class="nav-links">
+            <button class="nav-btn" onclick="location.href='Menus.html'">🍱 MENÚS</button>
+            <button class="nav-btn" onclick="location.href='Principales.html'">🍔 PRINCIPALES</button>
+            <button class="nav-btn" onclick="location.href='Complementos.html'">🍟 COMPLEMENTOS</button>
+            <button class="nav-btn" onclick="location.href='Salsas.html'">🍯 SALSAS</button>
+            <button class="nav-btn" onclick="location.href='Bebidas.html'">🥤 BEBIDAS</button>
+            <button class="nav-btn" onclick="location.href='Postres.html'">🎂 POSTRES</button>
+            <button class="nav-btn active">🎁 PROMOCIONES</button>
+        </nav>
+        <div class="cart-box">
+            <h3 class="cart-title">Tu Pedido</h3>
+            <div class="cart-items-list"></div>
+            <div class="total-row">
+                <span>Total:</span>
+                <span class="total-price">0.00€</span>
+            </div>
+            <button class="pay-btn">PAGAR AHORA</button>
+            <button class="clear-btn" onclick="carrito=[];guardarCarrito();">🗑️ Vaciar pedido</button>
+        </div>
+    </aside>
+
+    <main class="main-view">
+        <header class="top-info">
+            <span>Explorando: <strong>PROMOCIONES</strong></span>
+            <span class="highlight" id="contador-promos">Cargando promociones...</span>
+            <div id="auth-area"></div>
+        </header>
+
+        <div class="promo-banner secondary">
+            <div class="promo-content">
+                <h2>PROMOS <br><span>JAVA POINTS</span></h2>
+                <p>Canjea tus puntos por recompensas.</p>
+            </div>
+            <span style="font-size:80px;">🎁</span>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="buscador" placeholder="Busca promociones..." oninput="filtrarPromos()">
+            <button>🔍</button>
+        </div>
+
+        <div class="food-grid" id="grid-promos">
+            <p style="color:#aaa;padding:20px;">Cargando promociones…</p>
+        </div>
+    </main>
+</div>
+
+<script src="main.js"></script>
+<script>
+// Carga las promociones desde la BD (categoría Promociones)
+let todasLasPromos = [];
+
+async function cargarPromos() {
+    try {
+        const res = await fetch('/api/productos/categoria/Promociones');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        todasLasPromos = await res.json();
+    } catch (e) {
+        console.error('Error cargando promos:', e);
+        // Fallback estático si la API falla
+        todasLasPromos = [
+            { nombre: 'Patatas Fritas', precio: 500,  id_producto: 0 },
+            { nombre: 'CheeseBurger',   precio: 1200, id_producto: 0 },
+            { nombre: 'Salsa Barbacoa', precio: 300,  id_producto: 0 }
+        ];
+    }
+    renderPromos(todasLasPromos);
+}
+
+function renderPromos(lista) {
+    const grid = document.getElementById('grid-promos');
+
+    document.getElementById('contador-promos').textContent =
+        lista.length + ' Promociones Disponibles';
+
+    if (!lista.length) {
+        grid.innerHTML = '<p style="color:#aaa;padding:20px;">No hay promociones disponibles.</p>';
+        return;
+    }
+
+    grid.innerHTML = lista.map(p => `
+        <div class="card">
+            <div style="
+                width:100%; height:140px; border-radius:15px;
+                background:rgba(209,122,34,0.15);
+                display:flex; align-items:center; justify-content:center;
+                font-size:60px;">
+                🎁
+            </div>
+            <div class="card-body">
+                <h4>${p.nombre}</h4>
+                <div class="card-price">
+                    <span>${Math.round(p.precio)} pts</span>
+                    <button onclick="canjearPromo('${p.nombre}', ${Math.round(p.precio)})">+</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function filtrarPromos() {
+    const texto = document.getElementById('buscador').value.toLowerCase();
+    renderPromos(todasLasPromos.filter(p => p.nombre.toLowerCase().includes(texto)));
+}
+
+function canjearPromo(nombre, puntos) {
+    const usuario = JSON.parse(sessionStorage.getItem('javafoodUser'));
+    if (!usuario) {
+        alert('Debes iniciar sesión para canjear puntos.');
+        return;
+    }
+    alert('Próximamente podrás canjear "' + nombre + '" por ' + puntos + ' puntos.');
+}
+
+cargarPromos();
+</script>
+<script src="auth-rol.js"></script>
+</body>
+</html>

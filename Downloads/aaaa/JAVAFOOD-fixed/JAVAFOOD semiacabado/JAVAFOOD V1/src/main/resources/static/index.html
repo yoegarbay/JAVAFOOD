@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaFood</title>
+    <link rel="stylesheet" href="JAVAFOOD.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="code-overlay"></div>
+    <div class="kiosk-container">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <img src="Javafoodlogo.png" alt="Logo" class="main-logo">
+                <h1>Java<span>Food</span></h1>
+            </div>
+            <nav class="nav-links">
+                <button class="nav-btn" onclick="location.href='Menus.html'">🍱 MENÚS</button>
+                <button class="nav-btn" onclick="location.href='Principales.html'">🍔 PRINCIPALES</button>
+                <button class="nav-btn" onclick="location.href='Complementos.html'">🍟 COMPLEMENTOS</button>
+                <button class="nav-btn" onclick="location.href='Salsas.html'">🍯 SALSAS</button>
+                <button class="nav-btn" onclick="location.href='Bebidas.html'">🥤 BEBIDAS</button>
+                <button class="nav-btn" onclick="location.href='Postres.html'">🎂 POSTRES</button>
+				<button class="nav-btn" onclick="location.href='Promociones.html'">🎁 PROMOCIONES</button>
+				
+            </nav>
+            <div class="cart-box">
+                <h3 class="cart-title">Tu Pedido</h3>
+                <div class="cart-items-list"></div>
+                <div class="total-row">
+                    <span>Total:</span>
+                    <span class="total-price">0.00€</span>
+                </div>
+                <button class="pay-btn">PAGAR AHORA</button>
+                <button class="clear-btn" onclick="carrito=[];guardarCarrito();">🗑️ Vaciar pedido</button>
+            </div>
+        </aside>
+        <main class="main-view">
+            <header class="top-info">
+                <span id="saludo-usuario">Bienvenido a <strong>JAVAFOOD</strong></span>
+                <div id="auth-area"></div>
+            </header>
+            <script>
+            (function() {
+                const raw = sessionStorage.getItem('javafoodUser');
+                if (raw) {
+                    const u = JSON.parse(raw);
+                    const nombre = u.nombre || u.nom || '';
+                    if (nombre) {
+                        document.getElementById('saludo-usuario').innerHTML =
+                            'Hola, <strong style="color:var(--primary-orange)">' + nombre + '</strong>';
+                    }
+                }
+            })();
+            </script>
+            <div class="promo-banner" style="background: linear-gradient(90deg, #2b1b12, #d17a22);">
+                <div class="promo-content">
+                    <h2>JAVA<br><span style="color:#2b1b12;background:#f5e8d3;padding:2px 8px;border-radius:6px;">FOOD</span></h2>
+                    <p>El menú con más rendimiento del mercado.</p>
+                </div>
+                <span style="font-size: 80px;">🍔</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;padding:10px 0;">
+                <div class="card" style="cursor:pointer;text-align:center;padding:30px 20px;" onclick="location.href='Menus.html'">
+                    <span style="font-size:50px">🍱</span>
+                    <h4 style="margin-top:12px;">MENÚS</h4>
+                    <p style="font-size:.8rem;color:#aaa;margin-top:6px;">Combos completos</p>
+                </div>
+                <div class="card" style="cursor:pointer;text-align:center;padding:30px 20px;" onclick="location.href='Principales.html'">
+                    <span style="font-size:50px">🍔</span>
+                    <h4 style="margin-top:12px;">PRINCIPALES</h4>
+                    <p style="font-size:.8rem;color:#aaa;margin-top:6px;">Hamburgesas · Pizzas · Bocatas</p>
+                </div>
+                <div class="card" style="cursor:pointer;text-align:center;padding:30px 20px;" onclick="location.href='Complementos.html'">
+                    <span style="font-size:50px">🍟</span>
+                    <h4 style="margin-top:12px;">COMPLEMENTOS</h4>
+                    <p style="font-size:.8rem;color:#aaa;margin-top:6px;">Fries · Nuggets · Alitas</p>
+                </div>
+                <div class="card" style="cursor:pointer;text-align:center;padding:30px 20px;" onclick="location.href='Salsas.html'">
+                    <span style="font-size:50px">🍯</span>
+                    <h4 style="margin-top:12px;">SALSAS</h4>
+                    <p style="font-size:.8rem;color:#aaa;margin-top:6px;">Dips & Dressings</p>
+                </div>
+                <div class="card" style="cursor:pointer;text-align:center;padding:30px 20px;" onclick="location.href='Bebidas.html'">
+                    <span style="font-size:50px">🥤</span>
+                    <h4 style="margin-top:12px;">BEBIDAS</h4>
+                    <p style="font-size:.8rem;color:#aaa;margin-top:6px;">Refrescos · Cervezas · Cafés</p>
+                </div>
+                <div class="card" style="cursor:pointer;text-align:center;padding:30px 20px;" onclick="location.href='Postres.html'">
+                    <span style="font-size:50px">🎂</span>
+                    <h4 style="margin-top:12px;">POSTRES</h4>
+                    <p style="font-size:.8rem;color:#aaa;margin-top:6px;">Helados · Batidos · Donuts</p>
+                </div>
+				<div class="card" style="cursor:pointer;text-align:center;padding:30px 20px;" onclick="location.href='Promociones.html'">
+				    <span style="font-size:50px">🎁</span>
+				    <h4 style="margin-top:12px;">PROMOCIONES</h4>
+				    <p style="font-size:.8rem;color:#aaa;margin-top:6px;">Canjea tus puntos</p>
+				</div>
+            </div>
+        </main>
+    </div>
+<script src="main.js"></script>
+<script>
+    const u = JSON.parse(sessionStorage.getItem('javafoodUser') || 'null');
+    if (u) document.getElementById('user-info').textContent = '👤 ' + u.nom;
+</script>
+<script src="auth-rol.js"></script>
+</body>
+</html>

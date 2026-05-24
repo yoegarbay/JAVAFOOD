@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaFood | Buscador</title>
+    <link rel="stylesheet" href="JAVAFOOD.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        .results-header { padding: 16px 0 10px; border-bottom: 1px solid rgba(209,122,34,0.2); margin-bottom: 20px; }
+        .results-header h2 { font-size: 1.1rem; color: var(--cream); }
+        .results-header h2 span { color: var(--primary-orange); }
+        .results-header .count { font-size: 0.82rem; color: rgba(245,232,211,0.5); margin-top: 4px; }
+        .no-results { text-align:center; padding: 60px 20px; color: rgba(245,232,211,0.35); }
+        .no-results .icon { font-size: 60px; display:block; margin-bottom:16px; }
+        .tag-cat {
+            display: inline-block; font-size: 0.65rem; padding: 2px 8px;
+            border-radius: 20px; border: 1px solid rgba(209,122,34,0.4);
+            color: var(--primary-orange); margin-top: 6px; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .card-body { padding-top: 6px; }
+        .spinner {
+            display: flex; justify-content:center; align-items:center;
+            padding: 60px; color: rgba(245,232,211,0.3); font-size:0.9rem; gap:10px;
+        }
+        .spinner::before {
+            content: '';
+            width: 28px; height: 28px;
+            border: 3px solid rgba(209,122,34,0.2);
+            border-top-color: var(--primary-orange);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="code-overlay"></div>
+    <div class="kiosk-container">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <img src="Javafoodlogo.png" alt="Logo" class="main-logo">
+                <h1>Java<span>Food</span></h1>
+            </div>
+            <nav class="nav-links">
+                <button class="nav-btn" onclick="location.href='Menus.html'">🍱 MENÚS</button>
+                <button class="nav-btn" onclick="location.href='Principales.html'">🍔 PRINCIPALES</button>
+                <button class="nav-btn" onclick="location.href='Complementos.html'">🍟 COMPLEMENTOS</button>
+                <button class="nav-btn" onclick="location.href='Salsas.html'">🍯 SALSAS</button>
+                <button class="nav-btn" onclick="location.href='Bebidas.html'">🥤 BEBIDAS</button>
+                <button class="nav-btn" onclick="location.href='Postres.html'">🎂 POSTRES</button>
+            </nav>
+            <div class="cart-box">
+                <h3 class="cart-title">Tu Pedido</h3>
+                <div class="cart-items-list"></div>
+                <div class="total-row">
+                    <span>Total:</span>
+                    <span class="total-price">0.00€</span>
+                </div>
+                <button class="pay-btn">PAGAR AHORA</button>
+                <button class="clear-btn" onclick="carrito=[];guardarCarrito();">🗑️ Vaciar pedido</button>
+            </div>
+        </aside>
+        <main class="main-view">
+            <div class="results-header">
+                <h2 id="results-title">Resultados para <span id="query-display">...</span></h2>
+                <div class="count" id="results-count">Buscando...</div>
+            </div>
+            <div id="results-grid" class="food-grid">
+                <div class="spinner">Buscando productos</div>
+            </div>
+        </main>
+    </div>
+
+<script src="main.js"></script>
+<script>
+const CATEGORIAS_ALL = ['Hamburguesas','Pizzas','Bocatas','Complementos','Salsas','Bebidas','Postres'];
+
+const IMAGEN_MAP = {
+    // Complementos
+    'Java Fries': 'Imagenes/Complementos/Java Fries.png',
+    'Nuggets (6 uds)': 'Imagenes/Complementos/Nuggets (6 uds).png',
+    'Aros de Cebolla': 'Imagenes/Complementos/Aros de Cebolla.png',
+    'Ensalada': 'Imagenes/Complementos/Ensalada.png',
+    'Alitas (4 uds)': 'Imagenes/Complementos/Alitas (4 uds).png',
+    'Nachos': 'Imagenes/Complementos/Nachos.png',
+    'Croquetas': 'Imagenes/Complementos/Croquetas.png',
+    'Patatas Gajo': 'Imagenes/Complementos/Patatas Gajo.png',
+    'Bolas de queso con mermelada': 'Imagenes/Complementos/Bolas de queso con mermelada.png',
+    // Bebidas
+    'CocaCola': 'Imagenes/Bebidas/coca-cola-lata-33cl.jpg',
+    'Cerveza': 'Imagenes/Bebidas/cerveza.jpg',
+    'Cerveza Sin Alcohol': 'Imagenes/Bebidas/cerveza sin.jpg',
+    'Fanta de Naranja': 'Imagenes/Bebidas/fanta-de-naranja-330ml.jpg',
+    'Aquarius de Limon': 'Imagenes/Bebidas/aquarius.jfif',
+    'Café con Leche': 'Imagenes/Bebidas/cafe_leche.jpg',
+    // Hamburguesas
+    'CheeseBurger':   'Imagenes/Principales/Cheeseburger.png',
+    'BBQ Burger':     'Imagenes/Principales/BBQ.png',
+    'Bacon Burger':   'Imagenes/Principales/Beicon.png',
+    'La Completa':    'Imagenes/Principales/Completa.png',
+    'La Trufada':     'Imagenes/Principales/Trufada.png',
+    'Chicken Burger': 'Imagenes/Principales/Chicken.png',
+    // Pizzas
+    'Pepperoni':  'Imagenes/Principales/Pepperoni.png',
+    'Carbonara':  'Imagenes/Principales/Carbonara.png',
+    'Pizza BBQ':  'Imagenes/Principales/Pizza BBQ.png',
+    'Hawaiana':   'Imagenes/Principales/Hawaiana.png',
+    'Kebab':      'Imagenes/Principales/Kebab.png',
+    'Marinera':   'Imagenes/Principales/Marinera.png',
+    // Bocatas y Kebabs
+    'Bocata especial 1': 'Imagenes/Principales/Bocata especial 1.png',
+    'Bocata especial 2': 'Imagenes/Principales/Bocata especial 2.png',
+    'Bocata especial 3': 'Imagenes/Principales/Bocata especial 3.png',
+    'Bocata especial 4': 'Imagenes/Principales/Bocata especial 4.png',
+    'Bocata especial 5': 'Imagenes/Principales/Bocata especial 5.png',
+    'Bocata especial 6': 'Imagenes/Principales/Bocata especial 6.png',
+    'Durum pollo':   'Imagenes/Principales/Durum pollo.png',
+    'Durum ternera': 'Imagenes/Principales/Durum ternera.png',
+    'Durum mixto':   'Imagenes/Principales/Durum mixto.png',
+    'Kebab pollo':   'Imagenes/Principales/Kebab pollo.png',
+    'Kebab ternera': 'Imagenes/Principales/Kebab ternera.png',
+    'Kebab Mixto':   'Imagenes/Principales/Kebab Mixto.png',
+    // Postres
+    'Brownie con Helado':     'Imagenes/Postres/Brownie con Helado.png',
+    'Coulant de Chocolate':   'Imagenes/Postres/Coulant de Chocolate.png',
+    'Helado (3 bolas)':       'Imagenes/Postres/Helado (3 bolas).png',
+    'Tarta de Queso':         'Imagenes/Postres/Tarta de Queso.png',
+    'Crepe con Nutella':      'Imagenes/Postres/Crepe con Nutella.png',
+    // Salsas
+    'Ketchup':       'Imagenes/Salsas/Ketchup.png',
+    'Mayonesa':      'Imagenes/Salsas/Mayonesa.png',
+    'Barbacoa':      'Imagenes/Salsas/Barbacoa.png',
+    'Mostaza':       'Imagenes/Salsas/Mostaza.png',
+    'Alioli':        'Imagenes/Salsas/Alioli.png',
+    'Salsa Brava':   'Imagenes/Salsas/Salsa Brava.png',
+    'Miel y Mostaza':'Imagenes/Salsas/Miel y Mostaza.png',
+    'Ranch':         'Imagenes/Salsas/Ranch.png',
+    'Cheddar':       'Imagenes/Salsas/Cheddar.png',
+    'Pesto':         'Imagenes/Salsas/Pesto.png',
+    'Picante':       'Imagenes/Salsas/Picante.png',
+    'Teriyaki':      'Imagenes/Salsas/Teriyaki.png',
+    'César':         'Imagenes/Salsas/Cesar.png',
+    'Yogur':         'Imagenes/Salsas/Yogur.png',
+    'Curry':         'Imagenes/Salsas/Curry.png',
+    'Sriracha':      'Imagenes/Salsas/Sriracha.png',
+    'Tártara':       'Imagenes/Salsas/Tártara.png',
+    'Guacamole':     'Imagenes/Salsas/Guacamole.png',
+    'Soja':          'Imagenes/Salsas/Soja.png',
+    'Llave Ácida':   'Imagenes/Salsas/LLave acida.png',
+};
+
+const PAGE_MAP = {
+    Hamburguesas: 'Hamburguesas.html',
+    Pizzas: 'Pizzas.html',
+    Bocatas: 'Bocatas.html',
+    Complementos: 'Complementos.html',
+    Salsas: 'Salsas.html',
+    Bebidas: 'Bebidas.html',
+    Postres: 'Postres.html',
+};
+
+async function buscarProductos() {
+    const params = new URLSearchParams(window.location.search);
+    const q   = (params.get('q') || '').trim().toLowerCase();
+    const cat = params.get('cat') || 'todo';
+
+    document.getElementById('query-display').textContent = q || '(vacío)';
+    document.title = `JavaFood | Buscando "${q}"`;
+
+    const grid = document.getElementById('results-grid');
+
+    if (!q) {
+        grid.innerHTML = '';
+        document.getElementById('results-count').textContent = 'Escribe algo en el buscador.';
+        return;
+    }
+
+    const categoriasABuscar = cat === 'todo' ? CATEGORIAS_ALL : [cat];
+
+    // Fetch todas las categorías en paralelo
+    let todos = [];
+    const fetches = categoriasABuscar.map(async c => {
+        try {
+            const res = await fetch(`/api/productos/categoria/${c}`);
+            if (!res.ok) return [];
+            const data = await res.json();
+            return data.map(p => ({ ...p, _categoria: c }));
+        } catch { return []; }
+    });
+
+    const results = await Promise.all(fetches);
+    todos = results.flat();
+
+    // Filtrar por query
+    const filtrados = todos.filter(p =>
+        (p.nombre || '').toLowerCase().includes(q)
+    );
+
+    document.getElementById('results-count').textContent =
+        filtrados.length === 0
+            ? 'Sin resultados'
+            : `${filtrados.length} producto${filtrados.length !== 1 ? 's' : ''} encontrado${filtrados.length !== 1 ? 's' : ''}`;
+
+    if (filtrados.length === 0) {
+        grid.innerHTML = `
+            <div class="no-results">
+                <span class="icon">🔍</span>
+                <p style="font-size:1.1rem;margin-bottom:8px;">Sin resultados para "<strong>${q}</strong>"</p>
+                <p style="font-size:0.85rem;">Prueba con otro término o una categoría diferente.</p>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = filtrados.map(p => {
+        const img = p.imagen || IMAGEN_MAP[p.nombre] || '';
+        const paginaProducto = PAGE_MAP[p._categoria] || 'index.html';
+        return `
+            <div class="card" style="cursor:pointer;" onclick="location.href='${paginaProducto}'" title="Ver en ${p._categoria}">
+                <img src="${img}" onerror="this.style.display='none'" alt="${p.nombre}"
+                     style="width:100%;height:140px;object-fit:cover;border-radius:15px;">
+                <div class="card-body">
+                    <span class="tag-cat">${p._categoria}</span>
+                    <h4 style="margin-top:6px;">${p.nombre}</h4>
+                    <div class="card-price" style="margin-top:8px;">
+                        <span>${parseFloat(p.precio).toFixed(2)}€</span>
+                        <button>+</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+buscarProductos();
+</script>
+<script src="auth-rol.js"></script>
+</body>
+</html>

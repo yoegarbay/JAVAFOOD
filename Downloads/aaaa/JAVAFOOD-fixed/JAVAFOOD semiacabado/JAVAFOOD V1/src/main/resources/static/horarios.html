@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaFood — Horarios</title>
+<link rel="stylesheet" href="JAVAFOOD.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="code-overlay"></div>
+<div class="page-wrapper">
+    <div class="page-header">
+        <div class="header-left">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="32" cy="32" r="30" stroke="#d17a22" stroke-width="3"/>
+                <path d="M20 44 C20 44 24 20 32 20 C40 20 44 44 44 44" stroke="#d17a22" stroke-width="3" stroke-linecap="round"/>
+                <ellipse cx="32" cy="46" rx="10" ry="3" fill="#d17a22" opacity="0.5"/>
+                <path d="M28 14 C28 10 36 10 36 14" stroke="#d17a22" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <div>
+                <h1>Java<span>Food</span></h1>
+                <p>Gestión de Horarios</p>
+            </div>
+        </div>
+        <div class="header-controls">
+            <nav class="nav-header-links">
+                <a href="fichar.html">📋 Fichar</a>
+                <a href="AdminHorario.html" class="admin-link">⚙️ Admin Horarios</a>
+                <a href="AdminFichar.html" class="admin-link">🔐 Admin Fichajes</a>
+            </nav>
+            <div class="mes-nav">
+                <button class="mes-btn" onclick="cambiarMes(-1)">‹</button>
+                <div class="mes-nombre" id="mes-label">—</div>
+                <button class="mes-btn" onclick="cambiarMes(1)">›</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="empleados-tabs" id="empleados-tabs"></div>
+
+    <div class="leyenda">
+        <div class="ley-item"><div class="ley-color" style="background:#ffc107;"></div> Mañana (07:00–15:00)</div>
+        <div class="ley-item"><div class="ley-color" style="background:#64b5f6;"></div> Tarde (15:00–23:00)</div>
+        <div class="ley-item"><div class="ley-color" style="background:#bb8fce;"></div> Noche (23:00–07:00)</div>
+        <div class="ley-item"><div class="ley-color" style="background:#ff9800;"></div> Partido (Split)</div>
+        <div class="ley-item"><div class="ley-color" style="background:rgba(76,175,80,0.4);"></div> Libre</div>
+        <div class="ley-item"><div class="ley-color" style="background:#e74c3c;"></div> Baja / Ausencia</div>
+    </div>
+
+    <div class="resumen-mes" id="resumen-mes"></div>
+    <div class="cal-grid" id="cal-grid"></div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)cerrarModal()">
+    <div class="modal-content">
+        <button class="modal-close" onclick="cerrarModal()">×</button>
+        <h2 id="modal-titulo">—</h2>
+        <div class="modal-sub" id="modal-sub"></div>
+        <div id="modal-body"></div>
+    </div>
+</div>
+
+<script>
+const TURNOS_LABEL = { manana:'🌅 Mañana', tarde:'🌆 Tarde', noche:'🌙 Noche', partido:'⚡ Partido', libre:'✓ Libre', baja:'🏥 Baja' };
+const TURNOS_HORAS = { manana:'07:00–15:00', tarde:'15:00–23:00', noche:'23:00–07:00', partido:'10:00–14:00 / 18:00–22:00', libre:'—', baja:'—' };
+const DIAS_SEMANA  = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+const MESES        = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const COLORS       = ['#ffc107','#64b5f6','#bb8fce','#4caf50','#ff9800','#e74c3c','#26c6da','#ab47bc','#ef5350','#66bb6a'];
+
+let añoActual = new Date().getFullYear();
+let mesActual = new Date().getMonth();
+let empSelec  = -1;
+let EMPLEADOS = [];
+let HORARIOS  = {};  // clave: "idCliente-YYYY-MM-DD" → tipoTurno
+
+async function cargarEmpleados() {
+    try {
+        const res = await fetch('/api/empleados');
+        const raw = await res.json();
+        // Enriquecemos con color e iniciales para el frontend
+        EMPLEADOS = raw.map((e, i) => ({
+            ...e,
+            color:     COLORS[i % COLORS.length],
+            iniciales: ((e.nombre || '')[0] || '') + ((e.apellidos || '')[0] || '')
+        }));
+        await cargarHorarios();
+        render();
+    } catch(err) {
+        console.error('Error cargando empleados:', err);
+    }
+}
+
+async function cargarHorarios() {
+    try {
+        const res  = await fetch(`/api/horarios?anyo=${añoActual}&mes=${mesActual + 1}`);
+        const lista = await res.json();
+        HORARIOS = {};
+        // servidor devuelve: empleadoId, anyo, mes, dia, turnoCod
+        lista.forEach(h => {
+            const empId = h.empleado_id ?? h.empleadoId;
+            const cod   = h.turno_cod   ?? h.turnoCod;
+            const f = h.anyo+'-'+String(h.mes).padStart(2,'0')+'-'+String(h.dia).padStart(2,'0');
+            HORARIOS[empId+'-'+f] = cod;
+        });
+    } catch(err) {
+        console.error('Error cargando horarios:', err);
+    }
+}
+
+function getTurno(idCliente, d) {
+    const fecha = buildFecha(d);
+    return HORARIOS[`${idCliente}-${fecha}`] || 'libre';
+}
+
+function buildFecha(d) {
+    return `${añoActual}-${String(mesActual + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+}
+
+function buildTabs() {
+    const cont = document.getElementById('empleados-tabs');
+    cont.innerHTML = '';
+
+    const btnTodos = document.createElement('button');
+    btnTodos.className = 'tab-emp' + (empSelec === -1 ? ' active' : '');
+    btnTodos.innerHTML = `<span class="tab-dot" style="background:var(--primary-orange);"></span> Todos`;
+    btnTodos.onclick = () => { empSelec = -1; render(); };
+    cont.appendChild(btnTodos);
+
+    EMPLEADOS.forEach((e, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'tab-emp' + (empSelec === i ? ' active' : '');
+        btn.innerHTML = `<span class="tab-dot" style="background:${e.color};"></span> ${e.nombre} ${e.apellidos || ''}`;
+        btn.onclick = () => { empSelec = i; render(); };
+        cont.appendChild(btn);
+    });
+}
+
+function buildCalendario() {
+    const hoy  = new Date();
+    const grid = document.getElementById('cal-grid');
+    grid.innerHTML = '';
+
+    DIAS_SEMANA.forEach(d => {
+        const el = document.createElement('div');
+        el.className   = 'cal-dia-nombre';
+        el.textContent = d;
+        grid.appendChild(el);
+    });
+
+    const primer    = new Date(añoActual, mesActual, 1);
+    let   diaInicio = primer.getDay();
+    diaInicio = (diaInicio === 0 ? 6 : diaInicio - 1);
+    const totalDias = new Date(añoActual, mesActual + 1, 0).getDate();
+
+    for (let i = 0; i < diaInicio; i++) {
+        const el = document.createElement('div');
+        el.className = 'cal-celda vacio';
+        grid.appendChild(el);
+    }
+
+    for (let d = 1; d <= totalDias; d++) {
+        const esHoy = (d === hoy.getDate() && mesActual === hoy.getMonth() && añoActual === hoy.getFullYear());
+        const cel   = document.createElement('div');
+        cel.className = 'cal-celda' + (esHoy ? ' hoy' : '');
+        cel.onclick   = () => abrirModal(d);
+
+        const dow = new Date(añoActual, mesActual, d).getDay();
+        const fds = dow === 0 || dow === 6;
+
+        let html = `<div class="num-dia">${d}${fds ? '<span style="font-size:0.6rem;color:rgba(245,232,211,0.3);">FDS</span>' : ''}${esHoy ? '<span class="hoy-label">Hoy</span>' : ''}</div>`;
+
+        const mostrar = empSelec === -1 ? EMPLEADOS.slice(0, 3) : [EMPLEADOS[empSelec]];
+        mostrar.forEach(e => {
+            const t = getTurno(e.id, d);
+            html += `<div class="turno-chip turno-${t}">
+                ${empSelec === -1 ? `<span style="color:${e.color};font-size:0.6rem;">${e.iniciales}</span>` : ''}
+                ${TURNOS_LABEL[t]}
+            </div>`;
+        });
+        if (empSelec === -1 && EMPLEADOS.length > 3) {
+            html += `<div style="font-size:0.65rem;color:rgba(245,232,211,0.3);margin-top:3px;">+${EMPLEADOS.length - 3} más</div>`;
+        }
+
+        cel.innerHTML = html;
+        grid.appendChild(cel);
+    }
+}
+
+function buildResumen() {
+    const totalDias = new Date(añoActual, mesActual + 1, 0).getDate();
+    const emps      = empSelec === -1 ? EMPLEADOS : [EMPLEADOS[empSelec]];
+    let cuentas     = { manana:0, tarde:0, noche:0, partido:0, libre:0, baja:0 };
+
+    emps.forEach(e => {
+        for (let d = 1; d <= totalDias; d++) cuentas[getTurno(e.id, d)]++;
+    });
+
+    const horas = (cuentas.manana + cuentas.tarde + cuentas.noche + cuentas.partido) * 8;
+    document.getElementById('resumen-mes').innerHTML = `
+        <div class="res-card"><div class="res-num">${totalDias}</div><div class="res-label">Días del mes</div></div>
+        <div class="res-card"><div class="res-num">${cuentas.manana}</div><div class="res-label">Turnos mañana</div></div>
+        <div class="res-card"><div class="res-num">${cuentas.tarde}</div><div class="res-label">Turnos tarde</div></div>
+        <div class="res-card"><div class="res-num">${cuentas.noche}</div><div class="res-label">Turnos noche</div></div>
+        <div class="res-card"><div class="res-num">${cuentas.libre}</div><div class="res-label">Días libres</div></div>
+        <div class="res-card"><div class="res-num">${horas}h</div><div class="res-label">Horas estimadas</div></div>`;
+}
+
+function abrirModal(d) {
+    const dias  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const fecha = new Date(añoActual, mesActual, d);
+    document.getElementById('modal-titulo').textContent = `${dias[fecha.getDay()]} ${d}`;
+    document.getElementById('modal-sub').textContent    = `${MESES[mesActual]} ${añoActual}`;
+
+    const emps = empSelec === -1 ? EMPLEADOS : [EMPLEADOS[empSelec]];
+    let html = '';
+    emps.forEach(e => {
+        const t = getTurno(e.id, d);
+        html += `<div class="det-row">
+            <span style="display:flex;align-items:center;gap:8px;">
+                <span style="width:8px;height:8px;border-radius:50%;background:${e.color};display:inline-block;"></span>
+                ${e.nombre} ${e.apellidos || ''}
+            </span>
+            <span>
+                <span class="turno-chip turno-${t}" style="display:inline-flex;">${TURNOS_LABEL[t]}</span>
+                <span style="font-size:0.72rem;color:rgba(245,232,211,0.4);margin-left:6px;">${TURNOS_HORAS[t]}</span>
+            </span>
+        </div>`;
+    });
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal-overlay').classList.add('open');
+}
+
+function cerrarModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+async function cambiarMes(delta) {
+    mesActual += delta;
+    if (mesActual < 0)  { mesActual = 11; añoActual--; }
+    if (mesActual > 11) { mesActual = 0;  añoActual++; }
+    await cargarHorarios();
+    render();
+}
+
+function render() {
+    document.getElementById('mes-label').textContent = `${MESES[mesActual]} ${añoActual}`;
+    buildTabs();
+    buildResumen();
+    buildCalendario();
+}
+
+cargarEmpleados();
+</script>
+</body>
+</html>

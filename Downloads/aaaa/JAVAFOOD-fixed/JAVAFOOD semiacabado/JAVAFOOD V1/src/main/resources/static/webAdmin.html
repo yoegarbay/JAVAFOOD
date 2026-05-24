@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JavaFood — Administración de Usuarios</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --orange: #d17a22; --orange2: #f0932b;
+      --dark:   #0d0804; --card: rgba(30,18,10,0.97);
+      --cream:  #f5e8d3; --muted: rgba(245,232,211,0.45);
+      --border: rgba(209,122,34,0.22); --glow: rgba(209,122,34,0.30);
+      --red: #e05555;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--dark); color: var(--cream);
+      min-height: 100vh; padding: 40px 20px;
+    }
+
+    /* CONTENEDOR */
+    .main-container {
+      width: 100%; max-width: 960px; margin: 0 auto;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 36px 40px;
+      box-shadow: 0 0 60px rgba(0,0,0,.7);
+    }
+
+    /* ENCABEZADO */
+    h2 {
+      font-size: 1rem; font-weight: 900; letter-spacing: 2px;
+      color: var(--orange); text-transform: uppercase;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 28px; padding-bottom: 18px; border-bottom: 1px solid var(--border);
+    }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
+    .btn-green, .header-actions button {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px;
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      color: #fff; font-family: inherit; font-size: .82rem; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer; text-decoration: none;
+      transition: .2s; box-shadow: 0 2px 12px var(--glow);
+    }
+    .btn-green:hover, .header-actions button:hover {
+      transform: translateY(-1px); box-shadow: 0 4px 18px var(--glow);
+    }
+
+    /* TABLA */
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: rgba(43,27,18,0.7); border-bottom: 1px solid var(--border); }
+    th {
+      text-align: left; font-size: .65rem; text-transform: uppercase;
+      letter-spacing: .1em; opacity: .4; padding: 12px 20px; font-weight: 700;
+    }
+    td {
+      padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,.04);
+      font-size: .88rem; vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(209,122,34,.04); }
+    td strong { display: block; font-weight: 700; }
+    .rol {
+      display: inline-block; margin-top: 3px;
+      font-size: .68rem; font-weight: 700; letter-spacing: .04em;
+      text-transform: uppercase; padding: 2px 10px; border-radius: 20px;
+      background: rgba(74,158,255,.12); color: #7ab8ff; border: 1px solid rgba(74,158,255,.25);
+    }
+    .actions-cell { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+    /* BOTONES DE ACCIÓN */
+    button {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 7px 15px; border-radius: 9px; cursor: pointer;
+      font-family: inherit; font-size: .78rem; font-weight: 600;
+      transition: .15s; border: 1px solid;
+    }
+    .btn-gray-view { background: transparent; border-color: rgba(209,122,34,.35); color: var(--orange); }
+    .btn-gray-view:hover { background: rgba(209,122,34,.1); }
+    .btn-blue  { background: transparent; border-color: rgba(76,175,80,.35); color: #6fcf72; }
+    .btn-blue:hover  { background: rgba(76,175,80,.1); }
+    .btn-yellow { background: transparent; border-color: rgba(240,196,43,.35); color: #f0c42b; }
+    .btn-yellow:hover { background: rgba(240,196,43,.1); }
+    .btn-red   { background: transparent; border-color: rgba(224,85,85,.35); color: var(--red); }
+    .btn-red:hover   { background: rgba(224,85,85,.1); border-color: var(--red); }
+
+    /* MODALES */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.75); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      visibility: hidden; opacity: 0; transition: opacity .25s, visibility .25s; z-index: 1000;
+    }
+    .modal-overlay.active { visibility: visible; opacity: 1; }
+    .modal-content {
+      background: #1a0f07; border: 1px solid rgba(209,122,34,.4);
+      border-radius: 18px; padding: 32px; width: 95%; max-width: 440px;
+      display: flex; flex-direction: column; gap: 14px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.6);
+      transform: translateY(-14px); transition: transform .25s;
+    }
+    .modal-overlay.active .modal-content { transform: translateY(0); }
+    .modal-content h3 {
+      font-size: 1rem; font-weight: 900; color: var(--orange);
+      letter-spacing: 1px; text-transform: uppercase;
+      padding-bottom: 14px; border-bottom: 1px solid var(--border);
+    }
+    .modal-content input, .modal-content select {
+      width: 100%; padding: 11px 14px; background: rgba(0,0,0,.5);
+      border: 1px solid rgba(209,122,34,.3); color: var(--cream);
+      border-radius: 10px; font-family: inherit; font-size: .9rem; outline: none; transition: .2s;
+    }
+    .modal-content input:focus, .modal-content select:focus {
+      border-color: var(--orange); box-shadow: 0 0 8px var(--glow);
+    }
+    .modal-content input::placeholder { opacity: .35; }
+    .modal-content label {
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer; font-size: .9rem; padding: 6px 4px;
+    }
+    .modal-content label input[type="radio"] {
+      width: 16px; height: 16px; padding: 0; accent-color: var(--orange);
+    }
+    .modal-content p { color: var(--muted); font-size: .88rem; }
+
+    #infoUsuario p {
+      padding: 10px 14px; background: rgba(0,0,0,.3);
+      border-radius: 8px; border-left: 3px solid var(--orange);
+      font-size: .88rem; margin-bottom: 6px;
+    }
+    #infoUsuario p strong { color: var(--orange); margin-right: 6px; }
+
+    /* MODAL FOOTER */
+    .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
+    #cancelAdd, #cancelEdit, #cancelRole, #cancelDelete, #closeView {
+      background: transparent; border-color: rgba(245,232,211,.2); color: var(--muted);
+    }
+    #cancelAdd:hover, #cancelEdit:hover, #cancelRole:hover, #cancelDelete:hover, #closeView:hover {
+      border-color: rgba(245,232,211,.5); color: var(--cream);
+    }
+    #confirmDelete {
+      background: linear-gradient(135deg,#e05555,#c03030);
+      border-color: transparent; color: #fff; box-shadow: 0 2px 12px rgba(224,85,85,.35);
+    }
+    #confirmDelete:hover { transform: translateY(-1px); }
+    #saveEdit, #saveRole {
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      border-color: transparent; color: #fff; box-shadow: 0 2px 12px var(--glow);
+    }
+    #saveEdit:hover, #saveRole:hover { transform: translateY(-1px); box-shadow: 0 4px 14px var(--glow); }
+  </style>
+</head>
+
+<body>
+  <div class="main-container">
+
+    <h2>
+      ADMINISTRACIÓN DE USUARIOS
+      <div class="header-actions">
+        <a href="/index.html" class="btn-green">🔗 Sitio Web</a>
+        <button onclick="abrirModalAdd()">➕ Añadir usuario</button>
+      </div>
+    </h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th style="text-align:right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaUsuarios"></tbody>
+    </table>
+
+  </div>
+
+  <!-- MODAL AÑADIR -->
+  <div id="modalAdd" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Añadir usuario</h3>
+      <input id="nombre"    placeholder="Nombre">
+      <input id="apellidos" placeholder="Apellidos">
+      <input id="direccion" placeholder="Dirección">
+      <input id="telefono"  placeholder="Teléfono">
+      <input id="email"     placeholder="Email">
+      <input id="password"  type="password" placeholder="Contraseña">
+      <div class="modal-footer">
+        <button id="cancelAdd">Cancelar</button>
+        <button onclick="crearUsuario()" class="btn-green">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDIT -->
+  <div id="modalEdit" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Editar usuario</h3>
+      <input id="editNombre">
+      <input id="editApellidos">
+      <input id="editDireccion">
+      <input id="editTelefono">
+      <input id="editEmail">
+      <div class="modal-footer">
+        <button id="cancelEdit">Cancelar</button>
+        <button id="saveEdit">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ROLE -->
+  <div id="modalRole" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Cambiar rol</h3>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label><input type="radio" name="rol" value="ADMIN">    Admin</label>
+        <label><input type="radio" name="rol" value="EMPLEADO"> Empleado</label>
+        <label><input type="radio" name="rol" value="CLIENTE">  Cliente</label>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelRole">Cancelar</button>
+        <button id="saveRole">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DELETE -->
+  <div id="modalDelete" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Eliminar usuario</h3>
+      <p>Esta acción no se puede deshacer. ¿Seguro?</p>
+      <div class="modal-footer">
+        <button id="cancelDelete">Cancelar</button>
+        <button id="confirmDelete">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL VIEW -->
+  <div id="modalView" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Detalle de usuario</h3>
+      <div id="infoUsuario"></div>
+      <div class="modal-footer">
+        <button id="closeView">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/sitioAdmin/webAdmin.js"></script>
+</body>
+</html>

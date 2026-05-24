@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaFood Admin - Gestión Promociones</title>
+    <link rel="stylesheet" href="JAVAFOOD.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { overflow: hidden; }
+        .admin-header-box { background: var(--glass-bg); border: 1px solid var(--primary-orange); border-radius: 20px; padding: 20px 25px; margin-bottom: 20px; }
+        .section-title { color: var(--primary-orange); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
+        .admin-form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .input-name { flex: 1; min-width: 160px; padding: 10px 14px; background: rgba(0,0,0,0.4); border: 1px solid var(--primary-orange); color: white; border-radius: 10px; font-family: inherit; font-size: 0.9rem; outline: none; }
+        .input-price { width: 160px; padding: 10px 14px; background: rgba(0,0,0,0.4); border: 1px solid var(--primary-orange); color: white; border-radius: 10px; font-family: inherit; font-size: 0.9rem; outline: none; }
+        .input-name::placeholder, .input-price::placeholder { color: rgba(245,232,211,0.4); }
+        .btn-orange-add { padding: 10px 22px; background: var(--primary-orange); border: none; border-radius: 10px; color: var(--coffee-dark); font-weight: 900; cursor: pointer; font-family: inherit; font-size: 0.9rem; transition: 0.2s; white-space: nowrap; }
+        .btn-orange-add:hover { background: var(--cream); }
+        #admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
+        .product-card { background: var(--glass-bg); border: 1px solid rgba(209,122,34,0.25); border-radius: 18px; overflow: hidden; transition: 0.2s; }
+        .product-card:hover { border-color: var(--primary-orange); transform: translateY(-4px); }
+        .card-img-wrap { width: 100%; height: 130px; display: flex; align-items: center; justify-content: center; background: rgba(209,122,34,0.08); font-size: 3.5rem; }
+        .card-footer { padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
+        .card-footer .info { flex: 1; overflow: hidden; }
+        .p-title { font-size: 0.88rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--cream); }
+        .price { color: var(--primary-orange); font-weight: bold; font-size: 0.9rem; }
+        .actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .btn-edit, .btn-borrar { width: 32px; height: 32px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-edit   { background: rgba(209,122,34,0.2); color: var(--primary-orange); border: 1px solid var(--primary-orange); }
+        .btn-borrar { background: rgba(255,68,68,0.15); color: #ff6666; border: 1px solid rgba(255,68,68,0.5); }
+        .btn-edit:hover   { background: var(--primary-orange); color: var(--coffee-dark); }
+        .btn-borrar:hover { background: #ff4444; color: white; border-color: #ff4444; }
+        .admin-label { font-size: 0.7rem; color: var(--primary-orange); letter-spacing: 2px; margin-top: 4px; }
+        .modal-label { display: block; margin: 14px 0 5px; font-size: 0.78rem; color: var(--primary-orange); text-align: left; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .modal-input { width: 100%; padding: 11px; background: rgba(0,0,0,0.4); border: 1px solid var(--primary-orange); color: white; border-radius: 10px; font-family: inherit; outline: none; }
+        .cancel-btn { width: 100%; padding: 12px; background: transparent; border: 1px solid rgba(245,232,211,0.3); border-radius: 12px; color: var(--cream); font-weight: bold; cursor: pointer; margin-top: 8px; font-family: inherit; transition: 0.2s; }
+        .cancel-btn:hover { border-color: var(--primary-orange); color: var(--primary-orange); }
+        .admin-footer { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(43,27,18,0.95); border-top: 1px solid var(--primary-orange); padding: 10px 40px; backdrop-filter: blur(10px); z-index: 100; }
+        .footer-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+        .footer-logo { font-size: 1.3rem; font-weight: 700; color: white; }
+        .footer-logo span { color: var(--primary-orange); }
+        .text-orange { color: var(--primary-orange); } .text-white { color: white; }
+        .copy { font-size: 0.75rem; margin-top: 4px; } .group-members { font-size: 0.85rem; }
+        #toast { position: fixed; top: 20px; right: 20px; background: var(--primary-orange); color: var(--coffee-dark); padding: 12px 22px; border-radius: 12px; font-weight: bold; font-size: 0.9rem; opacity: 0; transform: translateY(-20px); transition: 0.3s; z-index: 99999; pointer-events: none; }
+        #toast.show { opacity: 1; transform: translateY(0); }
+        #toast.error { background: #ff4444; color: white; }
+        .loading-text { color: rgba(245,232,211,0.5); padding: 30px; text-align: center; }
+        .info-box { background: rgba(209,122,34,0.08); border: 1px solid rgba(209,122,34,0.3); border-radius: 10px; padding: 10px 14px; font-size: 0.8rem; color: rgba(245,232,211,0.7); margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+    <div class="code-overlay"></div>
+    <div id="toast"></div>
+
+    <div class="kiosk-container" style="padding-bottom: 60px;">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <h1>Java<span>Food</span></h1>
+                <p class="admin-label">ADMIN · PROMOCIONES</p>
+            </div>
+            <nav class="nav-links">
+                <button class="nav-btn active">🎁 Gestión Promociones</button>
+                <button class="nav-btn" onclick="location.href='Promociones.html'">🎁 Vista Pública</button>
+                <button class="nav-btn" onclick="location.href='index.html'" style="margin-top:10px;border-color:rgba(245,232,211,0.2);font-size:0.78rem;">← Volver al menú</button>
+            </nav>
+            <div class="cart-box">
+                <h3 class="cart-title">Estado del Sistema</h3>
+                <div class="total-row">
+                    <span>Promociones:</span>
+                    <span id="total-count" style="color:var(--primary-orange);font-weight:bold;">—</span>
+                </div>
+                <div class="total-row" style="font-size:0.78rem;opacity:.6;">
+                    <span>id_detalle: 11 ✓</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-view">
+            <header class="admin-header-box">
+                <h2 class="section-title">➕ Añadir Nueva Promoción</h2>
+                <div class="admin-form-row">
+                    <input type="text"   id="new-name"  placeholder="Nombre de la promoción" class="input-name">
+                    <input type="number" id="new-price" placeholder="Puntos necesarios" class="input-price" min="1"
+                           onkeydown="if(event.key==='-'||event.key==='e')event.preventDefault()">
+                    <button class="btn-orange-add" onclick="addProduct()">AÑADIR 🎁</button>
+                </div>
+            </header>
+
+            <div class="food-grid" id="admin-grid">
+                <p class="loading-text">Cargando promociones…</p>
+            </div>
+        </main>
+    </div>
+
+    <footer class="admin-footer">
+        <div class="footer-content">
+            <div class="footer-logo">Java<span>Food</span></div>
+            <div class="group-members"><span class="text-white">Desarrollado por:</span> <strong class="text-orange">Yoel, Miguel y Adrian</strong></div>
+            <div><p class="copy"><span class="text-orange">© 2026 Patente YMA-99.</span> <span class="text-white">Todos los derechos reservados.</span></p></div>
+        </div>
+    </footer>
+
+    <div class="modal-overlay" id="edit-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(10px); z-index:9999; justify-content:center; align-items:center;">
+        <div class="modal-content">
+            <h2>Modificar Promoción</h2>
+            <div class="modal-body">
+                <input type="hidden" id="edit-id">
+                <label class="modal-label">Nombre de la Promoción</label>
+                <input type="text" id="edit-name" class="modal-input" placeholder="Nombre">
+                <label class="modal-label">Puntos necesarios</label>
+                <input type="number" id="edit-price" class="modal-input" placeholder="500" min="1"
+                       onkeydown="if(event.key==='-'||event.key==='e')event.preventDefault()">
+                <button class="confirm-btn" onclick="saveEdit()">ACTUALIZAR</button>
+                <button class="cancel-btn" onclick="closeEdit()">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_ADMIN = '/api/admin/peliculas';
+        const API_CAT   = '/api/productos/categoria/Promociones';
+        const ID_DETALLE_PROMOS = 11;     // id_detalle = 11 → 'Productos Promo' en detalle_categoria
+
+        async function apiFetch(url, options = {}) {
+            const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...options });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            if (res.status === 204) return null;
+            const text = await res.text();
+            return text ? JSON.parse(text) : null;
+        }
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = isError ? 'show error' : 'show';
+            setTimeout(() => { t.className = ''; }, 2800);
+        }
+
+        function renderGrid(productos) {
+            const grid = document.getElementById('admin-grid');
+            document.getElementById('total-count').textContent = productos.length;
+
+            if (!productos.length) {
+                grid.innerHTML = '<p class="loading-text">No hay promociones. Añade la primera arriba.</p>';
+                return;
+            }
+
+            grid.innerHTML = productos.map(p => `
+                <div class="product-card" data-id="${p.id_producto}">
+                    <div class="card-img-wrap">🎁</div>
+                    <div class="card-footer">
+                        <div class="info">
+                            <h4 class="p-title" title="${p.nombre}">${p.nombre}</h4>
+                            <span class="price">${Math.round(p.precio)} pts</span>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-edit"   onclick="openEdit(${p.id_producto},'${p.nombre.replace(/'/g,"\\'")}',${p.precio})">✏️</button>
+                            <button class="btn-borrar" onclick="deleteProduct(${p.id_producto})">×</button>
+                        </div>
+                    </div>
+                </div>`
+            ).join('');
+        }
+
+        // Carga usando /api/productos/categoria/Promociones
+        // y auto-detecta el id_detalle del primer producto para usarlo en CRUD
+        async function loadPromos() {
+            try {
+                const promos = await apiFetch(API_CAT);
+
+                renderGrid(promos);
+            } catch (e) {
+                document.getElementById('admin-grid').innerHTML =
+                    '<p class="loading-text" style="color:#ff6666;">⚠️ Error conectando con el servidor.<br><small>¿Ejecutaste setup_promociones.sql?</small></p>';
+                showToast('Error al cargar datos', true);
+            }
+        }
+
+        async function addProduct() {
+            const nombre = document.getElementById('new-name').value.trim();
+            const puntos = parseInt(document.getElementById('new-price').value);
+
+            if (!nombre) { showToast('Escribe el nombre de la promoción', true); return; }
+            if (isNaN(puntos) || puntos < 1) { showToast('Los puntos deben ser un número positivo', true); return; }
+            try {
+                await apiFetch(API_ADMIN, {
+                    method: 'POST',
+                    body: JSON.stringify({ nombre, precio: puntos, id_detalle: ID_DETALLE_PROMOS })
+                });
+                document.getElementById('new-name').value  = '';
+                document.getElementById('new-price').value = '';
+                showToast(`✅ "${nombre}" añadida`);
+                loadPromos();
+            } catch (e) { showToast('Error al añadir la promoción', true); }
+        }
+
+        document.getElementById('new-price').addEventListener('keydown', e => { if (e.key === 'Enter') addProduct(); });
+        document.getElementById('new-name').addEventListener('keydown',  e => { if (e.key === 'Enter') document.getElementById('new-price').focus(); });
+
+        async function deleteProduct(id) {
+            const card   = document.querySelector(`.product-card[data-id="${id}"]`);
+            const nombre = card ? card.querySelector('.p-title').textContent : `#${id}`;
+            if (!confirm(`¿Eliminar la promoción "${nombre}"?`)) return;
+            try {
+                await apiFetch(`${API_ADMIN}/${id}`, { method: 'DELETE' });
+                showToast(`🗑️ "${nombre}" eliminada`);
+                loadPromos();
+            } catch (e) { showToast('Error al eliminar la promoción', true); }
+        }
+
+        function openEdit(id, nombre, precio) {
+            document.getElementById('edit-id').value    = id;
+            document.getElementById('edit-name').value  = nombre;
+            document.getElementById('edit-price').value = Math.round(precio);
+            document.getElementById('edit-modal').style.display = 'flex';
+        }
+        function closeEdit() { document.getElementById('edit-modal').style.display = 'none'; }
+
+        async function saveEdit() {
+            const id     = parseInt(document.getElementById('edit-id').value);
+            const nombre = document.getElementById('edit-name').value.trim();
+            const puntos = parseInt(document.getElementById('edit-price').value);
+
+            if (!nombre) { showToast('El nombre no puede estar vacío', true); return; }
+            if (isNaN(puntos) || puntos < 1) { showToast('Los puntos deben ser positivos', true); return; }
+
+            try {
+                await apiFetch(`${API_ADMIN}/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ nombre, precio: puntos, id_detalle: ID_DETALLE_PROMOS })
+                });
+                closeEdit();
+                showToast(`✏️ "${nombre}" actualizada`);
+                loadPromos();
+            } catch (e) { showToast('Error al actualizar la promoción', true); }
+        }
+
+        document.getElementById('edit-modal').addEventListener('click', function(e) { if (e.target === this) closeEdit(); });
+
+        loadPromos();
+    </script>
+</body>
+</html>

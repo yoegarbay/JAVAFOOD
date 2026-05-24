@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fichar — JavaFood</title>
+  <style>
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0d0d0d; color: #e0d0c0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+
+    header { display: flex; align-items: center; gap: 16px; padding: 0 28px; height: 62px; background: #111; border-bottom: 1px solid #2a1505; flex-shrink: 0; width: 100%; }
+    .brand { display: flex; flex-direction: column; }
+    .brand-title { font-size: 1.1rem; font-weight: bold; }
+    .brand-title span { color: #d17a22; }
+    .brand-sub { font-size: .7rem; color: #886655; }
+    nav { display: flex; gap: 8px; margin-left: 16px; }
+    nav a { padding: 5px 14px; border: 1px solid #444; border-radius: 6px; color: #bbb; text-decoration: none; font-size: .82rem; transition: all .2s; }
+    nav a:hover { background: #2a1505; border-color: #d17a22; color: #d17a22; }
+    .clock { margin-left: auto; font-size: 1.9rem; font-weight: bold; color: #d17a22; font-variant-numeric: tabular-nums; letter-spacing: 2px; }
+
+    /* centrado bajo cabecera */
+    .main { flex: 1; display: flex; justify-content: center; align-items: flex-start; gap: 24px; padding: 32px 28px; }
+
+    .card { background: #1a0d04; border: 1px solid #d17a22; border-radius: 12px; padding: 24px 20px; }
+    .card-fichaje   { width: 320px; flex-shrink: 0; }
+    .card-historial { width: 520px; }
+    .card-title { font-size: .65rem; letter-spacing: 3px; color: #886655; text-transform: uppercase; margin-bottom: 16px; }
+
+    select, input[type=password] { width: 100%; padding: 10px 12px; background: #0d0700; border: 1px solid #3a1e08; border-radius: 8px; color: #e0d0c0; font-size: .9rem; outline: none; transition: border .2s; }
+    select:focus, input[type=password]:focus { border-color: #d17a22; }
+
+    .turno-box { margin-top: 14px; background: #0d0700; border: 1px solid #2a1205; border-radius: 8px; padding: 10px 14px; font-size: .85rem; display: none; }
+    .small-label { font-size: .65rem; color: #886655; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+    .pin-section { margin-top: 14px; display: none; }
+    .pin-error { color: #e05555; font-size: .8rem; margin-top: 6px; display: none; }
+
+    .btn-row { display: flex; gap: 12px; margin-top: 16px; }
+    .btn-fichar { flex: 1; padding: 13px; border: none; border-radius: 8px; font-weight: bold; font-size: .9rem; cursor: pointer; transition: filter .2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-fichar:hover { filter: brightness(1.25); }
+    .btn-entrada { background: #1e6b1e; color: #c8f0c8; }
+    .btn-salida  { background: #7a1c1c; color: #f0c8c8; }
+
+    table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+    thead th { text-align: left; padding: 6px 10px; font-size: .65rem; letter-spacing: 2px; color: #886655; text-transform: uppercase; border-bottom: 1px solid #2a1205; }
+    tbody tr:hover { background: #200d04; }
+    td { padding: 9px 10px; border-bottom: 1px solid #160802; }
+    .hora-val { color: #d17a22; font-weight: bold; }
+    .badge { padding: 3px 10px; border-radius: 20px; font-size: .7rem; font-weight: bold; text-transform: uppercase; }
+    .badge-entrada { background: #0d3d0d; color: #4dbb4d; border: 1px solid #1a5c1a; }
+    .badge-salida  { background: #3d0d0d; color: #e05555; border: 1px solid #5c1a1a; }
+    .horas-val  { color: #d17a22; }
+    .horas-null { color: #554433; }
+    .empty-msg { color: #554433; font-size: .85rem; text-align: center; padding: 20px 0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-title">Java<span>Food</span></div>
+    <div class="brand-sub">Control de Presencia</div>
+  </div>
+  <nav>
+    <a href="/horarios.html">📅 Horarios</a>
+    <a href="/AdminFichar.html">🔒 Admin Fichajes</a>
+    <a href="/AdminHorario.html">⚙️ Admin Horarios</a>
+  </nav>
+  <div class="clock" id="clock">00:00:00</div>
+</header>
+
+<div class="main">
+
+  <div class="card card-fichaje">
+    <div class="card-title">Tu fichaje</div>
+
+    <select id="sel-empleado" onchange="onSelectEmpleado()">
+      <option value="">— Selecciona tu nombre —</option>
+    </select>
+
+    <div class="turno-box" id="turno-box">
+      <div class="small-label">Tu turno hoy</div>
+      <div id="turno-val">—</div>
+    </div>
+
+    <div class="pin-section" id="pin-section">
+      <div class="small-label">Introduce tu PIN</div>
+      <input type="password" id="inp-pin" maxlength="6"
+             placeholder="• • • • • •" inputmode="numeric"
+             oninput="clearPinError()">
+      <div class="pin-error" id="pin-error">❌ PIN incorrecto</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-fichar btn-entrada" onclick="fichar('entrada')">▶ Entrada</button>
+      <button class="btn-fichar btn-salida"  onclick="fichar('salida')">■ Salida</button>
+    </div>
+  </div>
+
+  <div class="card card-historial">
+    <div class="card-title">Mis fichajes recientes</div>
+    <table>
+      <thead>
+        <tr><th>Fecha</th><th>Hora</th><th>Tipo</th><th>Horas</th></tr>
+      </thead>
+      <tbody id="hist-tbody">
+        <tr><td colspan="4" class="empty-msg">Selecciona tu nombre para ver tu historial.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+/* ── Mapa de turnos (hardcoded para no hacer petición extra) ── */
+const TURNOS = {
+  manana:  { emoji: '🌅', nombre: 'Mañana',  horas: '07:00–15:00' },
+  tarde:   { emoji: '🌆', nombre: 'Tarde',   horas: '15:00–23:00' },
+  noche:   { emoji: '🌙', nombre: 'Noche',   horas: '23:00–07:00' },
+  partido: { emoji: '⚡', nombre: 'Partido', horas: '10:00–14:00 / 18:00–22:00' },
+  libre:   { emoji: '✓',  nombre: 'Libre',   horas: '—' },
+  baja:    { emoji: '🏥', nombre: 'Baja',    horas: '—' }
+};
+
+/* Reloj */
+function tick() {
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    String(n.getHours()).padStart(2,'0') + ':' +
+    String(n.getMinutes()).padStart(2,'0') + ':' +
+    String(n.getSeconds()).padStart(2,'0');
+}
+setInterval(tick, 1000); tick();
+
+let empleados = [];
+let empleadoActual = null;
+
+async function init() {
+  const res = await fetch('/api/empleados');
+  empleados = await res.json();
+  const sel = document.getElementById('sel-empleado');
+  empleados.forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = e.id; opt.textContent = e.nombre;
+    sel.appendChild(opt);
+  });
+}
+
+async function onSelectEmpleado() {
+  const id = document.getElementById('sel-empleado').value;
+  document.getElementById('inp-pin').value = '';
+  clearPinError();
+
+  if (!id) {
+    empleadoActual = null;
+    document.getElementById('turno-box').style.display   = 'none';
+    document.getElementById('pin-section').style.display = 'none';
+    document.getElementById('hist-tbody').innerHTML =
+      '<tr><td colspan="4" class="empty-msg">Selecciona tu nombre para ver tu historial.</td></tr>';
+    return;
+  }
+
+  empleadoActual = empleados.find(e => e.id == id);
+  document.getElementById('pin-section').style.display = 'block';
+
+  await Promise.all([loadTurnoHoy(id), loadHistorial(id)]);
+}
+
+async function loadTurnoHoy(id) {
+  const now = new Date();
+  const turnoBox = document.getElementById('turno-box');
+  const turnoVal = document.getElementById('turno-val');
+  try {
+    const res = await fetch(`/api/horarios/empleado/${id}?anyo=${now.getFullYear()}&mes=${now.getMonth()+1}`);
+    const horarios = await res.json();
+
+    // Con SNAKE_CASE Jackson devuelve turno_cod (no turnoCod)
+    const hoy = horarios.find(h => h.dia === now.getDate());
+
+    turnoBox.style.display = 'block';
+    if (hoy && hoy.turno_cod) {
+      const t = TURNOS[hoy.turno_cod] || { emoji: '📋', nombre: hoy.turno_cod, horas: '' };
+      turnoVal.textContent = `${t.emoji} ${t.nombre}  ${t.horas}`;
+    } else {
+      turnoVal.textContent = '✓ Libre  —';
+    }
+  } catch {
+    turnoBox.style.display = 'none';
+  }
+}
+
+async function loadHistorial(id) {
+  const res     = await fetch('/api/fichajes/empleado/' + id);
+  const fichajes = await res.json();
+  const tbody   = document.getElementById('hist-tbody');
+  if (!fichajes.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">No tienes fichajes aún.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = '';
+  fichajes.slice(0, 30).forEach(f => {
+    // Con SNAKE_CASE Jackson devuelve horas_calc (no horasCalc)
+    const hc   = f.horas_calc;
+    const hStr = hc != null ? hc + 'h' : '—';
+    const hCls = hc != null ? 'horas-val' : 'horas-null';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${f.fecha}</td>
+      <td class="hora-val">${f.hora ? f.hora.slice(0,8) : '—'}</td>
+      <td><span class="badge badge-${f.tipo}">${f.tipo.toUpperCase()}</span></td>
+      <td class="${hCls}">${hStr}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function fichar(tipo) {
+  if (!empleadoActual) { alert('Selecciona tu nombre primero'); return; }
+
+  const pinIntroducido = document.getElementById('inp-pin').value.trim();
+  if (empleadoActual.pin) {
+    if (pinIntroducido !== empleadoActual.pin) { mostrarPinError(); return; }
+  }
+
+  const now   = new Date();
+  const fecha = now.toISOString().slice(0, 10);
+  const hora  = now.toTimeString().slice(0, 8);
+
+  // SNAKE_CASE: mandar empleado_id (no empleadoId)
+  const res = await fetch('/api/fichajes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ empleado_id: empleadoActual.id, tipo, fecha, hora })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    alert('Error al fichar: ' + (err.detalle || err.mensaje || res.status));
+    return;
+  }
+
+  document.getElementById('inp-pin').value = '';
+  await loadHistorial(empleadoActual.id);
+}
+
+function mostrarPinError() {
+  document.getElementById('pin-error').style.display = 'block';
+  document.getElementById('inp-pin').value = '';
+}
+function clearPinError() {
+  document.getElementById('pin-error').style.display = 'none';
+}
+
+init();
+</script>
+</body>
+</html>
